@@ -30,7 +30,11 @@ CREATE TABLE Enseignant (
 
     
     -- Ajoutez d'autres colonnes selon les besoins
+
+    
 );
+
+
 
 -- Créer la table Eleve
 CREATE TABLE Eleve (
@@ -43,12 +47,14 @@ CREATE TABLE Eleve (
     Prenom VARCHAR(255),
     Date_naissance date,
     Note INT,
-    classe INT,
+    classe VARCHAR(255),
     parent INT
     
 
     
     -- Ajoutez d'autres colonnes selon les besoins
+
+    
 );
 
 -- Créer la table Parents
@@ -68,13 +74,15 @@ CREATE TABLE Parent (
 -- Créer la table Note
 CREATE TABLE Note (
     ID INT PRIMARY KEY,
-    Eleve INT,
-    Cours INT,
+    eleve INT,
+    cours INT,
     note INT,
     Date_evaluation date
   
     
     -- Ajoutez d'autres colonnes selon les besoins
+
+    
 );
 
 -- Créer la table Cours
@@ -90,7 +98,7 @@ CREATE TABLE Cours (
 );
 
 -- Créer la table Emplois de temps
-CREATE TABLE Note (
+CREATE TABLE emplois (
     ID INT PRIMARY KEY,
     classe VARCHAR(255)
   
@@ -117,17 +125,21 @@ CREATE TABLE Jour_cours (
   
     
     -- Ajoutez d'autres colonnes selon les besoins
+
+    
 );
 
 -- Créer la table presence
 CREATE TABLE presence (
     
-    Eleve INT,
+    eleve INT,
     cours INT,
     jour INT
   
     
     -- Ajoutez d'autres colonnes selon les besoins
+
+    
 );
 
 -- Créer la table Tranche paiement
@@ -137,26 +149,30 @@ CREATE TABLE Tranche_paiement (
     periode_scolaire VARCHAR(255),
     montant INT,
     date_echeance date,
-    statut ENUM("en retard",)
-    Eleve INT
+    statut ENUM("en retard"),
+    eleve INT
     
   
     
     -- Ajoutez d'autres colonnes selon les besoins
+
+    
 );
 
 -- Créer la table Tranche paiement
 CREATE TABLE historique_paiement (
     
     ID INT PRIMARY KEY,
-    date_paiement Vdate,
+    date_paiement date,
     montant INT,
-    tranche INT
-    Eleve INT
+    tranche INT,
+    eleve INT
     
   
     
     -- Ajoutez d'autres colonnes selon les besoins
+
+    
 );
 
 
@@ -164,7 +180,49 @@ CREATE TABLE historique_paiement (
 -- Créer d'autres tables en suivant le même modèle
 -- ...
 
--- Ajouter des contraintes de clé étrangère
+
+    -- Définir la clé étrangère
+    ALTER TABLE Enseignant
+    ADD FOREIGN KEY (emplois_temps) REFERENCES emplois(ID);
+
+    ALTER TABLE Eleve
+    -- Définir la clé étrangère
+    ADD FOREIGN KEY (Note) REFERENCES Note(ID),
+    -- Définir la clé étrangère
+    ADD FOREIGN KEY (parent) REFERENCES Parent(ID);
+
+    ALTER TABLE Note
+    -- Définir la clé étrangère
+    ADD FOREIGN KEY (eleve) REFERENCES Eleve(ID),
+    -- Définir la clé étrangère
+    ADD FOREIGN KEY (cours) REFERENCES Cours(ID);
+
+    ALTER TABLE Jour_cours
+    -- Définir la clé étrangère
+    ADD FOREIGN KEY (cours) REFERENCES Cours(ID),
+    -- Définir la clé étrangère
+    ADD FOREIGN KEY (emplois_temps) REFERENCES emplois(ID),
+    -- Définir la clé étrangère
+    ADD FOREIGN KEY (jour) REFERENCES jour(ID);
+
+    ALTER TABLE presence
+    -- Définir la clé étrangère
+    ADD FOREIGN KEY (eleve) REFERENCES Eleve(ID),
+    -- Définir la clé étrangère
+    ADD FOREIGN KEY (cours) REFERENCES Cours(ID),
+    -- Définir la clé étrangère
+    ADD FOREIGN KEY (jour) REFERENCES jour(ID);
+
+    ALTER TABLE Tranche_paiement
+    -- Définir la clé étrangère
+    ADD FOREIGN KEY (eleve) REFERENCES Eleve(ID);
+
+    ALTER TABLE historique_paiement
+    -- Définir la clé étrangère
+    ADD FOREIGN KEY (eleve) REFERENCES Eleve(ID);
+    
+
+
 
 
 -- Répétez cela pour les autres tables avec des clés étrangères
