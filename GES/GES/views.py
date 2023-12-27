@@ -1,26 +1,22 @@
-# views.py
-from rest_framework.views import APIView
-from rest_framework.response import Response
-from rest_framework import status
-from .models import Eleve
-from .serializers import EleveSerializer
+from django.shortcuts import render
+from django.http import HttpResponse
+from .models import Administrateur, Enseignant, Eleve, Parent, Note, Cours, Emplois, Jour, JourCours, Presence, TranchePaiement, HistoriquePaiement
 
-class EleveAPIView(APIView):
-    def get(self, request):
-        # Récupérer tous les élèves
-        eleves = Eleve.objects.all()
-        # Sérialiser les données pour les rendre compatibles avec JSON
-        serializer = EleveSerializer(eleves, many=True)
-        # Retourner la réponse au format JSON
-        return Response(serializer.data)
+# Exemple de vue pour afficher tous les enseignants
+def liste_enseignants(request):
+    enseignants = Enseignant.objects.all()
+    return render(request, 'liste_enseignants.html', {'enseignants': enseignants})
 
-    def post(self, request):
-        # Désérialiser les données reçues en format JSON
-        serializer = EleveSerializer(data=request.data)
-        if serializer.is_valid():
-            # Sauvegarder les données dans la base de données
-            serializer.save()
-            # Retourner la réponse au format JSON avec le statut 201 (Créé)
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        # En cas d'erreur de validation, retourner les erreurs avec le statut 400 (Bad Request)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+# Exemple de vue pour afficher tous les élèves
+def liste_eleves(request):
+    eleves = Eleve.objects.all()
+    return render(request, 'liste_eleves.html', {'eleves': eleves})
+
+# Exemple de vue pour afficher toutes les notes
+def liste_notes(request):
+    notes = Note.objects.all()
+    return render(request, 'liste_notes.html', {'notes': notes})
+
+# Ajoutez d'autres vues en fonction de vos besoins
+
+# N'oubliez pas d'ajuster les noms de vues et les templates en fonction de votre application.

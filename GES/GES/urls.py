@@ -16,7 +16,23 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
+from . import views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+
+      # Exemple d'URL pour afficher la liste des enseignants
+    path('enseignants/', views.liste_enseignants, name='liste_enseignants'),
+
+    # Exemple d'URL pour afficher la liste des élèves
+    path('eleves/', views.liste_eleves, name='liste_eleves'),
+
+    # Exemple d'URL pour afficher la liste des notes
+    path('notes/', views.liste_notes, name='liste_notes'),
+
+    # Ajoutez d'autres URL en fonction de vos besoins
 ]
+
+
+
+
