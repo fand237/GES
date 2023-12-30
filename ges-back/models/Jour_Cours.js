@@ -1,8 +1,7 @@
 // models/Jour_cours.js
-const { DataTypes, Model } = require('sequelize');
-const sequelize = require('ges-back/sequelize-config.js');
 
-class JourCours extends Model {
+
+class JourCours  {
 
     constructor(cours, emploisTemps, jour) {
         this.cours = cours;
@@ -12,8 +11,9 @@ class JourCours extends Model {
 
 }
 
-JourCours.init(
-  {
+
+module.exports = (sequelize,DataTypes) => {
+  const JourCours = sequelize.define("JourCours",{
     cours: {
       type: DataTypes.INTEGER,
       allowNull: false,
@@ -38,11 +38,7 @@ JourCours.init(
         key: 'id',
       },
     },
-  },
-  {
-    sequelize,
-    modelName: 'JourCours',
-  }
-);
 
-module.exports = JourCours;
+  });
+  return JourCours;
+};

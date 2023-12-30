@@ -1,8 +1,7 @@
 // models/Tranche_paiement.js
-const { DataTypes, Model } = require('sequelize');
-const sequelize = require('ges-back/sequelize-config.js');
 
-class TranchePaiement extends Model {
+
+class TranchePaiement  {
 
     constructor(id, periodeScolaire, montant, dateEcheance, statut, eleve) {
         this.id = id;
@@ -16,8 +15,10 @@ class TranchePaiement extends Model {
 
 }
 
-TranchePaiement.init(
-  {
+
+
+module.exports = (sequelize,DataTypes) => {
+  const TranchePaiement = sequelize.define("TranchePaiement",{
     id: {
       type: DataTypes.INTEGER,
       primaryKey: true,
@@ -46,11 +47,7 @@ TranchePaiement.init(
         key: 'id',
       },
     },
-  },
-  {
-    sequelize,
-    modelName: 'TranchePaiement',
-  }
-);
 
-module.exports = TranchePaiement;
+  });
+  return TranchePaiement;
+};

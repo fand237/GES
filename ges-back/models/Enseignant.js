@@ -1,8 +1,7 @@
 // models/Enseignant.js
-const { DataTypes, Model } = require('sequelize');
-const sequelize = require('ges-back/sequelize-config.js');
 
-class Enseignant extends Model {
+
+class Enseignant  {
     constructor(id, nomUtilisateur, motDePasse, email, matiere, nom, prenom, emploisTemps) {
       this.id = id;
       this.nomUtilisateur = nomUtilisateur;
@@ -15,9 +14,10 @@ class Enseignant extends Model {
     }
   }
   
-  Enseignant.init(
-    {
-      // Définissez les colonnes de votre modèle ici
+ 
+
+  module.exports = (sequelize,DataTypes) => {
+    const Enseignant = sequelize.define("Enseignant",{
       id: {
         type: DataTypes.INTEGER,
         primaryKey: true,
@@ -59,13 +59,7 @@ class Enseignant extends Model {
           key: 'ID',
         },
       },
-      // Ajoutez d'autres colonnes selon vos besoins
-    },
-    {
-      sequelize,
-      modelName: 'Enseignant',
-    }
-  );
-
-  module.exports = Enseignant;
   
+    });
+    return Enseignant;
+  };  

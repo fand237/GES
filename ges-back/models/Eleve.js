@@ -1,8 +1,7 @@
 // models/Eleve.js
-const { DataTypes, Model } = require('sequelize');
-const sequelize = require('ges-back/sequelize-config.js');
 
-class Eleve extends Model {
+
+class Eleve  {
     constructor(id, nomUtilisateur, motDePasse, email, matiere, nom, prenom, dateNaissance, note, classe, parent) {
         this.id = id;
         this.nomUtilisateur = nomUtilisateur;
@@ -18,8 +17,10 @@ class Eleve extends Model {
     }
 }
 
-Eleve.init(
-    {
+
+  
+  module.exports = (sequelize,DataTypes) => {
+    const Eleve = sequelize.define("Eleve",{
       id: {
         type: DataTypes.INTEGER,
         primaryKey: true,
@@ -67,11 +68,10 @@ Eleve.init(
           key: 'ID',
         },
       },
-    },
-    {
-      sequelize,
-      modelName: 'Eleve',
-    }
-  );
   
-  module.exports = Eleve;
+    });
+    return Eleve;
+  };
+
+
+

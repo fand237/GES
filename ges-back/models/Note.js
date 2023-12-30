@@ -1,8 +1,7 @@
 // models/Note.js
-const { DataTypes, Model } = require('sequelize');
-const sequelize = require('ges-back/sequelize-config.js');
 
-class Note extends Model {
+
+class Note  {
 
     constructor(eleve, cours, note, dateEvaluation) {
         this.eleve = eleve;
@@ -13,8 +12,10 @@ class Note extends Model {
 
 }
 
-Note.init(
-  {
+
+
+module.exports = (sequelize,DataTypes) => {
+  const Note = sequelize.define("Note",{
     eleve: {
       type: DataTypes.INTEGER,
       allowNull: false,
@@ -39,11 +40,6 @@ Note.init(
       type: DataTypes.DATEONLY,
       allowNull: false,
     },
-  },
-  {
-    sequelize,
-    modelName: 'Note',
-  }
-);
-
-module.exports = Note;
+  });
+  return Note;
+};

@@ -1,8 +1,7 @@
 // models/Historique_paiement.js
-const { DataTypes, Model } = require('sequelize');
-const sequelize = require('ges-back/sequelize-config.js');
 
-class HistoriquePaiement extends Model {
+
+class HistoriquePaiement  {
 
     constructor(id, datePaiement, montant, tranche, eleve) {
         this.id = id;
@@ -14,8 +13,10 @@ class HistoriquePaiement extends Model {
 
 }
 
-HistoriquePaiement.init(
-  {
+
+
+module.exports = (sequelize,DataTypes) => {
+  const HistoriquePaiement = sequelize.define("HistoriquePaiement",{
     id: {
       type: DataTypes.INTEGER,
       primaryKey: true,
@@ -45,11 +46,7 @@ HistoriquePaiement.init(
         key: 'id',
       },
     },
-  },
-  {
-    sequelize,
-    modelName: 'HistoriquePaiement',
-  }
-);
 
-module.exports = HistoriquePaiement;
+  });
+  return HistoriquePaiement;
+};

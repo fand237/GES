@@ -1,8 +1,7 @@
 // models/Cours.js
-const { DataTypes, Model } = require('sequelize');
-const sequelize = require('ges-back/sequelize-config.js');
 
-class Cours extends Model {
+
+class Cours  {
   constructor(id, matiere, classe, heureDebut, heureFin) {
     this.id = id;
     this.matiere = matiere;
@@ -12,8 +11,10 @@ class Cours extends Model {
   }
 }
 
-Cours.init(
-  {
+
+
+module.exports = (sequelize,DataTypes) => {
+  const Cours = sequelize.define("Cours",{
     id: {
       type: DataTypes.INTEGER,
       primaryKey: true,
@@ -35,11 +36,7 @@ Cours.init(
       type: DataTypes.TIME,
       allowNull: false,
     },
-  },
-  {
-    sequelize,
-    modelName: 'Cours',
-  }
-);
 
-module.exports = Cours;
+  });
+  return Cours;
+};

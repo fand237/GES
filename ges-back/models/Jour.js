@@ -1,8 +1,7 @@
 // models/Jour.js
-const { DataTypes, Model } = require('sequelize');
-const sequelize = require('ges-back/sequelize-config.js');
 
-class Jour extends Model {
+
+class Jour  {
 
     constructor(id, jour) {
         this.id = id;
@@ -11,8 +10,9 @@ class Jour extends Model {
 
 }
 
-Jour.init(
-  {
+
+module.exports = (sequelize,DataTypes) => {
+  const Jour = sequelize.define("Jour",{
     id: {
       type: DataTypes.INTEGER,
       primaryKey: true,
@@ -22,11 +22,6 @@ Jour.init(
       type: DataTypes.ENUM('Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi', 'Dimanche'),
       allowNull: false,
     },
-  },
-  {
-    sequelize,
-    modelName: 'Jour',
-  }
-);
-
-module.exports = Jour;
+  });
+  return Jour;
+};

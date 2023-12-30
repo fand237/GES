@@ -1,9 +1,8 @@
 
 // models/Emplois.js
-const { DataTypes, Model } = require('sequelize');
-const sequelize = require('ges-back/sequelize-config.js');
 
-class Emplois extends Model {
+
+class Emplois  {
 
     constructor(id, classe) {
         this.id = id;
@@ -12,8 +11,10 @@ class Emplois extends Model {
 
 }
 
-Emplois.init(
-  {
+
+
+module.exports = (sequelize,DataTypes) => {
+  const Emplois = sequelize.define("Emplois",{
     id: {
       type: DataTypes.INTEGER,
       primaryKey: true,
@@ -23,11 +24,7 @@ Emplois.init(
       type: DataTypes.STRING,
       allowNull: false,
     },
-  },
-  {
-    sequelize,
-    modelName: 'Emplois',
-  }
-);
 
-module.exports = Emplois;
+  });
+  return Emplois;
+};

@@ -1,8 +1,7 @@
 // models/Presence.js
-const { DataTypes, Model } = require('sequelize');
-const sequelize = require('ges-back/sequelize-config.js');
 
-class Presence extends Model {
+
+class Presence  {
 
     constructor(eleve, cours, jour) {
         this.eleve = eleve;
@@ -12,8 +11,10 @@ class Presence extends Model {
 
 }
 
-Presence.init(
-  {
+
+
+module.exports = (sequelize,DataTypes) => {
+  const Presence = sequelize.define("Presence",{
     eleve: {
       type: DataTypes.INTEGER,
       allowNull: false,
@@ -38,11 +39,7 @@ Presence.init(
         key: 'id',
       },
     },
-  },
-  {
-    sequelize,
-    modelName: 'Presence',
-  }
-);
 
-module.exports = Presence;
+  });
+  return Presence;
+};

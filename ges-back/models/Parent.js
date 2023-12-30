@@ -1,8 +1,7 @@
 // models/Parent.js
-const { DataTypes, Model } = require('sequelize');
-const sequelize = require('ges-back/sequelize-config.js');
 
-class Parent extends Model {
+
+class Parent  {
     constructor(id, nomUtilisateur, motDePasse, email, nom, prenom) {
         this.id = id;
         this.nomUtilisateur = nomUtilisateur;
@@ -13,43 +12,41 @@ class Parent extends Model {
     }
 }
 
-Parent.init(
-    {
-      id: {
-        type: DataTypes.INTEGER,
-        primaryKey: true,
-        autoIncrement: true,
-      },
-      nomUtilisateur: {
-        type: DataTypes.STRING,
-        allowNull: false,
-        unique: true,
-      },
-      motDePasse: {
-        type: DataTypes.STRING,
-        allowNull: false,
-      },
-      email: {
-        type: DataTypes.STRING,
-        allowNull: false,
-        unique: true,
-        validate: {
-          isEmail: true,
-        },
-      },
-      nom: {
-        type: DataTypes.STRING,
-        allowNull: false,
-      },
-      prenom: {
-        type: DataTypes.STRING,
-        allowNull: false,
+
+
+module.exports = (sequelize,DataTypes) => {
+  const Parent = sequelize.define("Parent",{
+    id: {
+      type: DataTypes.INTEGER,
+      primaryKey: true,
+      autoIncrement: true,
+    },
+    nomUtilisateur: {
+      type: DataTypes.STRING,
+      allowNull: false,
+      unique: true,
+    },
+    motDePasse: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+    email: {
+      type: DataTypes.STRING,
+      allowNull: false,
+      unique: true,
+      validate: {
+        isEmail: true,
       },
     },
-    {
-      sequelize,
-      modelName: 'Parent',
-    }
-);
+    nom: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+    prenom: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
 
-module.exports = Parent;
+  });
+  return Parent;
+};
