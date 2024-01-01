@@ -17,26 +17,17 @@ module.exports = (sequelize,DataTypes) => {
     cours: {
       type: DataTypes.INTEGER,
       allowNull: false,
-      references: {
-        model: 'Cours',
-        key: 'id',
-      },
+      
     },
     emploisTemps: {
       type: DataTypes.INTEGER,
       allowNull: false,
-      references: {
-        model: 'Emplois',
-        key: 'id',
-      },
+      
     },
     jour: {
       type: DataTypes.INTEGER,
       allowNull: false,
-      references: {
-        model: 'Jour',
-        key: 'id',
-      },
+      
     },
 
   });

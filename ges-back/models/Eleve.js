@@ -63,10 +63,7 @@ class Eleve  {
       },
       parent: {
         type: DataTypes.INTEGER,
-        references: {
-          model: 'Parent', // Assurez-vous que c'est le nom correct de votre modèle Parent
-          key: 'ID',
-        },
+        
       },
   
     });

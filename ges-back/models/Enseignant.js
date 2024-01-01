@@ -54,10 +54,7 @@ class Enseignant  {
       },
       emploisTemps: {
         type: DataTypes.INTEGER,
-        references: {
-          model: 'emplois', // Assurez-vous que c'est le nom correct de votre modèle d'emplois
-          key: 'ID',
-        },
+        
       },
   
     });

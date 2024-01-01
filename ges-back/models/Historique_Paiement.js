@@ -33,18 +33,12 @@ module.exports = (sequelize,DataTypes) => {
     tranche: {
       type: DataTypes.INTEGER,
       allowNull: false,
-      references: {
-        model: 'TranchePaiement',
-        key: 'id',
-      },
+      
     },
     eleve: {
       type: DataTypes.INTEGER,
       allowNull: false,
-      references: {
-        model: 'Eleve',
-        key: 'id',
-      },
+      
     },
 
   });

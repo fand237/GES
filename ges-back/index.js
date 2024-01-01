@@ -14,10 +14,13 @@ db.sequelize.sync().then(()=>{
 // Utilisez le middleware cors
 app.use(cors());
 
+//Routes
+const AdministrateurRouter = require("./routes/AdministrateurRoute");
+app.use("/Administrateur",AdministrateurRouter);
+
 app.get('/', (req, res) => {
   res.send('Backend de votre application React');
 });
 
-sequelize.sync({ force: true }); // Cela synchronisera les modèles avec la base de données
 
 

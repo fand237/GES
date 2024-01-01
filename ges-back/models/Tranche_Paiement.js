@@ -42,10 +42,7 @@ module.exports = (sequelize,DataTypes) => {
     eleve: {
       type: DataTypes.INTEGER,
       allowNull: false,
-      references: {
-        model: 'Eleve',
-        key: 'id',
-      },
+      
     },
 
   });
