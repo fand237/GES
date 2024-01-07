@@ -11,16 +11,27 @@ db.sequelize.sync().then(()=>{
   });
 });
 
+app.use(express.json());
+
 // Utilisez le middleware cors
 app.use(cors());
 
-//Routes
+//Routes Administrateur
 const AdministrateurRouter = require("./routes/AdministrateurRoute");
 app.use("/Administrateur",AdministrateurRouter);
+
+//Routes Cours
+const CoursRouter = require("./routes/CoursRoute");
+app.use("/Cours",CoursRouter);
+
+//Routes Enseignants
+const EnseignantsRouter = require("./routes/EnseignantsRoute");
+app.use("/Enseignants",EnseignantsRouter);
 
 app.get('/', (req, res) => {
   res.send('Backend de votre application React');
 });
+
 
 
 

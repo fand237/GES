@@ -1,14 +1,7 @@
 // models/Administrateur.js
 
 
-class Administrateur  {
-    constructor(id, nomUtilisateur, motDePasse, email) {
-        this.id = id;
-        this.nomUtilisateur = nomUtilisateur;
-        this.motDePasse = motDePasse;
-        this.email = email;
-    }
-}
+
 
 
 module.exports = (sequelize,DataTypes) => {

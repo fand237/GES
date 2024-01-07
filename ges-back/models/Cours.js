@@ -1,15 +1,6 @@
 // models/Cours.js
 
 
-class Cours  {
-  constructor(id, matiere, classe, heureDebut, heureFin) {
-    this.id = id;
-    this.matiere = matiere;
-    this.classe = classe;
-    this.heureDebut = heureDebut;
-    this.heureFin = heureFin;
-  }
-}
 
 
 
@@ -30,11 +21,21 @@ module.exports = (sequelize,DataTypes) => {
     },
     heureDebut: {
       type: DataTypes.TIME,
-      allowNull: false,
+      allowNull: true,
     },
     heureFin: {
       type: DataTypes.TIME,
-      allowNull: false,
+      allowNull: true,
+    },
+    jour: {
+      type: DataTypes.INTEGER,
+      allowNull: true,
+      
+    },
+    Enseignant: {
+      type: DataTypes.INTEGER,
+      allowNull: true,
+      
     },
 
   });

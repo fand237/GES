@@ -46,11 +46,11 @@ class Enseignant  {
       },
       prenom: {
         type: DataTypes.STRING,
-        allowNull: false,
+        allowNull: true,
       },
       matiere: {
         type: DataTypes.STRING,
-        allowNull: false,
+        allowNull: true,
       },
       emploisTemps: {
         type: DataTypes.INTEGER,

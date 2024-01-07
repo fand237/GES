@@ -1,0 +1,16 @@
+<h2>Ajouter un administrateur</h2>
+      <label>Nom d'utilisateur:</label>
+      <input type="text" value={username} onChange={(e) => setUsername(e.target.value)} required /><br />
+
+      <label>Mot de passe:</label>
+      <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} required /><br /><br />
+
+      <label>Email:</label>
+      <input type="text" value={email} onChange={(e) => setEmail(e.target.value)} required /><br />
+
+    
+      <button onClick={ajouterAdministrateur}>Ajouter Administrateur</button>
+
+      <h2>Résultat</h2>
+      <div>{result}</div>
+

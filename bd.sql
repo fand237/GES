@@ -90,6 +90,8 @@ CREATE TABLE Cours (
     ID INT PRIMARY KEY,
     Matiere VARCHAR(255),
     classe VARCHAR(255),
+    Enseignant INT,
+    jour INT,
     heure_debut TIME,
     heure_fin TIME
   
@@ -230,3 +232,5 @@ CREATE TABLE historique_paiement (
 
 -- Afficher les tables pour vérification
 SHOW TABLES;
+
+insert into Administrateurs (nomutilisateur,motDePasse,email) values("ad1","azerty","fr@yahoo.com");

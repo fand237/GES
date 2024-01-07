@@ -1,27 +1,32 @@
-import logo from './logo.svg';
 import './App.css';
+import {BrowserRouter as Router, Route, Routes, Link} from "react-router-dom";
+import Home from "./components/Home";
 import AdminForm from './components/AdminForm';
+import CoursForm from './components/CoursForm'
+import CoursAll from './components/CoursAll'
 
 
 function App() {
+
+
+
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <Router>
+    <Link to="/AdminForm">Creer un Administrateur</Link><br/>
+    <Link to="/CoursForm">Ajouter un Cours</Link><br/>
+    <Link to="/CoursAll">Tout les Cours</Link><br/>
+    <Link to="/Home">Accueil</Link>
 
-      <AdminForm />
+      <Routes>
+        <Route path="/Home" exact element={<Home />}/>
+        <Route path="/AdminForm" exact element={<AdminForm />}/>
+        <Route path="/CoursForm" exact element={<CoursForm />}/>
+        <Route path="/CoursAll" exact element={<CoursAll />}/>
+      </Routes>
+    </Router>
+
+      
     </div>
   );
 }
