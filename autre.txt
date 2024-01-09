@@ -14,3 +14,17 @@
       <h2>Résultat</h2>
       <div>{result}</div>
 
+
+
+<button type="button" onClick={() => handleDelete(`${value.id}`)}>Supprimer</button>
+<button type="button" onClick={() => {histotique(`/CoursUpdate/${value.id}`)}}>Enregistrer les modifications</button>
+
+                    const handleDelete = async (id) => {
+      try {
+        await axios.delete(`http://localhost:3001/Cours/${id}`);
+        console.log("Cours supprimé avec succès");
+        histotique(`/CoursAll`); // Rediriger vers la liste des cours après la suppression
+      } catch (error) {
+        console.error("Erreur lors de la suppression du cours : ", error);
+      }
+    };

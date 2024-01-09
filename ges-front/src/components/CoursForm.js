@@ -5,7 +5,7 @@ import axios from 'axios';
 
 function CoursForm() {
   const [enseignants, setEnseignants] = useState([]);
-  const jours = ["Lundi", "Mardi", "Mercredi", "Jeudi", "Vendredi", "Samedi", "Dimanche"];
+  const [jours, setJour] = useState([]);
   const matieresSecondaire = ["Mathématiques", "Physique", "Chimie", "Biologie", "Français", "Anglais", "Histoire-Géographie", "Philosophie"];
   const classesSecondaire = ["Seconde", "Première", "Terminale"];
 
@@ -20,6 +20,19 @@ function CoursForm() {
     };
 
     fetchEnseignants();
+  }, []);
+
+  useEffect(() => {
+    const fetchJour = async () => {
+      try {
+        const response = await axios.get("http://localhost:3001/Jour");
+        setJour(response.data);
+      } catch (error) {
+        console.error("Erreur lors de la récupération des jourd : ", error);
+      }
+    };
+
+    fetchJour();
   }, []);
 
   const initialValues = {
@@ -83,8 +96,8 @@ function CoursForm() {
           <ErrorMessage name="jour" component="span" />
           <Field as="select" id="jour" name="jour">
             <option value="" disabled>Sélectionnez un jour</option>
-            {jours.map((jour, index) => (
-              <option key={index} value={index}>{jour}</option>
+            {jours.map((jour) => (
+              <option key={jour.id} value={jour.id}>{jour.jour}</option>
             ))}
           </Field><br />
 

@@ -1,11 +1,15 @@
 import React, { useEffect, useState } from 'react';
 import { Formik, Form, Field, ErrorMessage } from 'formik';
+import { useParams } from 'react-router-dom';
 import * as Yup from 'yup';
 import axios from 'axios';
 
-function CoursUpdate({ match }) {
+function CoursUpdate() {
+  let { id } = useParams();
   const [enseignants, setEnseignants] = useState([]);
-  const jours = ["Lundi", "Mardi", "Mercredi", "Jeudi", "Vendredi", "Samedi", "Dimanche"];
+  const [jours, setJour] = useState([]);
+  const matieresSecondaire = ["Mathématiques", "Physique", "Chimie", "Biologie", "Français", "Anglais", "Histoire-Géographie", "Philosophie"];
+  const classesSecondaire = ["Seconde", "Première", "Terminale"];
   const [initialValues, setInitialValues] = useState({
     matiere: '',
     classe: '',
@@ -16,14 +20,15 @@ function CoursUpdate({ match }) {
   });
 
   useEffect(() => {
-    axios.get(`http://localhost:3001/Cours/${match.params.id}`)
+    axios.get(`http://localhost:3001/Cours/${id}`)
       .then((response) => {
+        console.log("Response from API:", response.data);
         setInitialValues(response.data);
       })
       .catch((error) => {
         console.error("Erreur lors de la récupération des informations du cours : ", error);
       });
-
+  
     axios.get("http://localhost:3001/Enseignants")
       .then((response) => {
         setEnseignants(response.data);
@@ -31,7 +36,21 @@ function CoursUpdate({ match }) {
       .catch((error) => {
         console.error("Erreur lors de la récupération des enseignants : ", error);
       });
-  }, [match.params.id]);
+      const fetchJour = async () => {
+        try {
+          const response = await axios.get("http://localhost:3001/Jour");
+          setJour(response.data);
+        } catch (error) {
+          console.error("Erreur lors de la récupération des jourd : ", error);
+        }
+      };
+  
+      fetchJour();
+
+  }, [id]);
+
+  
+  
 
   const validationSchema = Yup.object().shape({
     matiere: Yup.string().required("Matière obligatoire"),
@@ -43,7 +62,7 @@ function CoursUpdate({ match }) {
   });
 
   const onSubmit = (data) => {
-    axios.put(`http://localhost:3001/Cours/${match.params.id}`, data)
+    axios.put(`http://localhost:3001/Cours/${id}`, data)
       .then((response) => {
         console.log("Cours mis à jour avec succès");
       })
@@ -52,18 +71,48 @@ function CoursUpdate({ match }) {
       });
   };
 
+  // Condition pour rendre le formulaire uniquement lorsque les données sont disponibles
+  if (!initialValues.matiere) {
+    return <div>Loading...</div>;
+  }
+
   return (
     <div className='updateCoursFormPage'>
       <h2>Modifier le cours</h2>
       <Formik initialValues={initialValues} onSubmit={onSubmit} validationSchema={validationSchema}>
         <Form>
-          {/* ... (rest of the form fields) */}
+        <label>Matière :</label>
+          <ErrorMessage name="matiere" component="span" />
+          <Field as="select" id="matiere" name="matiere">
+            <option value="" disabled>Sélectionnez une matière</option>
+            {matieresSecondaire.map((matiere, index) => (
+              <option key={index} value={matiere}>{matiere}</option>
+            ))}
+          </Field><br />
+
+          <label>Classe :</label>
+          <ErrorMessage name="classe" component="span" />
+          <Field as="select" id="classe" name="classe">
+            <option value="" disabled>Sélectionnez une classe</option>
+            {classesSecondaire.map((classe, index) => (
+              <option key={index} value={classe}>{classe}</option>
+            ))}
+          </Field><br />
+
+          <label>Heure de début :</label>
+          <ErrorMessage name="heureDebut" component="span" />
+          <Field id="heureDebut" type="time" name="heureDebut" /><br />
+
+          <label>Heure de fin :</label>
+          <ErrorMessage name="heureFin" component="span" />
+          <Field id="heureFin" type="time" name="heureFin" /><br />
+
           <label>Jour :</label>
           <ErrorMessage name="jour" component="span" />
           <Field as="select" id="jour" name="jour">
             <option value="" disabled>Sélectionnez un jour</option>
-            {jours.map((jour, index) => (
-              <option key={index} value={index}>{jour}</option>
+            {jours.map((jour) => (
+              <option key={jour.id} value={jour.id}>{jour.jour}</option>
             ))}
           </Field><br />
 
@@ -72,7 +121,7 @@ function CoursUpdate({ match }) {
           <Field as="select" id="Enseignant" name="Enseignant">
             <option value="" disabled>Sélectionnez un enseignant</option>
             {enseignants.map((enseignant) => (
-              <option key={enseignant.id} value={enseignant.id}>{enseignant.username}</option>
+              <option key={enseignant.id} value={enseignant.id}>{enseignant.nomUtilisateur}</option>
             ))}
           </Field><br />
 

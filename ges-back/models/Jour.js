@@ -1,14 +1,7 @@
 // models/Jour.js
 
 
-class Jour  {
 
-    constructor(id, jour) {
-        this.id = id;
-        this.jour = jour;
-      }
-
-}
 
 
 module.exports = (sequelize,DataTypes) => {
@@ -23,5 +16,8 @@ module.exports = (sequelize,DataTypes) => {
       allowNull: false,
     },
   });
+
+  
+
   return Jour;
 };

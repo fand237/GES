@@ -4,6 +4,10 @@ import Home from "./components/Home";
 import AdminForm from './components/AdminForm';
 import CoursForm from './components/CoursForm'
 import CoursAll from './components/CoursAll'
+import CoursUpdate from './components/CoursUpdate'
+import CoursDelete from './components/CoursDelete'
+
+
 
 
 function App() {
@@ -23,6 +27,9 @@ function App() {
         <Route path="/AdminForm" exact element={<AdminForm />}/>
         <Route path="/CoursForm" exact element={<CoursForm />}/>
         <Route path="/CoursAll" exact element={<CoursAll />}/>
+        <Route path="/CoursUpdate/:id" exact element={<CoursUpdate />}/>
+        <Route path="/CoursDelete/:id" exact element={<CoursDelete />}/>
+
       </Routes>
     </Router>
 

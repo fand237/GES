@@ -19,7 +19,7 @@ function Home() {
             return (
                 <div className='Administrateur'>
 
-                    <div className='username'>{value.id}</div>
+                    <div className='username'>{value.nomUtilisateur}</div>
                     <div className='password'>{value.motDePasse}</div>
                     <div className='email'>{value.email}</div><br/>
                 </div>

@@ -1,7 +1,8 @@
 import React, { useState } from 'react'
 import axios from "axios";
 import { useEffect } from 'react';
-import { useHistory } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
+
 
 
 
@@ -9,9 +10,9 @@ function CoursAll() {
 
     const [listOfCours ,setListOfCours] = useState([]);
 
-    const jours = ["Lundi", "Mardi", "Mercredi", "Jeudi", "Vendredi", "Samedi", "Dimanche"];
 
-    let histotique = useHistory();
+
+    let histotique = useNavigate();
     
 
 
@@ -22,9 +23,11 @@ function CoursAll() {
           const coursesWithDetails = await Promise.all(
             response.data.map(async (course) => {
               const enseignantDetails = await axios.get(`http://localhost:3001/Enseignants/${course.Enseignant}`);
+              const joursDetails = await axios.get(`http://localhost:3001/Jour/${course.jour}`);
               return {
                 ...course,
                 Enseignant: enseignantDetails.data,
+                jour: joursDetails.data,
               };
             })
           );
@@ -32,23 +35,42 @@ function CoursAll() {
           setListOfCours(coursesWithDetails);
         })
         .catch((error) => {
-          console.error("Erreur lors de la récupération des cours : ", error);
+          console.error("Erreur lors de la récupération des cours et jours : ", error);
         });
     }, []);
+
+    
+    const handleDelete = async (id) => {
+      try {
+        await axios.delete(`http://localhost:3001/Cours/${id}`);
+        console.log("Cours supprimé avec succès");
+        histotique(`/CoursAll`); // Rediriger vers la liste des cours après la suppression
+      } catch (error) {
+        console.error("Erreur lors de la suppression du cours : ", error);
+      }
+    };
+
 
   return (
     <div>
         {listOfCours.map((value,key) => {
             return (
-                <div className='Cours' onClick={histotique.push('/')}>
+              <div>
+                
+              <div className='Cours' >
 
+                    <br/>
                     <div className='matiere'>{value.matiere}</div>
                     <div className='classe'>{value.classe}</div>
                     <div className='heureDebut'>{value.heureDebut}</div>
                     <div className='heureFin'>{value.heureFin}</div>
-                    <div className='jour'>{jours[key]}</div>
-                    <div className='Enseignant'>{value.Enseignant ? `${value.Enseignant.nom} (${value.Enseignant.nomUtilisateur})` : "N/A"}</div><br/>
+                    <div className='jour'>{value.jour ? `${value.jour.jour}` : "N/A"}</div>
+                    <div className='Enseignant'>{value.Enseignant ? `${value.Enseignant.nom} (${value.Enseignant.nomUtilisateur})` : "N/A"}</div>
+                    <button type="button" onClick={() => {histotique(`/CoursUpdate/${value.id}`)}}>Modifier</button>
+                    <button type="button" onClick={() => handleDelete(`${value.id}`)}>Supprimer</button>
 
+
+                </div>
                 </div>
             );
         })}
@@ -56,4 +78,4 @@ function CoursAll() {
   )
 }
 
-export default CoursAll
+export default CoursAll;

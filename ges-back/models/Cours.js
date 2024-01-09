@@ -39,5 +39,7 @@ module.exports = (sequelize,DataTypes) => {
     },
 
   });
+
+  
   return Cours;
 };
