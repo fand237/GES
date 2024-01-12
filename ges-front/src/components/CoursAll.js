@@ -24,10 +24,12 @@ function CoursAll() {
             response.data.map(async (course) => {
               const enseignantDetails = await axios.get(`http://localhost:3001/Enseignants/${course.Enseignant}`);
               const joursDetails = await axios.get(`http://localhost:3001/Jour/${course.jour}`);
+              const classesDetails = await axios.get(`http://localhost:3001/Classe/${course.classe}`);
               return {
                 ...course,
                 Enseignant: enseignantDetails.data,
                 jour: joursDetails.data,
+                classe: classesDetails.data,
               };
             })
           );
@@ -61,7 +63,7 @@ function CoursAll() {
 
                     <br/>
                     <div className='matiere'>{value.matiere}</div>
-                    <div className='classe'>{value.classe}</div>
+                    <div className='classe'>{value.classe ? `${value.classe.classe}` : "N/A"}</div>
                     <div className='heureDebut'>{value.heureDebut}</div>
                     <div className='heureFin'>{value.heureFin}</div>
                     <div className='jour'>{value.jour ? `${value.jour.jour}` : "N/A"}</div>

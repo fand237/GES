@@ -48,6 +48,22 @@ router.get("/byens/:ens", async (req, res) => {
     }
   });
 
+  router.get("/byclasse/:classe", async (req, res) => {
+    const classeid = req.params.classe;
+  
+    try {
+      // Utilisez findAll avec une condition where pour récupérer les cours de la classe spécifié
+      const courses = await Cours.findAll({
+        where: { classe: classeid },
+      });
+  
+      res.json(courses);
+    } catch (error) {
+      console.error("Erreur lors de la récupération des cours par classe : ", error);
+      res.status(500).json({ error: "Erreur serveur lors de la récupération des cours par classe" });
+    }
+  });
+
   router.get("/byjour/:jour", async (req, res) => {
     const jourid = req.params.jour;
   

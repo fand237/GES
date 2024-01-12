@@ -6,8 +6,8 @@ import axios from 'axios';
 function CoursForm() {
   const [enseignants, setEnseignants] = useState([]);
   const [jours, setJour] = useState([]);
+  const [classes, setClasse] = useState([]);
   const matieresSecondaire = ["Mathématiques", "Physique", "Chimie", "Biologie", "Français", "Anglais", "Histoire-Géographie", "Philosophie"];
-  const classesSecondaire = ["Seconde", "Première", "Terminale"];
 
   useEffect(() => {
     const fetchEnseignants = async () => {
@@ -20,6 +20,19 @@ function CoursForm() {
     };
 
     fetchEnseignants();
+  }, []);
+
+  useEffect(() => {
+    const fetchClasse = async () => {
+      try {
+        const response = await axios.get("http://localhost:3001/Classe");
+        setClasse(response.data);
+      } catch (error) {
+        console.error("Erreur lors de la récupération des classe : ", error);
+      }
+    };
+
+    fetchClasse();
   }, []);
 
   useEffect(() => {
@@ -46,7 +59,7 @@ function CoursForm() {
 
   const validationSchema = Yup.object().shape({
     matiere: Yup.string().required("Matière obligatoire"),
-    classe: Yup.string().required("Classe obligatoire"),
+    classe: Yup.number().required("Classe obligatoire"),
     heureDebut: Yup.string(),
     heureFin: Yup.string(),
     jour: Yup.number(),
@@ -79,8 +92,8 @@ function CoursForm() {
           <ErrorMessage name="classe" component="span" />
           <Field as="select" id="classe" name="classe">
             <option value="" disabled>Sélectionnez une classe</option>
-            {classesSecondaire.map((classe, index) => (
-              <option key={index} value={classe}>{classe}</option>
+            {classes.map((classe) => (
+              <option key={classe.id} value={classe.id}>{classe.classe}</option>
             ))}
           </Field><br />
 

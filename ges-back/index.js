@@ -32,6 +32,10 @@ app.use("/Enseignants",EnseignantsRouter);
 const JourRouter = require("./routes/JourRoute");
 app.use("/Jour",JourRouter);
 
+//Routes Classe
+const ClasseRoute = require("./routes/ClasseRoute");
+app.use("/Classe",ClasseRoute);
+
 app.get('/', (req, res) => {
   res.send('Backend de votre application React');
 });

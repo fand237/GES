@@ -6,6 +6,9 @@ import CoursForm from './components/CoursForm'
 import CoursAll from './components/CoursAll'
 import CoursUpdate from './components/CoursUpdate'
 import CoursDelete from './components/CoursDelete'
+import TimeTable from './components/TimeTable'
+
+
 
 
 
@@ -29,6 +32,8 @@ function App() {
         <Route path="/CoursAll" exact element={<CoursAll />}/>
         <Route path="/CoursUpdate/:id" exact element={<CoursUpdate />}/>
         <Route path="/CoursDelete/:id" exact element={<CoursDelete />}/>
+        <Route path="/EmploisTemps" exact element={<TimeTable />}/>
+
 
       </Routes>
     </Router>

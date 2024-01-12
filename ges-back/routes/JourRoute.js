@@ -12,6 +12,18 @@ router.get("/", async (req, res) => {
 
 });
 
+router.delete("/:id", async (req, res) => {
+    const id = req.params.id;
+    try {
+      // Utilisez la méthode destroy pour supprimer le jour par son ID
+      await Jour.destroy({ where: { id } });
+      res.status(204).end(); // 204 No Content pour indiquer une suppression réussie
+    } catch (error) {
+      console.error("Erreur lors de la suppression du jour : ", error);
+      res.status(500).json({ error: "Erreur lors de la suppression du jour" });
+    }
+  });
+
 router.get("/:id", async (req, res) => {
 
     const id=req.params.id;
