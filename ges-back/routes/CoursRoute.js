@@ -1,6 +1,8 @@
 const express = require('express')
 const router = express.Router();
 const {Cours} = require("../models")
+const CoursController = require('../controllers/CoursController');
+
 
 
 
@@ -20,15 +22,19 @@ router.get("/:id", async (req, res) => {
 });
 
 // Ajoutez une nouvelle route pour supprimer un cours par ID
-router.delete("/:id", async (req, res) => {
-    const id = req.params.id;
+router.delete("/:id", CoursController.deleteCours);
+
+  router.post('/checkOverlap', async (req, res) => {
     try {
-      // Utilisez la méthode destroy pour supprimer le cours par son ID
-      await Cours.destroy({ where: { id } });
-      res.status(204).end(); // 204 No Content pour indiquer une suppression réussie
+      const { jourId, plageHoraire, enseignantId, emploiTempsId } = req.body;
+  
+      // Utiliser la méthode statique checkOverlap du modèle Cours
+      const overlap = await Cours.checkOverlap(jourId, plageHoraire, enseignantId, emploiTempsId);
+  
+      res.json({ overlap });
     } catch (error) {
-      console.error("Erreur lors de la suppression du cours : ", error);
-      res.status(500).json({ error: "Erreur lors de la suppression du cours" });
+      console.error('Erreur lors de la vérification des chevauchements côté serveur : ', error);
+      res.status(500).send('Erreur serveur');
     }
   });
 
@@ -47,6 +53,23 @@ router.get("/byens/:ens", async (req, res) => {
       res.status(500).json({ error: "Erreur serveur lors de la récupération des cours par enseignant" });
     }
   });
+
+  router.get("/byemplois/:emplois", async (req, res) => {
+    const emploiid = req.params.emplois;
+  
+    try {
+      // Utilisez findAll avec une condition where pour récupérer les cours de l'enseignant spécifié
+      const courses = await Cours.findAll({
+        where: { emploisTemps: emploiid },
+      });
+  
+      res.json(courses);
+    } catch (error) {
+      console.error("Erreur lors de la récupération des cours par emplois de temps : ", error);
+      res.status(500).json({ error: "Erreur serveur lors de la récupération des cours par emplois de temps" });
+    }
+  });
+
 
   router.get("/byclasse/:classe", async (req, res) => {
     const classeid = req.params.classe;
@@ -81,12 +104,27 @@ router.get("/byens/:ens", async (req, res) => {
   });
   
 
-router.post("/", async(req, res) => {
+  router.post("/", async(req, res) => {
+    const post = req.body;
 
-    const post=req.body;
-    await Cours.create(post);
-    res.json(post);
-});
+    console.log(post)
+  
+    const isOverlap = await Cours.checkOverlap(post.matiere, post.classe);
+
+    if (isOverlap) {
+      return res.status(400).json({ error: 'Chevauchement détecté. Veuillez choisir un autre emplacement.' });
+    }
+
+    try {
+      const createdCours = await Cours.create(post);
+      res.status(201).json(createdCours); // Répond avec le cours créé
+
+    } catch (error) {
+      console.error("Erreur lors de la création du cours : ", error);
+      res.status(500).json({ error: "Erreur serveur lors de la création du cours" });
+    }
+  });
+  
 
 // Route pour la mise à jour d'un cours
 router.put("/:id", async (req, res) => {
@@ -111,6 +149,36 @@ router.put("/:id", async (req, res) => {
     }
   });
 
+  
+// Route pour mettre à jour un cours
+router.put('/MAJ_ET/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { jour, heureDebut, heureFin, emploistemps, /* autres champs si nécessaire */ } = req.body;
+    
+
+    // Vérifiez si le cours existe
+    const existingCours = await Cours.findByPk(id);
+    if (!existingCours) {
+      return res.status(404).json({ error: 'Cours non trouvé' });
+    }
+
+    // Mettez à jour les champs du cours
+    existingCours.jour = jour;
+    existingCours.heureDebut = heureDebut;
+    existingCours.heureFin = heureFin;
+    existingCours.emploisTemps = emploistemps;
+    // Mettez à jour d'autres champs selon vos besoins
+
+    // Enregistrez les modifications dans la base de données
+    await existingCours.save();
+
+    return res.status(200).json({ message: 'Cours mis à jour avec succès' });
+  } catch (error) {
+    console.error('Erreur lors de la mise à jour du cours : ', error);
+    return res.status(500).json({ error: 'Erreur serveur lors de la mise à jour du cours' });
+  }
+});
 
 
 module.exports = router;

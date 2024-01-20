@@ -5,7 +5,6 @@ import axios from 'axios';
 
 function CoursForm() {
   const [enseignants, setEnseignants] = useState([]);
-  const [jours, setJour] = useState([]);
   const [classes, setClasse] = useState([]);
   const matieresSecondaire = ["Mathématiques", "Physique", "Chimie", "Biologie", "Français", "Anglais", "Histoire-Géographie", "Philosophie"];
 
@@ -35,25 +34,13 @@ function CoursForm() {
     fetchClasse();
   }, []);
 
-  useEffect(() => {
-    const fetchJour = async () => {
-      try {
-        const response = await axios.get("http://localhost:3001/Jour");
-        setJour(response.data);
-      } catch (error) {
-        console.error("Erreur lors de la récupération des jourd : ", error);
-      }
-    };
-
-    fetchJour();
-  }, []);
+ 
 
   const initialValues = {
     matiere: "",
     classe: "",
     heureDebut: "",
     heureFin: "",
-    jour: "",
     Enseignant: "",
   };
 
@@ -62,7 +49,6 @@ function CoursForm() {
     classe: Yup.number().required("Classe obligatoire"),
     heureDebut: Yup.string(),
     heureFin: Yup.string(),
-    jour: Yup.number(),
     Enseignant: Yup.number(),
   });
 
@@ -71,7 +57,15 @@ function CoursForm() {
       await axios.post("http://localhost:3001/Cours", data);
       console.log("Cours créé avec succès");
     } catch (error) {
-      console.error("Erreur lors de la création du cours : ", error.response.data);
+      if (error.response) {
+        // L'erreur provient de la réponse de l'API
+        alert(`Erreur du serveur: ${error.response.data.error}`);      } else if (error.request) {
+        // La requête a été faite, mais aucune réponse n'a été reçue
+        console.error("Aucune réponse reçue du serveur.");
+      } else {
+        // Une erreur s'est produite lors de la configuration de la requête
+        console.error("Erreur de configuration de la requête :", error.message);
+      }
     }
   };
 
@@ -105,14 +99,6 @@ function CoursForm() {
           <ErrorMessage name="heureFin" component="span" />
           <Field id="heureFin" type="time" name="heureFin" /><br />
 
-          <label>Jour :</label>
-          <ErrorMessage name="jour" component="span" />
-          <Field as="select" id="jour" name="jour">
-            <option value="" disabled>Sélectionnez un jour</option>
-            {jours.map((jour) => (
-              <option key={jour.id} value={jour.id}>{jour.jour}</option>
-            ))}
-          </Field><br />
 
           <label>Enseignant :</label>
           <ErrorMessage name="Enseignant" component="span" />

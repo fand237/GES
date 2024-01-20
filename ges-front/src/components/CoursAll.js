@@ -45,8 +45,9 @@ function CoursAll() {
     const handleDelete = async (id) => {
       try {
         await axios.delete(`http://localhost:3001/Cours/${id}`);
-        console.log("Cours supprimé avec succès");
         histotique(`/CoursAll`); // Rediriger vers la liste des cours après la suppression
+        console.log("Cours supprimé avec succès");
+
       } catch (error) {
         console.error("Erreur lors de la suppression du cours : ", error);
       }
@@ -68,7 +69,6 @@ function CoursAll() {
                     <div className='heureFin'>{value.heureFin}</div>
                     <div className='jour'>{value.jour ? `${value.jour.jour}` : "N/A"}</div>
                     <div className='Enseignant'>{value.Enseignant ? `${value.Enseignant.nom} (${value.Enseignant.nomUtilisateur})` : "N/A"}</div>
-                    <button type="button" onClick={() => {histotique(`/CoursUpdate/${value.id}`)}}>Modifier</button>
                     <button type="button" onClick={() => handleDelete(`${value.id}`)}>Supprimer</button>
 
 

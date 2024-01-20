@@ -21,10 +21,27 @@ module.exports = (sequelize,DataTypes) => {
       autoIncrement: true,
     },
     classe: {
-      type: DataTypes.STRING,
+      type: DataTypes.INTEGER,
       allowNull: false,
     },
     
   });
+
+  Emplois.findByClasse = async function (classeId) {
+    let emploiDuTemps = await Emplois.findOne({
+      where: {
+        classe: classeId,
+      },
+    });
+
+    if (!emploiDuTemps) {
+      emploiDuTemps = await Emplois.create({
+        classe: classeId,
+      });
+    }
+
+    return emploiDuTemps;
+  };
+
   return Emplois;
 };

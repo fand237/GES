@@ -1,4 +1,5 @@
 // models/Cours.js
+const { Op } = require('sequelize');
 
 
 
@@ -37,9 +38,38 @@ module.exports = (sequelize,DataTypes) => {
       allowNull: true,
       
     },
+    emploisTemps: {
+      type: DataTypes.INTEGER,
+      allowNull: true,
+    
+    },
 
   });
 
-  
+  Cours.associate = (models) => {
+    Cours.hasMany(models.Jour_Cours, {
+      foreignKey: 'cours',
+      onDelete: 'CASCADE', // Cette ligne active la suppression en cascade
+    });
+  };
+
+  Cours.checkOverlap = async function (matiere, classeId) {
+    try {
+      const overlappingCours = await this.findAll({
+        where: {
+          matiere: matiere,
+          classe: classeId,
+          
+        },
+        
+      });
+
+      return overlappingCours.length > 0;
+    } catch (error) {
+      console.error('Erreur lors de la vérification des chevauchements dans la base de données (JourCours) : ', error);
+      throw error;
+    }
+  };
+
   return Cours;
 };

@@ -30,6 +30,10 @@ module.exports = (sequelize,DataTypes) => {
       allowNull: false,
       
     },
+    statut: {
+      type: DataTypes.ENUM('Présent(e)', 'Absent(e)'),
+      allowNull: false,
+    },
 
   });
   return Presence;

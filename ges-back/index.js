@@ -36,6 +36,23 @@ app.use("/Jour",JourRouter);
 const ClasseRoute = require("./routes/ClasseRoute");
 app.use("/Classe",ClasseRoute);
 
+//Routes Emplois_temps
+const Emplois_tempsRoute = require("./routes/Emplois_tempsRoute");
+app.use("/Emplois_temps",Emplois_tempsRoute);
+
+//Routes Jour_Cours
+const Jour_CoursRoute = require("./routes/Jour_CoursRoute");
+app.use("/Jour_Cours",Jour_CoursRoute);
+
+//Routes Eleve
+const EleveRoute = require("./routes/EleveRoute");
+app.use("/Eleve",EleveRoute);
+
+//Routes Parent
+const ParentRoute = require("./routes/ParentRoute");
+app.use("/Parent",ParentRoute);
+
+
 app.get('/', (req, res) => {
   res.send('Backend de votre application React');
 });

@@ -7,6 +7,9 @@ import CoursAll from './components/CoursAll'
 import CoursUpdate from './components/CoursUpdate'
 import CoursDelete from './components/CoursDelete'
 import TimeTable from './components/TimeTable'
+import TimeTableEnseignant from './components/TimeTableEnseignant'
+import EleveForm from './components/EleveForm'
+import ParentForm from './components/ParentForm'
 
 
 
@@ -33,6 +36,13 @@ function App() {
         <Route path="/CoursUpdate/:id" exact element={<CoursUpdate />}/>
         <Route path="/CoursDelete/:id" exact element={<CoursDelete />}/>
         <Route path="/EmploisTemps" exact element={<TimeTable />}/>
+        <Route path="/EmploisTempsEnseignant" exact element={<TimeTableEnseignant />}/>
+        <Route path="/EleveForm" exact element={<EleveForm />}/>
+        <Route path="/ParentForm" exact element={<ParentForm />}/>
+
+
+
+
 
 
       </Routes>
