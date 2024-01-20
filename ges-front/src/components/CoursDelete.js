@@ -3,7 +3,7 @@ import axios from 'axios';
 
 function CoursDelete() {
   const { id } = useParams();
-  const navigate = useNavigate();
+  let navigate = useNavigate();
 
   const handleDelete = () => {
     axios.delete(`http://localhost:3001/Cours/${id}`)

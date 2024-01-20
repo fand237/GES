@@ -24,6 +24,9 @@ router.get("/:id", async (req, res) => {
 // Ajoutez une nouvelle route pour supprimer un cours par ID
 router.delete("/:id", CoursController.deleteCours);
 
+
+// Ajoutez une nouvelle route pour verfier le chevauchement
+
   router.post('/checkOverlap', async (req, res) => {
     try {
       const { jourId, plageHoraire, enseignantId, emploiTempsId } = req.body;

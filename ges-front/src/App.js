@@ -10,6 +10,9 @@ import TimeTable from './components/TimeTable'
 import TimeTableEnseignant from './components/TimeTableEnseignant'
 import EleveForm from './components/EleveForm'
 import ParentForm from './components/ParentForm'
+import ParentUpdate from './components/ParentUpdate'
+import ParentDelete from './components/ParentDelete'
+import ParentAll from './components/ParentAll'
 
 
 
@@ -39,6 +42,10 @@ function App() {
         <Route path="/EmploisTempsEnseignant" exact element={<TimeTableEnseignant />}/>
         <Route path="/EleveForm" exact element={<EleveForm />}/>
         <Route path="/ParentForm" exact element={<ParentForm />}/>
+        <Route path="/ParentUpdate/:id" exact element={<ParentUpdate />}/>
+        <Route path="/ParentDelete/:id" exact element={<ParentDelete />}/>
+        <Route path="/ParentAll" exact element={<ParentAll />}/>
+
 
 
 

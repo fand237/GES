@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import axios from "axios";
 import { useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import {  useNavigate } from 'react-router-dom';
 
 
 
@@ -12,7 +12,7 @@ function CoursAll() {
 
 
 
-    let histotique = useNavigate();
+    let navigate = useNavigate();
     
 
 
@@ -42,16 +42,7 @@ function CoursAll() {
     }, []);
 
     
-    const handleDelete = async (id) => {
-      try {
-        await axios.delete(`http://localhost:3001/Cours/${id}`);
-        histotique(`/CoursAll`); // Rediriger vers la liste des cours après la suppression
-        console.log("Cours supprimé avec succès");
-
-      } catch (error) {
-        console.error("Erreur lors de la suppression du cours : ", error);
-      }
-    };
+    
 
 
   return (
@@ -69,7 +60,7 @@ function CoursAll() {
                     <div className='heureFin'>{value.heureFin}</div>
                     <div className='jour'>{value.jour ? `${value.jour.jour}` : "N/A"}</div>
                     <div className='Enseignant'>{value.Enseignant ? `${value.Enseignant.nom} (${value.Enseignant.nomUtilisateur})` : "N/A"}</div>
-                    <button type="button" onClick={() => handleDelete(`${value.id}`)}>Supprimer</button>
+                    <button type="button" onClick={() => navigate(`/CoursDelete/${value.id}`)}>Supprimer</button>
 
 
                 </div>

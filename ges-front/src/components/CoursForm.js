@@ -2,8 +2,11 @@ import React, { useEffect, useState } from 'react';
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
 import axios from 'axios';
+import {  useNavigate } from 'react-router-dom';
+
 
 function CoursForm() {
+  let navigate = useNavigate();
   const [enseignants, setEnseignants] = useState([]);
   const [classes, setClasse] = useState([]);
   const matieresSecondaire = ["Mathématiques", "Physique", "Chimie", "Biologie", "Français", "Anglais", "Histoire-Géographie", "Philosophie"];
@@ -56,6 +59,7 @@ function CoursForm() {
     try {
       await axios.post("http://localhost:3001/Cours", data);
       console.log("Cours créé avec succès");
+      navigate(`/CoursAll`);
     } catch (error) {
       if (error.response) {
         // L'erreur provient de la réponse de l'API
