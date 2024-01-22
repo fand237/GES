@@ -6,7 +6,10 @@ const {Parent} = require("../models")
 
 router.get("/", async (req, res) => {
 
-    const listOfParent = await Parent.findAll();
+    const listOfParent = await Parent.findAll({
+      order: [['nom', 'ASC']], // Tri par ordre alphabétique du nom
+
+    });
     res.json(listOfParent);
 
 
@@ -56,7 +59,7 @@ router.delete("/:id", async (req, res) => {
 });
 
 // Route pour la mise à jour d'un Parent
-router.put('/Parent/:id', async (req, res) => {
+router.put('/:id', async (req, res) => {
   try {
     const { id } = req.params;
     const { nomUtilisateur, motDePasse, email, nom, prenom } = req.body;
@@ -106,7 +109,6 @@ router.post("/", async(req, res) => {
       }
 
     await Parent.create(post);
-    res.json(post);
   
       // Si tout va bien, renvoyer une réponse de succès
       return res.status(200).json({ success: 'Parent créé avec succès' });
@@ -116,6 +118,7 @@ router.post("/", async(req, res) => {
     return res.status(500).json({ error: 'Erreur serveur' });
    }
 });
+
 
 
 module.exports = router;

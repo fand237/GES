@@ -11,23 +11,24 @@ function ParentUpdate() {
     let navigate = useNavigate();
 
     const [initialValues, setInitialValues] = useState({
-    nomUtilisateur: "",
-    email: "",
-    nom: "",
-    prenom: "",
+        nomUtilisateur: '',
+        nom: '',
+        email: '',
+        prenom: '',
       });
 
-        useEffect(() => {
-        axios.get(`http://localhost:3001/Parent/nopass/${id}`)
-            .then((response) => {
-            console.log("Response from API:", response.data);
-            setInitialValues(response.data);
-            })
-            .catch((error) => {
-            console.error("Erreur lors de la récupération des informations du cours : ", error);
-            });
-        
-        }, [id]);
+    useEffect(() => {
+    axios.get(`http://localhost:3001/Parent/nopass/${id}`)
+        .then((response) => {
+        console.log("Response from API:", response.data);
+        setInitialValues(response.data);
+        })
+        .catch((error) => {
+        console.error("Erreur lors de la récupération des informations du cours : ", error);
+        });
+    
+    }, [id]);
+    console.log("initiali",initialValues)
 
   
 
@@ -41,7 +42,7 @@ function ParentUpdate() {
   const onSubmit = async (data) => {
     try {
 
-      await axios.put("http://localhost:3001/Parent", data);
+      await axios.put(`http://localhost:3001/Parent/${id}`, data);
       console.log("Parent mis a jour avec succès");
       navigate(`/ParentAll`)
     } catch (error) {
@@ -71,7 +72,7 @@ function ParentUpdate() {
 
   return (
     <div className='updateParentFormPage'>
-      <Formik initialValues={initialValues} onSubmit={onSubmit} validationSchema={validationSchema}>
+      <Formik key={JSON.stringify(initialValues)} initialValues={initialValues} onSubmit={onSubmit} validationSchema={validationSchema}>
         <Form>
           <label>Nom d'utilisateur :</label>
           <ErrorMessage name="nomUtilisateur" component="span" />

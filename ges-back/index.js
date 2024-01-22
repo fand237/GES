@@ -52,6 +52,10 @@ app.use("/Eleve",EleveRoute);
 const ParentRoute = require("./routes/ParentRoute");
 app.use("/Parent",ParentRoute);
 
+//Routes Presence
+const PresenceRoute = require("./routes/PresenceRoute");
+app.use("/Presence",PresenceRoute);
+
 
 app.get('/', (req, res) => {
   res.send('Backend de votre application React');

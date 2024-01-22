@@ -9,10 +9,16 @@ import CoursDelete from './components/CoursDelete'
 import TimeTable from './components/TimeTable'
 import TimeTableEnseignant from './components/TimeTableEnseignant'
 import EleveForm from './components/EleveForm'
+import EleveAll from './components/EleveAll'
+import EleveUpdate from './components/EleveUpdate'
+import EleveDelete from './components/EleveDelete'
+
 import ParentForm from './components/ParentForm'
 import ParentUpdate from './components/ParentUpdate'
 import ParentDelete from './components/ParentDelete'
 import ParentAll from './components/ParentAll'
+import FicheAppel from './components/FicheAppel'
+
 
 
 
@@ -41,10 +47,19 @@ function App() {
         <Route path="/EmploisTemps" exact element={<TimeTable />}/>
         <Route path="/EmploisTempsEnseignant" exact element={<TimeTableEnseignant />}/>
         <Route path="/EleveForm" exact element={<EleveForm />}/>
+        <Route path="/EleveAll" exact element={<EleveAll />}/>
+        <Route path="/EleveUpdate/:id" exact element={<EleveUpdate />}/>
+        <Route path="/EleveDelete/:id" exact element={<EleveDelete />}/>
+
+        
         <Route path="/ParentForm" exact element={<ParentForm />}/>
         <Route path="/ParentUpdate/:id" exact element={<ParentUpdate />}/>
         <Route path="/ParentDelete/:id" exact element={<ParentDelete />}/>
         <Route path="/ParentAll" exact element={<ParentAll />}/>
+        <Route path="/ParentAll" exact element={<ParentAll />}/>
+        <Route path="/FicheAppel/:idens" exact element={<FicheAppel />}/>
+
+
 
 
 

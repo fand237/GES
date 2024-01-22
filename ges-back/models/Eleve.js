@@ -64,6 +64,9 @@
       Eleve.belongsTo(models.Parent, {
         foreignKey: 'parent',
         as: 'parentEleve',
+        onDelete: 'CASCADE', 
+        onUpdate: 'CASCADE', // Active la mise à jour en cascade
+
       });
     };
 

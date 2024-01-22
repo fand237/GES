@@ -64,6 +64,8 @@ function CoursUpdate() {
 
   }, [id]);
 
+  console.log("initiale",initialValues)
+
   
   
 

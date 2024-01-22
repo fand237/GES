@@ -6,6 +6,8 @@ function ParentAll() {
 
   const [parents, setParents] = useState([]);
   let navigate = useNavigate();
+  const [searchTerm, setSearchTerm] = useState('');
+
 
 
   // Récupérer la liste des Parents 
@@ -23,10 +25,19 @@ function ParentAll() {
     fetchParents();
   }, []);
 
+  const filteredParents = parents.filter((parent) =>
+  parent.nom.toLowerCase().includes(searchTerm.toLowerCase()) ||
+  parent.prenom.toLowerCase().includes(searchTerm.toLowerCase())
+
+  );
+
 
   return (
     <div className='parentAllPage'>
       <h1>Liste des Parents</h1>
+<br/>
+      <label>Recherche :</label>
+      <input type="text" onChange={(e) => setSearchTerm(e.target.value)} value={searchTerm} />
 
       
 
@@ -43,7 +54,7 @@ function ParentAll() {
           </tr>
         </thead>
         <tbody>
-          {parents.map((parent) => (
+          {filteredParents.map((parent) => (
             <tr key={parent.id}>
                 
               <td>{parent.nomUtilisateur}</td>

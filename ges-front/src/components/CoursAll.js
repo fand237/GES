@@ -61,6 +61,8 @@ function CoursAll() {
                     <div className='jour'>{value.jour ? `${value.jour.jour}` : "N/A"}</div>
                     <div className='Enseignant'>{value.Enseignant ? `${value.Enseignant.nom} (${value.Enseignant.nomUtilisateur})` : "N/A"}</div>
                     <button type="button" onClick={() => navigate(`/CoursDelete/${value.id}`)}>Supprimer</button>
+                    <button type="button" onClick={() => navigate(`/CoursUpdate/${value.id}`)}>Modifier</button>
+
 
 
                 </div>

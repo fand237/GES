@@ -1,6 +1,6 @@
 const express = require('express')
 const router = express.Router();
-const {Eleve} = require("../models")
+const {Eleve, Classe, Parent} = require("../models")
 
 
 
@@ -29,6 +29,12 @@ router.get("/byclasse/:id", async (req, res) => {
     // Utilisez findAll avec une condition where pour récupérer les cours du jour spécifié
     const Eleves = await Eleve.findAll({
       where: { classe: classeid },
+      include: [
+        { model: Classe, as: 'classeEleve' }, // Inclure les informations sur la classe
+        { model: Parent, as: 'parentEleve' }, // Inclure les informations sur le parent
+      ],
+      order: [['nom', 'ASC']], // Tri par ordre alphabétique du nom
+
     });
 
     res.json(Eleves);
@@ -96,6 +102,18 @@ router.put('/:id', async (req, res) => {
   }
 });
 
+router.delete("/:id", async (req, res) => {
+  const id = req.params.id;
+  try {
+    // Utilisez la méthode destroy pour supprimer l'Eleve par son ID
+    await Eleve.destroy({ where: { id } });
+    res.status(204).end(); // 204 No Content pour indiquer une suppression réussie
+  } catch (error) {
+    console.error("Erreur lors de la suppression du Enseignant : ", error);
+    res.status(500).json({ error: "Erreur lors de la suppression du Enseignant" });
+  }
+});
+
 
 router.post("/", async(req, res) => {
 
@@ -113,7 +131,6 @@ router.post("/", async(req, res) => {
           }
     
         await Eleve.create(post);
-        res.json(post);
           // Si tout va bien, renvoyer une réponse de succès
         return res.status(200).json({ success: 'Eleve créé avec succès' });
     
