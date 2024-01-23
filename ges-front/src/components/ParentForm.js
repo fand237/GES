@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
 import axios from 'axios';
@@ -6,12 +6,33 @@ import { SHA256 } from 'crypto-js';
 
 
 function ParentForm() {
+  const [indicatifs, setIndicatifs] = useState([]);
+
+  useEffect(() => {
+    const fetchIndicatifs = async () => {
+      try {
+        const response = await axios.get('https://restcountries.com/v3.1/all');
+        const indicatifsPays = response.data.map((country) => country.diallingCodes[0]);
+        
+        // Ajouter l'indicatif par défaut en haut de la liste
+        indicatifsPays.unshift('+237');
+        setIndicatifs(indicatifsPays);
+      } catch (error) {
+        console.error('Erreur lors de la récupération des indicatifs de pays : ', error);
+      }
+    };
+
+    fetchIndicatifs();
+  }, []);
+
   const initialValues = {
     nomUtilisateur: "",
     motDePasse: "",
     email: "",
     nom: "",
     prenom: "",
+    indicatif: "+237",
+    numeroTelephone:"",
   };
   
   const validationSchema = Yup.object().shape({
@@ -20,6 +41,10 @@ function ParentForm() {
     email: Yup.string().email("Adresse email invalide").required("Email obligatoire"),
     nom: Yup.string().required("Nom obligatoire"),
     prenom: Yup.string().required("Prénom obligatoire"),
+    indicatif: Yup.string().required("Indicatif obligatoire"),
+    numeroTelephone: Yup.string()
+      .matches(/^\d{6,14}$/, 'Le numéro de téléphone doit contenir de 6 à 14 chiffres')
+      .required('Numéro de téléphone obligatoire'),
   });
 
   const onSubmit = async (data) => {
@@ -41,7 +66,9 @@ function ParentForm() {
               alert("Ce nom d'utilisateur est déjà utilisé.");
             } else if (errorMessage.includes("adresse e-mail")) {
               alert("Cette adresse e-mail est déjà utilisée.");
-            } else {
+            } else if (errorMessage.includes("numero")) {
+              alert("Ce numero est déjà utilisée.");
+            }else {
               alert(`Erreur du serveur: ${errorMessage}`);
             }
           } else { 
@@ -78,6 +105,18 @@ function ParentForm() {
           <label>Prénom :</label>
           <ErrorMessage name="prenom" component="span" />
           <Field type="text" id="prenom" name="prenom" /><br />
+
+          <label>Indicatif du pays :</label>
+          <ErrorMessage name="indicatifPays" component="span" />
+          <Field as="select" id="indicatifPays" name="indicatifPays">
+            {indicatifs.map((indicatif) => (
+              <option key={indicatif} value={indicatif}>{indicatif}</option>
+            ))}
+          </Field><br />
+
+          <label>Numéro de téléphone :</label>
+          <ErrorMessage name="numeroTelephone" component="span" />
+          <Field type="text" id="numeroTelephone" name="numeroTelephone" /><br />
 
           <button type="submit">Ajouter Parent</button>
         </Form>

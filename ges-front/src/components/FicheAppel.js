@@ -14,6 +14,8 @@ function FicheAppel() {
   const [selectedCours, setSelectedCours] = useState(null);
   const [elevesList, setElevesList] = useState([]);
   const [presenceStatus, setPresenceStatus] = useState({});
+  const [retardMinutes, setRetardMinutes] = useState({});
+
 
   useEffect(() => {
     const fetchCoursList = async () => {
@@ -51,11 +53,14 @@ function FicheAppel() {
         } catch (error) {
           console.error('Erreur lors de la récupération des élèves pour le cours : ', error);
         }
+        console.log(selectedCours)
       }
     };
 
     fetchElevesByCours();
   }, [selectedCours]);
+  console.log("les eleves sont",elevesList)
+
 
   const handleCoursChange = (event) => {
     const selectedCoursId = event.target.value;
@@ -64,29 +69,83 @@ function FicheAppel() {
     setPresenceStatus({});
   };
 
-  const handlePresenceChange = async (eleveId, statut) => {
+  const handlePresenceChange = async (eleve, statut) => {
     const dateDuJour = format(new Date(), 'yyyy-MM-dd');
-
+    console.log("valeur de eleve:",eleve)
+ 
      // Mettre à jour ou créer l'instance dans la table Presence
      axios.post('http://localhost:3001/Presence/updateOrCreate', {
-        eleve: eleveId,
+        eleve: eleve.id,
         cours: selectedCours.id,
         jour: dateDuJour,
         statut: statut,
+        retard: statut === 'Présent(e)' ? (retardMinutes[eleve.id] || 0) : null,
       })
         .then(() => {
-          console.log(`Statut de présence pour l'élève avec l'ID ${eleveId} mis à jour avec succès`);
+          console.log(`Statut de présence pour l'élève avec l'ID ${eleve.id} mis à jour avec succès`);
+          
           // Mettre à jour l'état presenceStatus
       setPresenceStatus(prevState => ({
         ...prevState,
-        [eleveId]: statut,
+        [eleve.id]: statut,
       }));
+
+      if (statut==='Absent(e)'){
+        const MessageParent=`Bonjour M./Mme ${eleve.parentEleve.nom} ${eleve.parentEleve.prenom} votre enfant ${eleve.nom} ${eleve.prenom} de la ${selectedCours.classe.classe} à eu une absence au cours ${selectedCours.matiere}, bien vouloir nous contactez pour plus d'eclaircissement`
+        axios.post('http://localhost:3001/Notification/absence', {
+          numeroTelephone: eleve.parentEleve.indicatif.concat(eleve.parentEleve.numeroTelephone),
+          message: MessageParent,
+          
+        })
+      }
 
         
         })
         .catch((error) => {
           console.error(`Erreur lors de la mise à jour du statut de présence : `, error);
         });
+  };
+
+  const handleKeyDown = (event, eleve) => {
+    if (event.key === 'Enter') {
+      handlePresenceChange(eleve, 'Présent(e)');
+    }
+  };
+
+  const handleRetardMinutesChange = (eleveId, value) => {
+    setRetardMinutes(prevState => ({
+      ...prevState,
+      [eleveId]: value,
+    }));
+  };
+
+  const handleEnregistrer = () => {
+    const dateDuJour = format(new Date(), 'yyyy-MM-dd');
+
+    // Filtrer les élèves présents avec retard
+    const elevesAvecRetard = elevesList.filter(eleve => presenceStatus[eleve.id] === 'Présent(e)' && retardMinutes[eleve.id]);
+
+    // Enregistrer les retards pour chaque élève
+    elevesAvecRetard.forEach(eleve => {
+      const retard = retardMinutes[eleve.id];
+      axios.post('http://localhost:3001/Presence/updateOrCreate', {
+        eleve: eleve.id,
+        cours: selectedCours.id,
+        jour: dateDuJour,
+        statut: 'Présent(e)',
+        retard: retard,
+      })
+      .then(() => {
+        console.log(`Retard de ${retard} minutes enregistré pour l'élève avec l'ID ${eleve.id}`);
+      })
+      .catch((error) => {
+        console.error(`Erreur lors de l'enregistrement du retard : `, error);
+      });
+    });
+
+    // Réinitialiser les états
+    setPresenceStatus({});
+    setRetardMinutes({});
   };
 
   return (
@@ -107,6 +166,8 @@ function FicheAppel() {
             <tr>
               <th>Nom de l'élève</th>
               <th>Statut de présence</th>
+              <th>Retard (minutes)</th>
+
             </tr>
           </thead>
           <tbody>
@@ -121,7 +182,7 @@ function FicheAppel() {
                       name={`presence_${eleve.id}`}
                       value="Présent(e)"
                       checked={presenceStatus[eleve.id] === 'Présent(e)'}
-                      onChange={() => handlePresenceChange(eleve.id, 'Présent(e)')}
+                      onChange={() => handlePresenceChange(eleve, 'Présent(e)')}
                     />
                   </label>
                   <label>
@@ -131,14 +192,28 @@ function FicheAppel() {
                       name={`presence_${eleve.id}`}
                       value="Absent(e)"
                       checked={presenceStatus[eleve.id] === 'Absent(e)'}
-                      onChange={() => handlePresenceChange(eleve.id, 'Absent(e)')}
+                      onChange={() => handlePresenceChange(eleve, 'Absent(e)')}
                     />
                   </label>
+                </td>
+                <td>
+                  {presenceStatus[eleve.id] === 'Présent(e)' && (
+                    <input
+                      type="number"
+                      min="0"
+                      value={retardMinutes[eleve.id] || ''}
+                      onChange={(e) => handleRetardMinutesChange(eleve.id, e.target.value)}
+                      onKeyDown={(e) => handleKeyDown(e, eleve)}
+                    />
+                  )}
                 </td>
               </tr>
             ))}
           </tbody>
+          <button onClick={handleEnregistrer}>Enregistrer</button>
+
         </table>
+        
       )}
     </div>
   );

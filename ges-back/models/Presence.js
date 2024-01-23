@@ -25,6 +25,11 @@ module.exports = (sequelize,DataTypes) => {
       allowNull: false,
     },
 
+    retard: {
+      type: DataTypes.INTEGER,
+      allowNull: true,
+    },
+
   });
 
   Presence.checkOverlap = async function (eleveId, coursId, jour) {

@@ -4,6 +4,7 @@ const {Parent} = require("../models")
 
 
 
+
 router.get("/", async (req, res) => {
 
     const listOfParent = await Parent.findAll({
@@ -100,12 +101,16 @@ router.post("/", async(req, res) => {
 
     const isOverlap = await Parent.checkOverlapEmail( post.email);
     const isOverlapUser = await Parent.checkOverlapUsername( post.nomUtilisateur);
+    const isOverlapnumero = await Parent.checkOverlapnumero( post.indicatif, post.numeroTelephone);
+
 
     // Si l'unicité n'est pas respectée, renvoyer une réponse avec le statut 422
     if (isOverlapUser) {
         return res.status(422).json({ error: "Ce nom d'utilisateur est déjà utilisé." });
       } else if (isOverlap) {
         return res.status(422).json({ error: "Cette adresse e-mail est déjà utilisée." });
+      }else if (isOverlapnumero) {
+        return res.status(422).json({ error: "Ce numero est déjà utilisée." });
       }
 
     await Parent.create(post);

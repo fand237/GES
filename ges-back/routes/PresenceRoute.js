@@ -6,7 +6,7 @@ const {Presence} = require("../models")
 // Route pour créer ou mettre à jour la présence
 router.post('/updateOrCreate', async (req, res) => {
     try {
-      const { eleve, cours, jour, statut } = req.body;
+      const { eleve, cours, jour, statut, retard } = req.body;
   
       // Recherche d'une instance existante
       const existingInstance = await Presence.findOne({
@@ -14,17 +14,20 @@ router.post('/updateOrCreate', async (req, res) => {
           eleve,
           cours,
           jour,
+          
         },
       });
   
       if (existingInstance) {
         // Si l'instance existe, mettez à jour le statut
         existingInstance.statut = statut;
+        existingInstance.retard = retard;
+
         await existingInstance.save();
       } else {
         // Sinon, créez une nouvelle instance
-        await Presence.create({ eleve, cours, jour, statut });
-      }
+        await Presence.create({ eleve, cours, jour, statut, retard});
+      } 
   
       res.json({ message: 'Mise à jour ou création réussie' });
     } catch (error) {

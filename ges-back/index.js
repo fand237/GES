@@ -56,6 +56,10 @@ app.use("/Parent",ParentRoute);
 const PresenceRoute = require("./routes/PresenceRoute");
 app.use("/Presence",PresenceRoute);
 
+//Routes Notification
+const TwilioRoute = require("./routes/TwilioRoute");
+app.use("/Notification",TwilioRoute);
+
 
 app.get('/', (req, res) => {
   res.send('Backend de votre application React');

@@ -10,7 +10,8 @@
     "react-dnd-html5-backend": "^16.0.1",
     "react-dom": "^18.2.0",
     "react-router-dom": "^6.21.1",
-    "react-toastify": "^10.0.1"
+    "react-toastify": "^10.0.1",
+    "twilio": "^4.20.1"
   },
   "devDependencies": {
     "@babel/plugin-proposal-private-property-in-object": "^7.21.11"

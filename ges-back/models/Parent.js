@@ -35,6 +35,14 @@ module.exports = (sequelize,DataTypes) => {
       type: DataTypes.STRING,
       allowNull: false,
     },
+    indicatif: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+    numeroTelephone: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
 
   });
 
@@ -68,6 +76,24 @@ module.exports = (sequelize,DataTypes) => {
       return overlappingParent.length > 0;
     } catch (error) {
       console.error('Erreur lors de la vérification des chevauchements dans la base de données nom utilisateur : ', error);
+      throw error;
+    }
+  };
+
+  Parent.checkOverlapnumero = async function (indicatif,numero) {
+    try {
+      const overlappingParent = await this.findAll({
+        where: {
+          indicatif: indicatif,
+          numeroTelephone: numero,
+          
+        },
+        
+      });
+
+      return overlappingParent.length > 0;
+    } catch (error) {
+      console.error('Erreur lors de la vérification des chevauchements dans la base de données numero : ', error);
       throw error;
     }
   };
