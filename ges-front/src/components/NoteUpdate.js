@@ -1,57 +1,28 @@
-<h2>Ajouter un administrateur</h2>
-      <label>Nom d'utilisateur:</label>
-      <input type="text" value={username} onChange={(e) => setUsername(e.target.value)} required /><br />
-
-      <label>Mot de passe:</label>
-      <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} required /><br /><br />
-
-      <label>Email:</label>
-      <input type="text" value={email} onChange={(e) => setEmail(e.target.value)} required /><br />
-
-    
-      <button onClick={ajouterAdministrateur}>Ajouter Administrateur</button>
-
-      <h2>Résultat</h2>
-      <div>{result}</div>
-
-
-
-<button type="button" onClick={() => handleDelete(`${value.id}`)}>Supprimer</button>
-<button type="button" onClick={() => {histotique(`/CoursUpdate/${value.id}`)}}>Enregistrer les modifications</button>
-
-                    const handleDelete = async (id) => {
-      try {
-        await axios.delete(`http://localhost:3001/Cours/${id}`);
-        console.log("Cours supprimé avec succès");
-        histotique(`/CoursAll`); // Rediriger vers la liste des cours après la suppression
-      } catch (error) {
-        console.error("Erreur lors de la suppression du cours : ", error);
-      }
-    };
-
-
-
-    import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import axios from 'axios';
 
 const NoteUpdate = () => {
-  const { idEnseignant } = useParams();
+  // Récupérer l'ID de l'enseignant depuis les paramètres d'URL
+  const { idEnseignant} = useParams();
 
+  // États pour stocker les données nécessaires
   const [coursList, setCoursList] = useState([]);
   const [selectedCours, setSelectedCours] = useState(null);
   const [eleves, setEleves] = useState([]);
-  const [notes, setNotes] = useState({});
+  const [notes, setNotes] = useState([]);
   const [typesEvaluation, setTypeEvaluation] = useState([]);
   const [sequences, setSequences] = useState([]);
   const [selectedSequence, setSelectedSequence] = useState('');
   const [selectedTypeEvaluation, setSelectedTypeEvaluation] = useState('');
-  const [dateEvaluation, setDateEvaluation] = useState('');
+  const [dateEvaluation, setDateEvaluation] = useState("");
 
+  // États pour gérer les erreurs
   const [sequenceError, setSequenceError] = useState(false);
   const [typeEvaluationError, setTypeEvaluationError] = useState(false);
   const [dateError, setDateError] = useState(false);
   const [notesError, setNotesError] = useState(false);
+
 
   useEffect(() => {
     const fetchSequenceList = async () => {
@@ -64,12 +35,13 @@ const NoteUpdate = () => {
     };
 
     fetchSequenceList();
-  }, []);
+  }, []); // Effectuer une seule fois au chargement
 
   useEffect(() => {
     const fetchTypeEvaluationList = async () => {
       try {
         const response = await axios.get('http://localhost:3001/Type_Evaluation');
+
         setTypeEvaluation(response.data);
       } catch (error) {
         console.error('Erreur lors de la récupération de la liste des types d\'évaluation :', error);
@@ -77,41 +49,51 @@ const NoteUpdate = () => {
     };
 
     fetchTypeEvaluationList();
-  }, []);
+  }, []); // Effectuer une seule fois au chargement
 
+  // Effet pour récupérer la liste des cours au chargement de la page
   useEffect(() => {
     const fetchCoursList = async () => {
       try {
+        // Appeler l'API pour récupérer la liste des cours de l'enseignant
         const response = await axios.get(`http://localhost:3001/Cours/byens/${idEnseignant}`);
         const coursesWithDetails = await Promise.all(
           response.data.map(async (course) => {
             const classeDetails = await axios.get(`http://localhost:3001/Classe/${course.classe}`);
+
+
             return {
               ...course,
               classe: classeDetails.data,
             };
           })
         );
+        // Mettre à jour l'état avec la liste des cours
         setCoursList(coursesWithDetails);
       } catch (error) {
         console.error('Erreur lors de la récupération de la liste des cours :', error);
       }
     };
 
+    // Appeler la fonction pour récupérer la liste des cours
     fetchCoursList();
   }, [idEnseignant]);
 
+  // Fonction pour récupérer la liste des élèves pour un cours spécifique
   const fetchElevesForCours = async (classeId) => {
     try {
+      // Appeler l'API pour récupérer la liste des élèves pour le cours spécifié
       const response = await axios.get(`http://localhost:3001/Eleve/byclasse/${classeId}`);
+      // Retourner la liste des élèves
       return response.data;
     } catch (error) {
       console.error('Erreur lors de la récupération des élèves pour le cours :', error);
+      // En cas d'erreur, retourner un tableau vide
       return [];
     }
   };
 
-  const preRemplirNotes = async () => {
+  const preRemplirNotes = async (selectedCours) => {
     try {
         // Réinitialiser les erreurs
         setSequenceError(false);
@@ -139,7 +121,12 @@ const NoteUpdate = () => {
   }
   };
 
+
+
+  // Gérer le changement de cours
   const handleCoursChange = async (coursId) => {
+    
+
     if (!selectedSequence) {
         setSequenceError(true);
         return;
@@ -158,44 +145,60 @@ const NoteUpdate = () => {
       setSequenceError(false);
     setTypeEvaluationError(false);
     setDateError(false);
-
+    // Trouver le cours sélectionné dans la liste des cours
     const selectedCours = coursList.find((cours) => cours.id === parseInt(coursId));
-    console.log("les cours sont:",coursList)
+    // Mettre à jour l'état du cours sélectionné
+    console.log("les donnees sont", selectedCours, selectedSequence, selectedTypeEvaluation,dateEvaluation);
 
-    console.log("les donnees du cours selectionne:",selectedCours)
+    console.log("les donnees du cours selectionne apres changement de cours:",selectedCours)
     setSelectedCours(selectedCours);
 
+
+    // Récupérer la liste des élèves pour le cours sélectionné
     const elevesForCours = await fetchElevesForCours(selectedCours.classe.id);
+    // Mettre à jour l'état avec la liste des élèves
     setEleves(elevesForCours);
 
-    // Vérifier que tous les éléments nécessaires sont sélectionnés avant d'appeler la fonction de pré-remplissage
-    if (selectedCours && selectedSequence && selectedTypeEvaluation && dateEvaluation) {
+     // Vérifier que tous les éléments nécessaires sont sélectionnés avant d'appeler la fonction de pré-remplissage
+     if (selectedCours && selectedSequence && selectedTypeEvaluation && dateEvaluation) {
         // Appeler la fonction de pré-remplissage des notes
-        await preRemplirNotes();
+        await preRemplirNotes(selectedCours);
       }
 
-    
+
+
   };
 
-  const handletypeChange = async (typeId) => {
-    const selectedTypeEvaluation = typesEvaluation.find((typeeval) => typeeval.id === parseInt(typeId));
+  const handletypeChange = async (coursId) => {
+    // Trouver le cours sélectionné dans la liste des cours
+    const selectedTypeEvaluation = typesEvaluation.find((typeeval) => typeeval.id === parseInt(coursId));
+    // Mettre à jour l'état du cours sélectionné
     setSelectedTypeEvaluation(selectedTypeEvaluation);
+
   };
 
-  const handlesequenceChange = async (sequenceId) => {
-    const selectedSequence = sequences.find((sequence) => sequence.id === parseInt(sequenceId));
-    console.log("la sélection de la séquence est ", selectedSequence);
+  const handlesequenceChange = async (coursId) => {
+    // Trouver le cours sélectionné dans la liste des cours
+    const selectedSequence = sequences.find((sequence) => sequence.id === parseInt(coursId));
+    console.log("le selection de sequence est ", selectedSequence)
+    // Mettre à jour l'état du cours sélectionné
     setSelectedSequence(selectedSequence);
+
   };
 
+
+  // Gérer le changement de note pour un élève
   const handleNoteChange = (eleveId, value) => {
+    // Mettre à jour l'état des notes
     setNotes((prevNotes) => ({
       ...prevNotes,
       [eleveId]: value,
     }));
   };
 
+  // Gérer l'enregistrement des notes
   const handleSaveNotes = async () => {
+
     if (!selectedSequence) {
       setSequenceError(true);
       return;
@@ -216,20 +219,39 @@ const NoteUpdate = () => {
       return;
     }
 
+    console.log("les donnees sont", selectedCours, selectedSequence, selectedTypeEvaluation,dateEvaluation);
+
+
+    // Réinitialiser les erreurs
     setSequenceError(false);
     setTypeEvaluationError(false);
     setDateError(false);
     setNotesError(false);
 
-    eleves.forEach(async (eleve) => {
+    // Enregistrer les retards pour chaque élève
+    eleves.forEach(eleve => {
       const note = notes[eleve.id];
-      console.log("le type d'evaluation est ", selectedTypeEvaluation);
-      console.log("les notes ", notes);
+      console.log("le type d'evaluation est ", selectedTypeEvaluation)
+      console.log("les notes ", notes)
 
-      // Mettre à jour les notes existantes pour chaque élève
-      await updateNote(selectedCours.id, eleve.id, selectedSequence.id, selectedTypeEvaluation.id, dateEvaluation, note);
-      console.log(`Note mise à jour pour l'élève avec l'ID ${eleve.id}`);
+      axios.post('http://localhost:3001/Note', {
+        eleve: eleve.id,
+        cours: selectedCours.id,
+        note: note,
+        dateEvaluation: dateEvaluation,
+        type_Evaluation: selectedTypeEvaluation.id,
+        sequence: selectedSequence.id,
+      })
+        .then(() => {
+          console.log(`note de ${note} minutes enregistré pour l'élève avec l'ID ${eleve.id}`);
+        })
+        .catch((error) => {
+          console.error(`Erreur lors de l'enregistrement de la note : `, error);
+        });
     });
+
+
+
   };
 
   const fetchExistingNotes = async (coursId, sequenceId, typeEvaluationId, date) => {
@@ -246,26 +268,21 @@ const NoteUpdate = () => {
     }
   };
 
-  const updateNote = async (coursId, eleveId, sequenceId, typeEvaluationId, date, note) => {
-    try {
-      await axios.put(`http://localhost:3001/Note/${coursId}/${eleveId}/${sequenceId}/${typeEvaluationId}/${date}`, {
-        note: note,
-      });
-    } catch (error) {
-      console.error('Erreur lors de la mise à jour de la note :', error);
-    }
-  };
-
+  // JSX de la page
   return (
     <div>
-      <h2>Mise à jour des Notes</h2>
+      <h2>Enregistrement des Notes</h2>
+      {/* Indicateurs d'erreurs */}
       {sequenceError && <p>Veuillez sélectionner une séquence.</p>}
       {typeEvaluationError && <p>Veuillez sélectionner un type d'évaluation.</p>}
       {dateError && <p>Veuillez sélectionner une date d'évaluation.</p>}
       {notesError && <p>Veuillez saisir des notes valides (entre 0 et 20).</p>}
-      
+
+
+      {/* Sélection du cours */}
       <label>Sélectionnez un cours :</label>
-      <select onChange={(e) => handleCoursChange(e.target.value)} value={selectedCours ? selectedCours.id : ''}>
+      <select onChange={(e) => handleCoursChange(e.target.value)}
+        value={selectedCours ? selectedCours.id : ''}>
         <option value="" disabled>Sélectionnez un Cours</option>
         {coursList.map((cours) => (
           <option key={cours.id} value={cours.id}>{cours.matiere} {cours.classe.classe}</option>
@@ -273,7 +290,10 @@ const NoteUpdate = () => {
       </select>
 
       <label>Sélectionnez une séquence :</label>
-      <select onChange={(e) => handlesequenceChange(e.target.value)} value={selectedSequence ? selectedSequence.id : ''}>
+      <select
+        onChange={(e) => handlesequenceChange(e.target.value)}
+        value={selectedSequence ? selectedSequence.id : ''}
+      >
         <option value="" disabled>Sélectionnez une séquence</option>
         {sequences.map((sequence) => (
           <option key={sequence.id} value={sequence.id}>{sequence.sequence}</option>
@@ -281,17 +301,30 @@ const NoteUpdate = () => {
       </select>
 
       <label>Date d'évaluation :</label>
-      <input type="date" value={dateEvaluation} onChange={(e) => setDateEvaluation(e.target.value)} />
+      <input
+        type="date"
+        value={dateEvaluation}
+        onChange={(e) => setDateEvaluation(e.target.value)}
+      />
 
+
+
+      {/* Nouveau champ pour sélectionner le type d'évaluation */}
       <label>Sélectionnez le type d'évaluation :</label>
-      <select onChange={(e) => handletypeChange(e.target.value)} value={selectedTypeEvaluation ? selectedTypeEvaluation.id : ''}>
+      <select
+        onChange={(e) => handletypeChange(e.target.value)}
+        value={selectedTypeEvaluation ? selectedTypeEvaluation.id : ''}
+      >
         <option value="" disabled>Sélectionnez le type d'évaluation</option>
         {typesEvaluation.map((type) => (
           <option key={type.id} value={type.id}>{type.type}</option>
         ))}
       </select>
-      
 
+      {/* Autres champs et sélections nécessaires */}
+      {/* ... */}
+
+      {/* Tableau des élèves avec zones de saisie des notes */}
       <table>
         <thead>
           <tr>
@@ -317,10 +350,11 @@ const NoteUpdate = () => {
         </tbody>
       </table>
 
-      <button onClick={handleSaveNotes}>Enregistrer les Modifications</button>
-   
+      {/* Bouton d'enregistrement des notes */}
+      <button onClick={handleSaveNotes}>Enregistrer les Notes</button>
     </div>
   );
 };
+
 
 export default NoteUpdate;

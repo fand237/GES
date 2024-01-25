@@ -18,6 +18,10 @@ import ParentUpdate from './components/ParentUpdate'
 import ParentDelete from './components/ParentDelete'
 import ParentAll from './components/ParentAll'
 import FicheAppel from './components/FicheAppel'
+import NoteForm from './components/NoteForm'
+import NoteUpdate2 from './components/NoteUpdate2'
+
+import NoteEval from './components/NoteEval'
 
 
 
@@ -58,6 +62,13 @@ function App() {
         <Route path="/ParentAll" exact element={<ParentAll />}/>
         <Route path="/ParentAll" exact element={<ParentAll />}/>
         <Route path="/FicheAppel/:idens" exact element={<FicheAppel />}/>
+        <Route path="/NoteForm/:idEnseignant" exact element={<NoteForm />}/>
+        <Route path="/NoteEval/:idEnseignant" exact element={<NoteEval />}/>
+        <Route path="/NoteUpdate/:idCours/:idClasse/:idSequence/:idType/:date" exact element={<NoteUpdate2 />}/>
+
+
+
+
 
 
 

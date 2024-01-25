@@ -60,6 +60,19 @@ app.use("/Presence",PresenceRoute);
 const TwilioRoute = require("./routes/TwilioRoute");
 app.use("/Notification",TwilioRoute);
 
+//Routes Sequence
+const SequenceRoute = require("./routes/SequenceRoute");
+app.use("/Sequence",SequenceRoute);
+
+//Routes Type_Evaluation
+const Type_EvaluationRoute = require("./routes/Type_EvaluationRoute");
+app.use("/Type_Evaluation",Type_EvaluationRoute);
+
+
+//Routes Note
+const NoteRoute = require("./routes/NoteRoute");
+app.use("/Note",NoteRoute);
+
 
 app.get('/', (req, res) => {
   res.send('Backend de votre application React');

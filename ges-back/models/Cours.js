@@ -5,8 +5,8 @@ const { Op } = require('sequelize');
 
 
 
-module.exports = (sequelize,DataTypes) => {
-  const Cours = sequelize.define("Cours",{
+module.exports = (sequelize, DataTypes) => {
+  const Cours = sequelize.define("Cours", {
     id: {
       type: DataTypes.INTEGER,
       primaryKey: true,
@@ -31,17 +31,27 @@ module.exports = (sequelize,DataTypes) => {
     jour: {
       type: DataTypes.INTEGER,
       allowNull: true,
-      
+
     },
     Enseignant: {
       type: DataTypes.INTEGER,
       allowNull: true,
-      
+
     },
     emploisTemps: {
       type: DataTypes.INTEGER,
       allowNull: true,
-    
+
+    },
+    coefficient: {
+      type: DataTypes.INTEGER,
+      allowNull: true,
+
+    },
+    groupe: {
+      type: DataTypes.INTEGER,
+      allowNull: true,
+
     },
 
   });
@@ -49,8 +59,41 @@ module.exports = (sequelize,DataTypes) => {
   Cours.associate = (models) => {
     Cours.hasMany(models.Jour_Cours, {
       foreignKey: 'cours',
-      onDelete: 'CASCADE', // Cette ligne active la suppression en cascade
+      onDelete: 'SET NULL', // Cette ligne active la suppression en cascade
     });
+
+    Cours.belongsTo(models.Classe, {
+      foreignKey: 'classe',
+      as: 'classeCours',
+      onUpdate: 'CASCADE', // Active la mise à jour en cascade
+      onDelete: 'SET NULL', // Définir la clé étrangère à NULL lors de la suppression de l'élève
+
+    });
+
+    Cours.belongsTo(models.Jour, {
+      foreignKey: 'jour',
+      as: 'jourCours',
+      onUpdate: 'CASCADE', // Active la mise à jour en cascade
+      onDelete: 'SET NULL', // Définir la clé étrangère à NULL lors de la suppression de l'élève
+
+    });
+
+    Cours.belongsTo(models.Groupe, {
+      foreignKey: 'groupe',
+      as: 'groupeCours',
+      onUpdate: 'CASCADE', // Active la mise à jour en cascade
+      onDelete: 'SET NULL', // Définir la clé étrangère à NULL lors de la suppression de l'élève
+
+    });
+
+    Cours.belongsTo(models.Classe, {
+      foreignKey: 'classe',
+      as: 'EnseignantCours',
+      onUpdate: 'CASCADE', // Active la mise à jour en cascade
+      onDelete: 'SET NULL', // Définir la clé étrangère à NULL lors de la suppression de l'élève
+
+    });
+
   };
 
   Cours.checkOverlap = async function (matiere, classeId) {
@@ -59,9 +102,9 @@ module.exports = (sequelize,DataTypes) => {
         where: {
           matiere: matiere,
           classe: classeId,
-          
+
         },
-        
+
       });
 
       return overlappingCours.length > 0;
