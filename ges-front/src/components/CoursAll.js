@@ -55,13 +55,12 @@ function CoursAll() {
 
                     <br/>
                     <div className='matiere'>{value.matiere}</div>
+                    <div className='coefficient'>{value.coefficient}</div>
+                    <div className='groupe'>{value.groupeCours ? `${value.groupeCours.groupe}` : "N/A"}</div>
+
                     <div className='classe'>{value.classe ? `${value.classe.classe}` : "N/A"}</div>
-                    <div className='heureDebut'>{value.heureDebut}</div>
-                    <div className='heureFin'>{value.heureFin}</div>
-                    <div className='jour'>{value.jour ? `${value.jour.jour}` : "N/A"}</div>
                     <div className='Enseignant'>{value.Enseignant ? `${value.Enseignant.nom} (${value.Enseignant.nomUtilisateur})` : "N/A"}</div>
                     <button type="button" onClick={() => navigate(`/CoursDelete/${value.id}`)}>Supprimer</button>
-                    <button type="button" onClick={() => navigate(`/CoursUpdate/${value.id}`)}>Modifier</button>
 
 
 

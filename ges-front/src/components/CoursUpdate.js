@@ -13,6 +13,8 @@ function CoursUpdate() {
   const [jours, setJour] = useState([]);
   const [classes, setClasse] = useState([]);
   const matieresSecondaire = ["Mathématiques", "Physique", "Chimie", "Biologie", "Français", "Anglais", "Histoire-Géographie", "Philosophie"];
+  const [groupes, setGroupe] = useState([]);
+  const coefficients = [1,2,3,4,5,6,7,8,9,10];
   const [initialValues, setInitialValues] = useState({
     matiere: '',
     classe: '',
@@ -20,6 +22,8 @@ function CoursUpdate() {
     heureFin: '',
     jour: '',
     Enseignant: '',
+    groupe:"",
+    coefficient:","
   });
 
   useEffect(() => {
@@ -64,7 +68,19 @@ function CoursUpdate() {
 
   }, [id]);
 
-  console.log("initiale",initialValues)
+  useEffect(() => {
+    const fetchGroupe = async () => {
+      try {
+        const response = await axios.get("http://localhost:3001/Groupe");
+        setGroupe(response.data);
+      } catch (error) {
+        console.error("Erreur lors de la récupération des groupes : ", error);
+      }
+    };
+
+    fetchGroupe();
+  }, []);
+
 
   
   
@@ -76,6 +92,9 @@ function CoursUpdate() {
     heureFin: Yup.string(),
     jour: Yup.number(),
     Enseignant: Yup.number(),
+    groupe: Yup.number().required("groupe obligatoire"),
+    coefficient: Yup.number().required("coefficient obligatoire"),
+   
   });
 
   const onSubmit = (data) => {
@@ -116,6 +135,24 @@ function CoursUpdate() {
             <option value="" disabled>Sélectionnez une classe</option>
             {classes.map((classe) => (
               <option key={classe.id} value={classe.id}>{classe.classe}</option>
+            ))}
+          </Field><br />
+
+          <label>Coefficient :</label>
+          <ErrorMessage name="coefficient" component="span" />
+          <Field as="select" id="coefficient" name="coefficient">
+            <option value="" disabled>Sélectionnez un coefficient</option>
+            {coefficients.map((coefficient, index) => (
+              <option key={index} value={coefficient}>{coefficient}</option>
+            ))}
+          </Field><br />
+
+          <label>Groupe :</label>
+          <ErrorMessage name="groupe" component="span" />
+          <Field as="select" id="groupe" name="groupe">
+            <option value="" disabled>Sélectionnez un groupe</option>
+            {groupes.map((groupe) => (
+              <option key={groupe.id} value={groupe.id}>{groupe.groupe}</option>
             ))}
           </Field><br />
 

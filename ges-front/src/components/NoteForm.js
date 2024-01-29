@@ -185,8 +185,8 @@ const NoteForm = () => {
     // Enregistrer les retards pour chaque élève
     eleves.forEach(eleve => {
       const note = notes[eleve.id];
-      console.log("le type d'evaluation est ", selectedTypeEvaluation)
-      console.log("les notes ", notes)
+      console.log("la note ", note)
+      
 
       axios.post('http://localhost:3001/Note', {
         eleve: eleve.id,

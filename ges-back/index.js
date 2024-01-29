@@ -73,6 +73,18 @@ app.use("/Type_Evaluation",Type_EvaluationRoute);
 const NoteRoute = require("./routes/NoteRoute");
 app.use("/Note",NoteRoute);
 
+//Routes Groupe
+const GroupeRoute = require("./routes/GroupeRoute");
+app.use("/Groupe",GroupeRoute);
+
+//Routes Annee_Academique
+const Annee_AcademiqueRoute = require("./routes/Annee_AcademiqueRoute");
+app.use("/Annee_Academique",Annee_AcademiqueRoute);
+
+//Routes Bulletin
+const BulletinRoute = require("./routes/BulletinRoute");
+app.use("/Bulletin",BulletinRoute);
+
 
 app.get('/', (req, res) => {
   res.send('Backend de votre application React');

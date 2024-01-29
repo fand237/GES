@@ -68,7 +68,7 @@ module.exports = (sequelize,DataTypes) => {
       onDelete: 'CASCADE', 
       onUpdate: 'CASCADE', // Active la mise à jour en cascade
 
-    });
+    }); 
 
     
   };

@@ -2,7 +2,7 @@
 
 const express = require('express');
 const router = express.Router();
-const { Note, Cours, Sequence, Type_Evaluation, Classe } = require('../models');
+const { Note, Cours, Sequence, Type_Evaluation, Classe, Bulletin } = require('../models');
 
 
 // Route pour créer une nouvelle note
@@ -32,7 +32,16 @@ router.post('/', async (req, res) => {
     } else {
       if (note == '') { note = null }
       // Sinon, créez une nouvelle instance
-      await Note.create({ eleve, cours, note, dateEvaluation, type_Evaluation, sequence });
+      const newNote = await Note.create({ eleve, cours, note, dateEvaluation, type_Evaluation, sequence });
+      const idannee = 1;
+      const idnote = newNote.id
+      // Vérifiez si les valeurs requises pour la création du Bulletin sont disponibles
+      if (idnote && idannee) {
+        const newBulletin = await Bulletin.create({ eleve, note: idnote, annee: idannee });
+      } else {
+        console.error('Valeurs manquantes pour la création du Bulletin.');
+      }
+
     }
 
     res.json({ message: 'Mise à jour ou création réussie' });
@@ -50,8 +59,8 @@ router.get("/forupdate/:coursId/:sequenceId/:typeEvaluationId/:date", async (req
   try {
     const notes = await Note.findAll({
       where: {
-        cours:coursId,
-        sequence:sequenceId,
+        cours: coursId,
+        sequence: sequenceId,
         type_Evaluation: typeEvaluationId,
         dateEvaluation: date,
       },
@@ -74,7 +83,7 @@ router.get("/byeval/:idEnseignant", async (req, res) => {
     const distinctElements = await Note.findAll({
       attributes: ['cours', 'sequence', 'type_Evaluation', 'dateEvaluation'],
       include: [
-        { model: Cours, attributes: ['id','matiere','Enseignant'], as: 'coursNote' , include: [{ model: Classe, as: 'classeCours' }],where: { Enseignant: idEnseignant } }, // Utilisez l'alias 'coursNote' correspondant à votre association
+        { model: Cours, attributes: ['id', 'matiere', 'Enseignant'], as: 'coursNote', include: [{ model: Classe, as: 'classeCours' }], where: { Enseignant: idEnseignant } }, // Utilisez l'alias 'coursNote' correspondant à votre association
         { model: Sequence, attributes: ['sequence'], as: 'sequenceNote' }, // Utilisez l'alias 'sequenceNote' correspondant à votre association
         { model: Type_Evaluation, attributes: ['type'], as: 'TypeNote' }, // Utilisez l'alias 'typeEvaluationNote' correspondant à votre association
       ],

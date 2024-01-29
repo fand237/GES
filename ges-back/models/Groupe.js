@@ -15,8 +15,8 @@ module.exports = (sequelize,DataTypes) => {
         type: DataTypes.ENUM('1er Groupe', '2eme Groupe', '3eme Groupe'),
         allowNull: false,
       },
-    });
-  
+    }); 
+    
     
   
     return Groupe;

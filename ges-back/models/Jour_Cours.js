@@ -6,7 +6,7 @@ module.exports = (sequelize, DataTypes) => {
   const Jour_Cours = sequelize.define("Jour_Cours", {
     cours: {
       type: DataTypes.INTEGER,
-      allowNull: false,
+      allowNull: true,
     },
     emploisTemps: {
       type: DataTypes.INTEGER,
@@ -29,7 +29,10 @@ module.exports = (sequelize, DataTypes) => {
   Jour_Cours.associate = (models) => {
     Jour_Cours.belongsTo(models.Cours, {
       foreignKey: 'cours', // Assurez-vous que 'cours' est la clé étrangère correcte dans votre modèle JourCours
+      onUpdate: 'CASCADE', // Active la mise à jour en cascade
+      onDelete: 'CASCADE', // Définir la clé étrangère à NULL lors de la suppression de l'élève
       as: 'coursDetails',
+
     });
   };
 

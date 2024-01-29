@@ -173,6 +173,13 @@ const TimetableDropArea = ({ classes, jours, selectedClass, handleClassChange, t
     }
 
     try {
+
+      console.log("les donnees sont:", draggedItem.course.id,
+      jours[colIndex - 1].id,
+      timeSlots[rowIndex].heureDebut,
+      timeSlots[rowIndex].heureFin,
+       draggedItem.course.Enseignant.id,
+      timetableId,)
       const response = await axios.post('http://localhost:3001/Jour_Cours/create', {
         coursId: draggedItem.course.id,
         jourId: jours[colIndex - 1].id,

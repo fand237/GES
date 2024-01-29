@@ -9,7 +9,11 @@ function CoursForm() {
   let navigate = useNavigate();
   const [enseignants, setEnseignants] = useState([]);
   const [classes, setClasse] = useState([]);
+  const [groupes, setGroupe] = useState([]);
+  const coefficients = [1,2,3,4,5,6,7,8,9,10];
+
   const matieresSecondaire = ["Mathématiques", "Physique", "Chimie", "Biologie", "Français", "Anglais", "Histoire-Géographie", "Philosophie"];
+
 
   useEffect(() => {
     const fetchEnseignants = async () => {
@@ -37,6 +41,24 @@ function CoursForm() {
     fetchClasse();
   }, []);
 
+  useEffect(() => {
+    const fetchGroupe = async () => {
+      try {
+        const response = await axios.get("http://localhost:3001/Groupe");
+        setGroupe(response.data);
+      } catch (error) {
+        console.error("Erreur lors de la récupération des groupes : ", error);
+      }
+    };
+
+    fetchGroupe();
+  }, []);
+
+
+
+
+
+
  
 
   const initialValues = {
@@ -45,11 +67,15 @@ function CoursForm() {
     heureDebut: "",
     heureFin: "",
     Enseignant: "",
+    groupe:"",
+    coefficient:","
   };
 
   const validationSchema = Yup.object().shape({
     matiere: Yup.string().required("Matière obligatoire"),
     classe: Yup.number().required("Classe obligatoire"),
+    groupe: Yup.number().required("groupe obligatoire"),
+    coefficient: Yup.number().required("coefficient obligatoire"),
     heureDebut: Yup.string(),
     heureFin: Yup.string(),
     Enseignant: Yup.number(),
@@ -59,7 +85,7 @@ function CoursForm() {
     try {
       await axios.post("http://localhost:3001/Cours", data);
       console.log("Cours créé avec succès");
-      navigate(`/CoursAll`);
+      //navigate(`/CoursAll`);
     } catch (error) {
       if (error.response) {
         // L'erreur provient de la réponse de l'API
@@ -83,6 +109,24 @@ function CoursForm() {
             <option value="" disabled>Sélectionnez une matière</option>
             {matieresSecondaire.map((matiere, index) => (
               <option key={index} value={matiere}>{matiere}</option>
+            ))}
+          </Field><br />
+
+          <label>Coefficient :</label>
+          <ErrorMessage name="coefficient" component="span" />
+          <Field as="select" id="coefficient" name="coefficient">
+            <option value="" disabled>Sélectionnez un coefficient</option>
+            {coefficients.map((coefficient, index) => (
+              <option key={index} value={coefficient}>{coefficient}</option>
+            ))}
+          </Field><br />
+
+          <label>Groupe :</label>
+          <ErrorMessage name="groupe" component="span" />
+          <Field as="select" id="groupe" name="groupe">
+            <option value="" disabled>Sélectionnez un groupe</option>
+            {groupes.map((groupe) => (
+              <option key={groupe.id} value={groupe.id}>{groupe.groupe}</option>
             ))}
           </Field><br />
 
@@ -112,6 +156,8 @@ function CoursForm() {
               <option key={enseignant.id} value={enseignant.id}>{enseignant.nomUtilisateur} ({enseignant.nom}) </option>
             ))}
           </Field><br />
+
+          
 
 
           <button type="submit">Ajouter Cours</button>

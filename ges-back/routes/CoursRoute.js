@@ -1,6 +1,6 @@
 const express = require('express')
 const router = express.Router();
-const {Cours} = require("../models")
+const {Cours, Groupe} = require("../models")
 const CoursController = require('../controllers/CoursController');
 
 
@@ -8,7 +8,13 @@ const CoursController = require('../controllers/CoursController');
 
 router.get("/", async (req, res) => {
 
-    const listOfCours = await Cours.findAll();
+    const listOfCours = await Cours.findAll({
+      include: [
+        { model: Groupe, attributes: ['groupe'], as: 'groupeCours' ,  }, // Utilisez l'alias 'coursNote' correspondant à votre association
+      ],
+      
+
+    });
     res.json(listOfCours);
 
 });

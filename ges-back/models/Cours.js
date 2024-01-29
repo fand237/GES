@@ -59,22 +59,23 @@ module.exports = (sequelize, DataTypes) => {
   Cours.associate = (models) => {
     Cours.hasMany(models.Jour_Cours, {
       foreignKey: 'cours',
-      onDelete: 'SET NULL', // Cette ligne active la suppression en cascade
+      onUpdate: 'CASCADE', // Active la mise à jour en cascade
+      onDelete: 'CASCADE', // Cette ligne active la suppression en cascade
     });
 
     Cours.belongsTo(models.Classe, {
       foreignKey: 'classe',
       as: 'classeCours',
       onUpdate: 'CASCADE', // Active la mise à jour en cascade
-      onDelete: 'SET NULL', // Définir la clé étrangère à NULL lors de la suppression de l'élève
+      onDelete: 'CASCADE', // Définir la clé étrangère à NULL lors de la suppression de l'élève
 
     });
 
-    Cours.belongsTo(models.Jour, {
+    Cours.hasMany(models.Jour, {
       foreignKey: 'jour',
       as: 'jourCours',
       onUpdate: 'CASCADE', // Active la mise à jour en cascade
-      onDelete: 'SET NULL', // Définir la clé étrangère à NULL lors de la suppression de l'élève
+      onDelete: 'CASCADE', // Définir la clé étrangère à NULL lors de la suppression de l'élève
 
     });
 
@@ -82,15 +83,15 @@ module.exports = (sequelize, DataTypes) => {
       foreignKey: 'groupe',
       as: 'groupeCours',
       onUpdate: 'CASCADE', // Active la mise à jour en cascade
-      onDelete: 'SET NULL', // Définir la clé étrangère à NULL lors de la suppression de l'élève
+      onDelete: 'CASCADE', // Définir la clé étrangère à NULL lors de la suppression de l'élève
 
     });
 
-    Cours.belongsTo(models.Classe, {
+    Cours.belongsTo(models.Enseignant, {
       foreignKey: 'classe',
       as: 'EnseignantCours',
       onUpdate: 'CASCADE', // Active la mise à jour en cascade
-      onDelete: 'SET NULL', // Définir la clé étrangère à NULL lors de la suppression de l'élève
+      onDelete: 'CASCADE', // Définir la clé étrangère à NULL lors de la suppression de l'élève
 
     });
 

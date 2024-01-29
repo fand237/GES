@@ -44,7 +44,7 @@ module.exports = (sequelize,DataTypes) => {
       foreignKey: 'type_Evaluation',
       as: 'TypeNote', 
       onUpdate: 'CASCADE', // Active la mise à jour en cascade
-      onDelete: 'SET NULL', // Définir la clé étrangère à NULL lors de la suppression de l'élève
+      onDelete: 'CASCADE', // Définir la clé étrangère à NULL lors de la suppression de l'élève
 
     });
 
@@ -53,7 +53,7 @@ module.exports = (sequelize,DataTypes) => {
       foreignKey: 'sequence',
       as: 'sequenceNote',
       onUpdate: 'CASCADE', // Active la mise à jour en cascade
-      onDelete: 'SET NULL', // Définir la clé étrangère à NULL lors de la suppression de l'élève
+      onDelete: 'CASCADE', // Définir la clé étrangère à NULL lors de la suppression de l'élève
 
 
     });
@@ -63,7 +63,7 @@ module.exports = (sequelize,DataTypes) => {
       foreignKey: 'cours',
       as: 'coursNote',
       onUpdate: 'CASCADE', // Active la mise à jour en cascade
-      onDelete: 'SET NULL', // Définir la clé étrangère à NULL lors de la suppression de l'élève
+      onDelete: 'CASCADE', // Définir la clé étrangère à NULL lors de la suppression de l'élève
 
 
     });
@@ -73,7 +73,7 @@ module.exports = (sequelize,DataTypes) => {
       foreignKey: 'eleve',
       as: 'eleveNote',
       onUpdate: 'CASCADE', // Active la mise à jour en cascade
-      onDelete: 'SET NULL', // Définir la clé étrangère à NULL lors de la suppression de l'élève
+      onDelete: 'CASCADE', // Définir la clé étrangère à NULL lors de la suppression de l'élève
 
 
     });
