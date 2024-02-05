@@ -79,5 +79,17 @@ module.exports = (sequelize,DataTypes) => {
     });
   };
 
+  // models/Note.js
+  const { calculateAndSetMoyenne } = sequelize.models.Moyenne;
+
+
+Note.addHook('afterCreate', async (note, options) => {
+  // Récupérer l'ID du cours associé à la note
+  const coursId =  note.cours;
+
+  // Appeler la fonction pour calculer et mettre à jour la moyenne
+  await calculateAndSetMoyenne(coursId, sequelize.models);
+});
+
   return Note;
-};
+};  

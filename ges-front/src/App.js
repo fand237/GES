@@ -66,7 +66,7 @@ function App() {
         <Route path="/NoteForm/:idEnseignant" exact element={<NoteForm />}/>
         <Route path="/NoteEval/:idEnseignant" exact element={<NoteEval />}/>
         <Route path="/NoteUpdate/:idCours/:idClasse/:idSequence/:idType/:date" exact element={<NoteUpdate2 />}/>
-        <Route path="/BulletinSequence" exact element={<BulletinSequence />}/>
+        <Route path="/BulletinSequence/:idEleve/:idSequence" exact element={<BulletinSequence />}/>
 
 
 

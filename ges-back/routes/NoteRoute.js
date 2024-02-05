@@ -2,7 +2,7 @@
 
 const express = require('express');
 const router = express.Router();
-const { Note, Cours, Sequence, Type_Evaluation, Classe, Bulletin } = require('../models');
+const { Note, Moyenne, Cours, Sequence, Type_Evaluation, Classe, Bulletin } = require('../models');
 
 
 // Route pour créer une nouvelle note

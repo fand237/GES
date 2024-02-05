@@ -74,7 +74,6 @@ function EleveAll() {
       <label>Recherche :</label>
       <input type="text" onChange={(e) => setSearchTerm(e.target.value)} value={searchTerm} />
 
-      {/* Tableau d'élèves */}
       <table>
         <thead>
           <tr>
@@ -86,10 +85,6 @@ function EleveAll() {
             <th>Classe</th>
             <th>Parent</th>
 
-
-
-
-            {/* Ajoutez d'autres colonnes si nécessaire */}
           </tr>
         </thead>
         <tbody>

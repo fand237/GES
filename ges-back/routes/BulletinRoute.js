@@ -19,6 +19,7 @@ router.post("/", async (req, res) => {
 router.get("/byeleve/:idEleve/:idSequence", async (req, res) => {
   const idEleve = req.params.idEleve;
   const idSequence = req.params.idSequence;
+  
 
   try {
     const distinctElements = await Bulletin.findAll({

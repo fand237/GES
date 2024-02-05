@@ -85,6 +85,10 @@ app.use("/Annee_Academique",Annee_AcademiqueRoute);
 const BulletinRoute = require("./routes/BulletinRoute");
 app.use("/Bulletin",BulletinRoute);
 
+//Routes Moynne
+const MoyenneRoute = require("./routes/MoyenneRoute");
+app.use("/Moyenne",MoyenneRoute);
+
 
 app.get('/', (req, res) => {
   res.send('Backend de votre application React');

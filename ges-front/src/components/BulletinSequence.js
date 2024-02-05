@@ -15,7 +15,7 @@ function BulletinSequence() {
     const fetchBulletin = async () => {
       try {
         // Appeler l'API pour récupérer le bulletin pour l'élève et la séquence spécifiés
-        const response = await axios.get(`http://localhost:3001/Bulletin/byeleve/1/1`);
+        const response = await axios.get(`http://localhost:3001/Bulletin/byeleve/${idEleve}/${idSequence}`);
         console.log(response.data)
 
         // Mettre à jour l'état avec les données du bulletin

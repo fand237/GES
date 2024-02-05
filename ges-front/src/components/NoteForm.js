@@ -202,6 +202,8 @@ const NoteForm = () => {
         .catch((error) => {
           console.error(`Erreur lors de l'enregistrement de la note : `, error);
         });
+
+        
     });
 
 
