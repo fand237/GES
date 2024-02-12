@@ -1,29 +1,33 @@
 const express = require('express')
 const router = express.Router();
-const {Eleve, Classe, Parent} = require("../models")
+const { Eleve, Classe, Parent } = require("../models")
+const { SHA256 } = require('crypto-js');
+const {validateToken} = require("../middlewares/AuthMiddleware")
+const { sign } = require('jsonwebtoken')
+
 
 
 
 router.get("/", async (req, res) => {
 
-    const listOfEleve = await Eleve.findAll();
-    res.json(listOfEleve);
+  const listOfEleve = await Eleve.findAll();
+  res.json(listOfEleve);
 
 
 });
 
 router.get("/:id", async (req, res) => {
 
-    const id=req.params.id;
-    const post = await Eleve.findByPk(id);
-    res.json(post);
+  const id = req.params.id;
+  const post = await Eleve.findByPk(id);
+  res.json(post);
 
 
 });
 
 router.get("/byclasse/:id", async (req, res) => {
 
-  const classeid=req.params.id;
+  const classeid = req.params.id;
 
   try {
     // Utilisez findAll avec une condition where pour récupérer les cours du jour spécifié
@@ -73,7 +77,7 @@ router.put('/:id', async (req, res) => {
   try {
     const { id } = req.params;
     const { nomUtilisateur, motDePasse, email, nom, prenom } = req.body;
- 
+
     // Récupérer le Eleve existant par son ID
     const eleve = await Eleve.findByPk(id);
 
@@ -115,31 +119,59 @@ router.delete("/:id", async (req, res) => {
 });
 
 
-router.post("/", async(req, res) => {
+router.post("/", async (req, res) => {
 
-    try{
-        const post=req.body;
-    
-        const isOverlap = await Eleve.checkOverlapEmail( post.email);
-        const isOverlapUser = await Eleve.checkOverlapUsername( post.nomUtilisateur);
-    
-        // Si l'unicité n'est pas respectée, renvoyer une réponse avec le statut 422
-        if (isOverlapUser) {
-            return res.status(422).json({ error: "Ce nom d'utilisateur est déjà utilisé." });
-          } else if (isOverlap) {
-            return res.status(422).json({ error: "Cette adresse e-mail est déjà utilisée." });
-          }
-    
-        await Eleve.create(post);
-          // Si tout va bien, renvoyer une réponse de succès
-        return res.status(200).json({ success: 'Eleve créé avec succès' });
-    
-       }catch(error){
-        console.error(error);
-        return res.status(500).json({ error: 'Erreur serveur' });
-       }
+  try {
+    const post = req.body;
+
+    const isOverlap = await Eleve.checkOverlapEmail(post.email);
+    const isOverlapUser = await Eleve.checkOverlapUsername(post.nomUtilisateur);
+
+    // Si l'unicité n'est pas respectée, renvoyer une réponse avec le statut 422
+    if (isOverlapUser) {
+      return res.status(422).json({ error: "Ce nom d'utilisateur est déjà utilisé." });
+    } else if (isOverlap) {
+      return res.status(422).json({ error: "Cette adresse e-mail est déjà utilisée." });
+    }
+
+    let ele = await Eleve.create(post);
+
+    ele.typeuser = "Eleve"; 
+    await ele.save(); 
+    // Si tout va bien, renvoyer une réponse de succès
+    return res.status(200).json({ success: 'Eleve créé avec succès' });
+
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ error: 'Erreur serveur' });
+  }
 });
 
+router.post("/login", async (req, res) => {
+
+  try {
+    const { nomUtilisateur, motDePasse } = req.body;
+    const user = await Eleve.findOne({ where: { nomUtilisateur: nomUtilisateur } })
+
+    if (!user) return res.json({ error: "Utilisateur inexistant" });
+
+    if (!(user.motDePasse == SHA256(motDePasse).toString())) {
+      // Si tout va bien, renvoyer une réponse de succès
+      return res.json({ error: "udername ou password incorrrect" });
+    }
+
+    const accessToken = sign(
+      {nomUtilisateur: user.nomUtilisateur, id: user.id},
+      "importantsecret"
+      );
+    res.json(accessToken)
+
+
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ error: 'Erreur serveur' });
+  }
+});
 
 
 module.exports = router;

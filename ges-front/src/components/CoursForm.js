@@ -6,6 +6,7 @@ import {  useNavigate } from 'react-router-dom';
 
 
 function CoursForm() {
+  // eslint-disable-next-line 
   let navigate = useNavigate();
   const [enseignants, setEnseignants] = useState([]);
   const [classes, setClasse] = useState([]);
@@ -64,8 +65,7 @@ function CoursForm() {
   const initialValues = {
     matiere: "",
     classe: "",
-    heureDebut: "",
-    heureFin: "",
+   
     Enseignant: "",
     groupe:"",
     coefficient:","
@@ -76,8 +76,7 @@ function CoursForm() {
     classe: Yup.number().required("Classe obligatoire"),
     groupe: Yup.number().required("groupe obligatoire"),
     coefficient: Yup.number().required("coefficient obligatoire"),
-    heureDebut: Yup.string(),
-    heureFin: Yup.string(),
+    
     Enseignant: Yup.number(),
   });
 
@@ -139,13 +138,7 @@ function CoursForm() {
             ))}
           </Field><br />
 
-          <label>Heure de début :</label>
-          <ErrorMessage name="heureDebut" component="span" />
-          <Field id="heureDebut" type="time" name="heureDebut" /><br />
-
-          <label>Heure de fin :</label>
-          <ErrorMessage name="heureFin" component="span" />
-          <Field id="heureFin" type="time" name="heureFin" /><br />
+         
 
 
           <label>Enseignant :</label>

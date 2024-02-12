@@ -16,7 +16,7 @@ module.exports = (sequelize,DataTypes) => {
       moyenne: {
         type: DataTypes.INTEGER,
         allowNull: true,
-      },
+      }, 
       
       
     });

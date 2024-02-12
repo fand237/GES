@@ -5,37 +5,10 @@ import axios from 'axios';
 import { SHA256 } from 'crypto-js';
 
 
-function EleveForm() {
-  const [classes, setClasses] = useState([]);
-  const [parents, setParents] = useState([]);
+function EnseignantForm() {
+ 
 
-  
 
-  useEffect(() => {
-    const fetchClasses = async () => {
-      try {
-        const response = await axios.get("http://localhost:3001/Classe");
-        setClasses(response.data);
-      } catch (error) {
-        console.error("Erreur lors de la récupération des classe : ", error);
-      }
-    };
-
-    fetchClasses();
-  }, []);
-
-  useEffect(() => {
-    const fetchParents = async () => {
-      try {
-        const response = await axios.get("http://localhost:3001/Parent");
-        setParents(response.data);
-      } catch (error) {
-        console.error("Erreur lors de la récupération des parents : ", error);
-      }
-    };
-
-    fetchParents();
-  }, []);
 
 
   const initialValues = {
@@ -44,20 +17,16 @@ function EleveForm() {
     email: "",
     nom: "",
     prenom: "",
-    dateNaissance: "",
-    classe: "",
-    parent: "",
+    
   };
 
   const validationSchema = Yup.object().shape({
-    nomUtilisateur: Yup.string().min(6).required("Nom d'utilisateur obligatoire"),
-    motDePasse: Yup.string().min(6).required("Mot de passe obligatoire"),
+    nomUtilisateur: Yup.string().required("Nom d'utilisateur obligatoire"),
+    motDePasse: Yup.string().required("Mot de passe obligatoire"),
     email: Yup.string().email("Adresse email invalide").required("Email obligatoire"),
     nom: Yup.string().required("Nom obligatoire"),
     prenom: Yup.string().required("Prénom obligatoire"),
-    dateNaissance: Yup.date().required("Date de naissance obligatoire"),
-    classe: Yup.string().required("Classe obligatoire"),
-    parent: Yup.number().required("Parent obligatoire"),
+    
   });
 
   const onSubmit = async (data) => {
@@ -66,11 +35,11 @@ function EleveForm() {
       const hashedPassword = SHA256(data.motDePasse).toString();
 
       // Utiliser le mot de passe hashé dans la requête
-      await axios.post("http://localhost:3001/Eleve", {
+      await axios.post("http://localhost:3001/Enseignants", {
         ...data,
         motDePasse: hashedPassword,
       });
-      console.log("Élève créé avec succès");
+      console.log("Enseignant créé avec succès");
     } catch (error) {
         if (error.response) {
           if (error.response.status === 422) {
@@ -95,7 +64,7 @@ function EleveForm() {
   };
 
   return (
-    <div className='createEleveFormPage'>
+    <div className='createEnseignantFormPage'>
       <Formik initialValues={initialValues} onSubmit={onSubmit} validationSchema={validationSchema}>
       <Form>
         <label>Nom d'utilisateur :</label>
@@ -118,35 +87,13 @@ function EleveForm() {
         <ErrorMessage name="prenom" component="span" />
         <Field type="text" id="prenom" name="prenom" /><br />
 
-        <label>Date de naissance :</label>
-        <ErrorMessage name="dateNaissance" component="span" />
-        <Field type="date" id="dateNaissance" name="dateNaissance" /><br />
+        
 
-        {/* ... (ajoutez d'autres champs si nécessaire) */}
-
-        <label>Classe :</label>
-        <ErrorMessage name="classe" component="span" />
-        <Field as="select" id="classe" name="classe">
-          <option value="" disabled>Sélectionnez une classe</option>
-          {classes.map((classe) => (
-            <option key={classe.id} value={classe.id}>{classe.classe}</option>
-          ))}
-        </Field><br />
-
-        <label>Parent :</label>
-        <ErrorMessage name="parent" component="span" />
-        <Field as="select" id="parent" name="parent">
-          <option value="" disabled>Sélectionnez un parent</option>
-          {parents.map((parent) => (
-            <option key={parent.id} value={parent.id}>{parent.nom} {parent.prenom}</option>
-          ))}
-        </Field><br />
-
-        <button type="submit">Ajouter Élève</button>
+        <button type="submit">Ajouter Enseignant</button>
       </Form>
     </Formik>
     </div>
   );
 }
 
-export default EleveForm;
+export default EnseignantForm;

@@ -12,7 +12,7 @@ router.post('/absence', async (req, res) => {
   // Envoyer un SMS au parent
   const parentPhoneNumber = post.numeroTelephone;
   const message = post.message;
-
+ 
   try {
     await twilioController.sendSMS(parentPhoneNumber, message);
     res.status(200).json({ success: true, message: 'SMS sent successfully' });

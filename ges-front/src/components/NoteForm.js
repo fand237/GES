@@ -195,7 +195,13 @@ const NoteForm = () => {
         dateEvaluation: dateEvaluation,
         type_Evaluation: selectedTypeEvaluation.id,
         sequence: selectedSequence.id,
-      })
+      },
+      {
+        headers: {
+          accessToken: localStorage.getItem("accessToken"),
+        },
+      }
+      )
         .then(() => {
           console.log(`note de ${note} minutes enregistré pour l'élève avec l'ID ${eleve.id}`);
         })

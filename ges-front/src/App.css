@@ -5,19 +5,46 @@
 /* Ajoutez ces styles dans le fichier CSS de votre choix ou dans une balise style dans l'en-tête HTML */
 
 table {
-  border-collapse: collapse; /* Fusionne les bordures de cellules */
-  width: 100%; /* Ajuste la largeur du tableau à 100% du conteneur */
+  border-collapse: collapse;
+  /* Fusionne les bordures de cellules */
+  width: 100%;
+  /* Ajuste la largeur du tableau à 100% du conteneur */
 }
 
-th, td {
-  border: 1px solid black; /* Ajoute une bordure de 1 pixel solide */
-  padding: 8px; /* Ajoute un espacement intérieur pour un meilleur aspect */
-  text-align: left; /* Alignement du texte à gauche */
+th,
+td {
+  border: 1px solid black;
+  /* Ajoute une bordure de 1 pixel solide */
+  padding: 8px;
+  /* Ajoute un espacement intérieur pour un meilleur aspect */
+  text-align: left;
+  /* Alignement du texte à gauche */
 }
 
 /* Styles optionnels */
 th {
-  background-color: #f2f2f2; /* Ajoute une couleur de fond pour les en-têtes */
+  background-color: #f2f2f2;
+  /* Ajoute une couleur de fond pour les en-têtes */
 }
 
 /* ... Ajoutez d'autres styles personnalisés selon vos besoins */
+.navbar button {
+  width: 150px;
+  height: 40px;
+  cursor: pointer;
+}
+
+.navbar{
+  width: 100%;
+  height: 70px;
+  background-color: blanchedalmond;
+  display: flex;
+  align-items: center;
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+.navbar a{
+  margin-left: 20px;
+  text-decoration: none;
+  color: black;
+}

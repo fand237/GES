@@ -3,14 +3,15 @@
 const express = require('express');
 const router = express.Router();
 const { Note, Moyenne, Cours, Sequence, Type_Evaluation, Classe, Bulletin } = require('../models');
+const {validateToken} = require("../middlewares/AuthMiddleware")
 
 
 // Route pour créer une nouvelle note
-router.post('/', async (req, res) => {
+router.post('/', validateToken,async (req, res) => {
   try {
 
     let { eleve, cours, note, dateEvaluation, type_Evaluation, sequence } = req.body;
-
+    console.log(req.utilisateur)
     // Recherche d'une instance existante
     const existingInstance = await Note.findOne({
       where: {

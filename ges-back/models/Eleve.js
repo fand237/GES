@@ -49,6 +49,11 @@
         type: DataTypes.INTEGER,
         
       },
+      typeuser: {
+        type: DataTypes.STRING,
+        allowNull: true,
+        
+      },
   
     });
 
@@ -63,7 +68,7 @@
       // Association avec le modèle Parent (Many-to-One)
       Eleve.belongsTo(models.Parent, {
         foreignKey: 'parent',
-        as: 'parentEleve',
+        as: 'parentEleve',  
         onDelete: 'CASCADE', 
         onUpdate: 'CASCADE', // Active la mise à jour en cascade
 

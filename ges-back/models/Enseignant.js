@@ -56,10 +56,48 @@ class Enseignant  {
         type: DataTypes.INTEGER,
         
       },
+      typeuser: {
+        type: DataTypes.STRING,
+        allowNull: true,
+        
+      },
+  
   
     });
 
-    
+    Enseignant.checkOverlapUsername = async function (nomUtilisateur) {
+      try {
+        const overlappingParent = await this.findAll({
+          where: {
+            nomUtilisateur: nomUtilisateur,
+            
+          },
+          
+        });
+  
+        return overlappingParent.length > 0;
+      } catch (error) {
+        console.error('Erreur lors de la vérification des chevauchements dans la base de données nom utilisateur : ', error);
+        throw error;
+      }
+    };
+  
+    Enseignant.checkOverlapEmail = async function (email) {
+      try {
+        const overlappingParent = await this.findAll({
+          where: {
+            email: email,
+            
+          },
+          
+        });  
+  
+        return overlappingParent.length > 0;
+      } catch (error) {
+        console.error('Erreur lors de la vérification des chevauchements dans la base de données Email : ', error);
+        throw error;
+      }
+    };
 
     return Enseignant;
   };  

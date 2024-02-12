@@ -71,7 +71,7 @@ module.exports = (sequelize, DataTypes) => {
 
     });
 
-    Cours.hasMany(models.Jour, {
+    Cours.belongsTo(models.Jour, {
       foreignKey: 'jour',
       as: 'jourCours',
       onUpdate: 'CASCADE', // Active la mise à jour en cascade

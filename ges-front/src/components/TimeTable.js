@@ -30,7 +30,7 @@ const DraggableItem = ({ course, handleDragStart }) => {
 };
 
 const TimetableDropArea = ({ classes, jours, selectedClass, handleClassChange, timetableId }) => {
-  
+
   const timeSlots = [
     { heureDebut: '07:30:00', heureFin: '08:20:00' },
     { heureDebut: '08:20:00', heureFin: '09:10:00' },
@@ -43,7 +43,7 @@ const TimetableDropArea = ({ classes, jours, selectedClass, handleClassChange, t
     { heureDebut: '13:15:00', heureFin: '14:05:00' },
     { heureDebut: '14:05:00', heureFin: '14:55:00' },
   ];
-  
+
   const createEmptyTimetable = () => {
     return Array.from({ length: 10 }, () => Array(6).fill(null)); // 10 créneaux, 7 jours
   };
@@ -58,7 +58,7 @@ const TimetableDropArea = ({ classes, jours, selectedClass, handleClassChange, t
     if (timetableId) {
       try {
         const response = await axios.get(`http://localhost:3001/Jour_Cours/byemplois/${timetableId}`);
-        
+
         const coursesWithDetails = await Promise.all(
           response.data.map(async (course) => {
             const coursDetails = await axios.get(`http://localhost:3001/Cours/${course.cours}`);
@@ -66,10 +66,10 @@ const TimetableDropArea = ({ classes, jours, selectedClass, handleClassChange, t
             const enseignantDetails = await axios.get(
               `http://localhost:3001/Enseignants/${coursDetails.data.Enseignant}`
             );
-            
+
             return {
               ...course,
-              cours:coursDetails.data,
+              cours: coursDetails.data,
               Enseignant: enseignantDetails.data,
             };
           })
@@ -81,8 +81,8 @@ const TimetableDropArea = ({ classes, jours, selectedClass, handleClassChange, t
       }
     }
   }, [timetableId]);
-  
-  
+
+
 
   useEffect(() => {
     fetchPreFilledCourses();
@@ -112,7 +112,7 @@ const TimetableDropArea = ({ classes, jours, selectedClass, handleClassChange, t
     try {
       // Faites une requête DELETE pour supprimer le Jour_Cours côté serveur
       const response = await axios.delete(`http://localhost:3001/Jour_Cours/${jourCoursId}`);
-  
+
       if (response.data.success) {
         console.log('Jour_Cours supprimé avec succès.');
         return true; // Indiquez que la suppression a réussi
@@ -126,36 +126,36 @@ const TimetableDropArea = ({ classes, jours, selectedClass, handleClassChange, t
     }
   };
 
-  const handleCellClick = async ( rowIndex, colIndex, clickedItem) => {
-   
-  
+  const handleCellClick = async (rowIndex, colIndex, clickedItem) => {
+
+
 
     console.log('Ancien timetable :', timetable);
 
 
 
-  // Vérifiez si la cellule contient un cours
-  if (clickedItem) {
-    // Demander une confirmation avant la suppression
-    const isConfirmed = window.confirm("Voulez-vous vraiment supprimer cet élément de l'emploi du temps?");
+    // Vérifiez si la cellule contient un cours
+    if (clickedItem) {
+      // Demander une confirmation avant la suppression
+      const isConfirmed = window.confirm("Voulez-vous vraiment supprimer cet élément de l'emploi du temps?");
 
-    if (isConfirmed) {
-      // Supprimer le JourCours côté serveur
-      const deleteSuccess = await deleteJour_Cours(clickedItem.id);
+      if (isConfirmed) {
+        // Supprimer le JourCours côté serveur
+        const deleteSuccess = await deleteJour_Cours(clickedItem.id);
 
 
-      if (deleteSuccess) {
-        setPreFilledCourses((prevPreFilledCourses) =>
-        prevPreFilledCourses.filter((course) => course.id !== clickedItem.id)
-      );
-        // Mettez à jour l'emploi du temps en supprimant l'élément de la cellule correspondante
-        const newTimetable = timetable.map((row) => [...row]);
-        newTimetable[rowIndex][colIndex] = null;
-        setTimetable(newTimetable);
-        console.log('Nouveau timetable :', newTimetable);
+        if (deleteSuccess) {
+          setPreFilledCourses((prevPreFilledCourses) =>
+            prevPreFilledCourses.filter((course) => course.id !== clickedItem.id)
+          );
+          // Mettez à jour l'emploi du temps en supprimant l'élément de la cellule correspondante
+          const newTimetable = timetable.map((row) => [...row]);
+          newTimetable[rowIndex][colIndex] = null;
+          setTimetable(newTimetable);
+          console.log('Nouveau timetable :', newTimetable);
+        }
       }
     }
-  }
   };
 
   const handleDrop = async (e, rowIndex, colIndex) => {
@@ -175,11 +175,11 @@ const TimetableDropArea = ({ classes, jours, selectedClass, handleClassChange, t
     try {
 
       console.log("les donnees sont:", draggedItem.course.id,
-      jours[colIndex - 1].id,
-      timeSlots[rowIndex].heureDebut,
-      timeSlots[rowIndex].heureFin,
-       draggedItem.course.Enseignant.id,
-      timetableId,)
+        jours[colIndex - 1].id,
+        timeSlots[rowIndex].heureDebut,
+        timeSlots[rowIndex].heureFin,
+        draggedItem.course.Enseignant.id,
+        timetableId,)
       const response = await axios.post('http://localhost:3001/Jour_Cours/create', {
         coursId: draggedItem.course.id,
         jourId: jours[colIndex - 1].id,
@@ -196,50 +196,50 @@ const TimetableDropArea = ({ classes, jours, selectedClass, handleClassChange, t
 
       // Si aucune chevauchement, continuer avec la mise à jour du tableau et de la base de données
       // Créer une copie de l'emploi du temps existant
-    const newTimetable = timetable.map((row) => [...row]);
+      const newTimetable = timetable.map((row) => [...row]);
 
-    // Placer l'élément dans la case spécifiée
-    newTimetable[rowIndex][colIndex] = draggedItem.course;
+      // Placer l'élément dans la case spécifiée
+      newTimetable[rowIndex][colIndex] = draggedItem.course;
 
-    // Mettre à jour l'emploi du temps avec la nouvelle configuration
-    setTimetable(newTimetable);
-
-    
-      
-     // Mise à jour de preFilledCourses après l'ajout
-    const newCourse = {
-      ...response.data,
-      cours: { ...response.data.cours },
-      Enseignant: { ...response.data.Enseignant }
-    };
-
-    console.log('le nouveau cours est',newCourse)
-
-    // Mettre à jour immédiatement les cours pré-remplis
-    fetchPreFilledCourses(); 
+      // Mettre à jour l'emploi du temps avec la nouvelle configuration
+      setTimetable(newTimetable);
 
 
-      
+
+      // Mise à jour de preFilledCourses après l'ajout
+      const newCourse = {
+        ...response.data,
+        cours: { ...response.data.cours },
+        Enseignant: { ...response.data.Enseignant }
+      };
+
+      console.log('le nouveau cours est', newCourse)
+
+      // Mettre à jour immédiatement les cours pré-remplis
+      fetchPreFilledCourses();
+
+
+
       console.log("JourCours créé avec succès dans la base de données.");
     } catch (error) {
       console.error('Erreur lors de la création de JourCours : ', error);
       // Récupérez et affichez l'erreur à l'utilisateur
-    if (error.response) {
-      // Il y a une réponse du serveur avec un statut différent de 2xx
-      alert(`Erreur du serveur: ${error.response.data.error}`);
-    } else if (error.request) {
-      // La requête a été faite, mais aucune réponse n'a été reçue
-      console.error('Aucune réponse reçue du serveur.');
-    } else {
-      // Une erreur s'est produite lors de la configuration de la requête
-      console.error('Erreur de configuration de la requête :', error.message);
-    }
+      if (error.response) {
+        // Il y a une réponse du serveur avec un statut différent de 2xx
+        alert(`Erreur du serveur: ${error.response.data.error}`);
+      } else if (error.request) {
+        // La requête a été faite, mais aucune réponse n'a été reçue
+        console.error('Aucune réponse reçue du serveur.');
+      } else {
+        // Une erreur s'est produite lors de la configuration de la requête
+        console.error('Erreur de configuration de la requête :', error.message);
+      }
     }
 
-    
+
   };
 
-  
+
 
   const renderTimetableRows = () => {
     const timeSlots = [
@@ -256,7 +256,7 @@ const TimetableDropArea = ({ classes, jours, selectedClass, handleClassChange, t
     ];
 
     return timetable.map((row, rowIndex) => (
-      
+
       <div key={rowIndex} style={{ display: 'flex' }}>
         {row.map((course, colIndex) => {
           const isPauseRow = (rowIndex === 3 && colIndex) || (rowIndex === 6 && colIndex);
@@ -264,30 +264,30 @@ const TimetableDropArea = ({ classes, jours, selectedClass, handleClassChange, t
           // Trouver le cours pré-rempli correspondant à la cellule actuelle
           let preFilledCourse = null;
 
-        if (colIndex > 0) {
-          //console.log('---- Début de la recherche ----');
-           /* console.log('Contenu de preFilledCourses :', preFilledCourses);
-            console.log('Valeur de iJ :', colIndex-1);
-            console.log('Contenu de jours :', jours);
-            console.log('Contenu de jours[iJ] :', jours[colIndex-1]);
-            console.log('Contenu de timeSlots[rowIndex].heureDebut :', timeSlots[rowIndex].heureDebut);
-*/
-          for (let i = 0; i < preFilledCourses.length; i++) {
-            const c = preFilledCourses[i];
-            //console.log('Itération de la boucle, examen du cours :', c);
+          if (colIndex > 0) {
+            //console.log('---- Début de la recherche ----');
+            /* console.log('Contenu de preFilledCourses :', preFilledCourses);
+             console.log('Valeur de iJ :', colIndex-1);
+             console.log('Contenu de jours :', jours);
+             console.log('Contenu de jours[iJ] :', jours[colIndex-1]);
+             console.log('Contenu de timeSlots[rowIndex].heureDebut :', timeSlots[rowIndex].heureDebut);
+ */
+            for (let i = 0; i < preFilledCourses.length; i++) {
+              const c = preFilledCourses[i];
+              //console.log('Itération de la boucle, examen du cours :', c);
 
-            if (c.jour === jours[colIndex - 1].id && c.heureDebut === timeSlots[rowIndex].heureDebut) {
-              preFilledCourse = c;
-              console.log('Cours pré-rempli trouvé ! Contenu de preFilledCourse :', preFilledCourse);
-              break;
+              if (c.jour === jours[colIndex - 1].id && c.heureDebut === timeSlots[rowIndex].heureDebut) {
+                preFilledCourse = c;
+                console.log('Cours pré-rempli trouvé ! Contenu de preFilledCourse :', preFilledCourse);
+                break;
+              }
             }
+
+            //console.log('---- Fin de la recherche ----');
           }
 
-          //console.log('---- Fin de la recherche ----');
-        }
-          
 
-         // console.log('contenu de tout les prefile',preFilledCourses)
+          // console.log('contenu de tout les prefile',preFilledCourses)
           //console.log('contenu de prefile',preFilledCourse)
 
 
@@ -303,8 +303,8 @@ const TimetableDropArea = ({ classes, jours, selectedClass, handleClassChange, t
               }}
               onDrop={(e) => handleDrop(e, rowIndex, colIndex)}
               onDragOver={(e) => e.preventDefault()}
-              onClick={() => handleCellClick(rowIndex, colIndex,preFilledCourse)} // Ajoutez un gestionnaire de clic pour la suppression
-              
+              onClick={() => handleCellClick(rowIndex, colIndex, preFilledCourse)} // Ajoutez un gestionnaire de clic pour la suppression
+
             >
               {isPauseRow ? (
                 <p>Pause</p>
@@ -319,7 +319,7 @@ const TimetableDropArea = ({ classes, jours, selectedClass, handleClassChange, t
                         <>
                           <p>{preFilledCourse.Enseignant.nom}</p>
                           <p>{preFilledCourse.cours.matiere}</p>
-                          
+
                         </>
                       ) : (
                         <p>Vide</p>
@@ -337,30 +337,30 @@ const TimetableDropArea = ({ classes, jours, selectedClass, handleClassChange, t
   };
 
   return (
-   <div>
-    
-    <h2>Emploi du temps</h2>
-    <label htmlFor="classSelect">Sélectionner la classe : </label>
-        <select
-          id="classSelect"
-          onChange={(e) => handleClassChange(e.target.value)}
-          value={selectedClass ? selectedClass.id : ''}
-        >
-          {classes.map((classe) => (
-            <option key={classe.id} value={classe.id}>
-              {classe.classe}
-            </option>
-          ))}
-        </select>
-    <div style={{ ...timetableStyle, border: '1px solid black', padding: '5px', position: 'relative'  }}>
-      
-      <div>
-        
+    <div>
+
+      <h2>Emploi du temps</h2>
+      <label htmlFor="classSelect">Sélectionner la classe : </label>
+      <select
+        id="classSelect"
+        onChange={(e) => handleClassChange(e.target.value)}
+        value={selectedClass ? selectedClass.id : ''}
+      >
+        {classes.map((classe) => (
+          <option key={classe.id} value={classe.id}>
+            {classe.classe}
+          </option>
+        ))}
+      </select>
+      <div style={{ ...timetableStyle, border: '1px solid black', padding: '5px', position: 'relative' }}>
+
+        <div>
+
+        </div>
+        {renderDayHeaders(jours)}
+        {renderTimetableRows()}
+
       </div>
-      {renderDayHeaders(jours)}
-      {renderTimetableRows()}
-      
-    </div>
     </div>
   );
 };
@@ -507,14 +507,14 @@ const TimeTable = () => {
         ))}
       </div>
       <div style={{ marginLeft: '220px', overflowX: 'auto' }}>
-      <TimetableDropArea
-        classes={classes}
-        jours={jours}
-        selectedClass={selectedClass}
-        handleClassChange={handleClassChange}
-        timetableId={timetableId} // Passer timetableId comme prop
+        <TimetableDropArea
+          classes={classes}
+          jours={jours}
+          selectedClass={selectedClass}
+          handleClassChange={handleClassChange}
+          timetableId={timetableId} // Passer timetableId comme prop
 
-      />
+        />
       </div>
     </div>
   );
