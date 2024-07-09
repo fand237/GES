@@ -16,6 +16,14 @@ router.get("/", async (req, res) => {
 
 });
 
+router.get("/auth", validateToken,(req, res) => {
+  console.log("le req user dans auth est ", req.utilisateur);
+
+  return res.json(req.utilisateur);
+
+
+});
+
 router.get("/:id", validateToken, async (req, res) => {
 
   const id = req.params.id;
@@ -98,7 +106,7 @@ router.post("/login", async (req, res) => {
     );
 
 
-   return res.json(accessToken);
+    return res.json({token: accessToken,nomUtilisateur: user.nomUtilisateur, id: user.id, typeUtilisateur: user.typeuser });
   } catch (error) {
     console.error(error);
     return res.status(500).json({ error: 'Erreur serveur' });
@@ -106,14 +114,6 @@ router.post("/login", async (req, res) => {
 });
 
 
-
-router.get("/auth", validateToken, async (req, res) => {
-  console.log("le req user dans auth est ",req.utilisateur);
-
-  res.json(req.utilisateur);
-
-
-});
 
 
 

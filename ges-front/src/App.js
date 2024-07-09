@@ -1,7 +1,9 @@
 import './App.css';
-import { BrowserRouter as Router, Route, Routes, Link } from "react-router-dom";
+import { BrowserRouter as Router, Route, Routes, Link ,Navigate} from "react-router-dom";
+import jwt from 'jsonwebtoken';
 import Home from "./components/Home";
 import AdminForm from './components/AdminForm';
+import DashboardAdmin from './components/DashboardAdmin';
 import CoursForm from './components/CoursForm'
 import CoursAll from './components/CoursAll'
 import CoursUpdate from './components/CoursUpdate'
@@ -27,6 +29,9 @@ import ParentAll from './components/ParentAll'
 import FicheAppel from './components/FicheAppel'
 import NoteForm from './components/NoteForm'
 import NoteUpdate2 from './components/NoteUpdate2'
+import LoginAll from './components/LoginAll'
+import Logout from './components/Logout'
+
 
 import NoteEval from './components/NoteEval'
 import BulletinSequence from './components/BulletinSequence'
@@ -35,7 +40,32 @@ import ProtectedRoute from './components/ProtectedRoute'
 import { AuthContext } from './helpers/AuthContext'
 import { useState, useEffect } from 'react';
 import axios from 'axios';
+// eslint-disable-next-line 
 
+import { useNavigate } from 'react-router-dom';
+
+  
+
+const AuthenticatedRoute = ({ children, role }) => {
+  const [token, setToken] = useState('');
+  const [userRole, setUserRole] = useState('');
+
+  useEffect(() => {
+    const storedToken = localStorage.getItem('accessToken');
+    if (storedToken) {
+      setToken(storedToken);
+      const decoded = jwt.verify(storedToken, 'importantsecret'); // Replace 'secretKey' with your actual secret
+      setUserRole(decoded.typeUtilisateur);
+    }
+  }, []);
+
+  // Check if user is logged in and has the required role
+  if (!token || userRole !== role) {
+    return <Navigate to="/LoginAll" replace />;
+  }
+
+  return children;
+};
 
 
 
@@ -44,6 +74,8 @@ import axios from 'axios';
 
 
 function App() {
+  //const navigate = useNavigate(); // Utilisation de useNavigate
+
   const [authState, setAuthState] = useState({
     nomUtilisateur: "",
     id: 0,
@@ -55,16 +87,17 @@ function App() {
     const setSatate = async () => {
       try {
         await axios
-        .get('http://localhost:3001/Enseignants/auth', {
+        .get(`http://localhost:3001/Enseignants/auth`, {
           headers: {
             "accessToken": localStorage.getItem("accessToken"),
           },
         })
         .then((response) => {
-          console.log(response.data)
-          if (response.data && response.data.error) {
+          if (response.data.error) {
             setAuthState({
-              ...authState,
+              nomUtilisateur: "",
+              id: 0,
+              typeUtilisateur:"",
               status: false,
             });
   
@@ -91,7 +124,9 @@ function App() {
   const logout = () => {
     localStorage.removeItem("accessToken");
     setAuthState({
-      ...authState,
+      nomUtilisateur: "",
+      id: 0,
+      typeUtilisateur:"",
       status: false,
     });
   }
@@ -103,10 +138,10 @@ function App() {
           <div className='navbar'>
             <Link to="/CoursForm">Ajouter un Cours</Link><br />
             <Link to="/CoursAll">Tout les Cours</Link><br />
-            {!authState.status ? (
+            {(!authState.status ) ? (
               <>
 
-                <Link to="/EnseignantConnect">Se Connecter</Link><br />
+                <Link to="/LoginAll">Se Connecter</Link><br />
                 <Link to="/EnseignantForm">S'enregistrer</Link><br />
               </>
             ) : (
@@ -118,13 +153,19 @@ function App() {
           <Routes>
             <Route path="/Home" exact element={<Home />} />
             <Route path="/AdminForm" exact element={<AdminForm />} />
+            <Route path="/DashboardAdmin" exact element={<DashboardAdmin />} />
+
             <Route path="/CoursForm" exact element={<CoursForm />} />
             <Route path="/CoursAll" exact element={<CoursAll />} />
             <Route path="/CoursUpdate/:id" exact element={<CoursUpdate />} />
             <Route path="/CoursDelete/:id" exact element={<CoursDelete />} />
+
             <Route path="/EmploisTemps" exact element={<TimeTable />} />
+
             <Route path="/EmploisTempsEnseignant" exact element={<TimeTableEnseignant />} />
             <Route path="/DashboardEnseignant" exact element={<DashboardEnseignant />} />
+            <Route path="/LoginAll" exact element={<LoginAll />} />
+            <Route path="/Logout" exact element={<Logout />} />
 
             <Route path="/EleveForm" exact element={<EleveForm />} />
             <Route path="/EleveLogin" exact element={<EleveConnect />} />

@@ -3,6 +3,7 @@ import { Formik, Form, Field, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+
 import { AuthContext } from '../helpers/AuthContext';
 
 
@@ -32,10 +33,7 @@ function EnseignantConnect
             await axios
 
                 .post("http://localhost:3001/Enseignants/login", data, {
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'accessToken': localStorage.getItem("accessToken") // Ajoutez le token d'accès aux en-têtes de la requête
-                    }
+                   
                 })
 
                 .then((response) => {
@@ -43,8 +41,13 @@ function EnseignantConnect
                         alert(response.data.error)
                     }
                     else {
-                        localStorage.setItem("accessToken", response.data)
-                        setAuthState(true)
+                        localStorage.setItem("accessToken", response.data.token)
+                        setAuthState({
+                            nomUtilisateur: response.data.nomUtilisateur,
+                            id: response.data.id,
+                            typeUtilisateur:response.data.typeUtilisateur,
+                            status: true,
+                          })
                         navigate(`/DashboardEnseignant`)
 
                     };
@@ -72,23 +75,38 @@ function EnseignantConnect
     }, [navigate]);
 
     return (
-        <div className='createEnseignantConnect
-    Page'>
+        <div className="pannel-connect-1">
+        <div className="pannel-connect-2">
+        <h1 className="titre-connect">
+                   Connexion ENS
+                </h1>
             <Formik initialValues={initialValues} onSubmit={onSubmit} validationSchema={validationSchema}>
-                <Form>
-                    <label>Nom d'utilisateur :</label>
+                <Form className="mt-6">
+                    <div className="mb-2">
+                    <label for="email"
+                            className="block text-sm font-semibold text-gray-800">Nom d'utilisateur :</label>
                     <ErrorMessage name="nomUtilisateur" component="span" />
-                    <Field type="text" id="nomUtilisateur" name="nomUtilisateur" /><br />
-
-                    <label>Mot de passe :</label>
+                    <Field type="text" id="nomUtilisateur" name="nomUtilisateur" className="input-user"/><br />
+                    </div>
+                    <div className="mb-2">
+                    <label for="password"
+                            className="block text-sm font-semibold text-gray-800">Mot de passe :</label>
                     <ErrorMessage name="motDePasse" component="span" />
-                    <Field type="password" id="motDePasse" name="motDePasse" /><br />
-
-
-
-                    <button type="submit">Se Connecter</button>
+                    <Field type="password" id="motDePasse" name="motDePasse"
+                            className="input-password" /><br />
+                    </div>
+                    <a
+                        href="#"
+                        className="forget-password"
+                    >
+                        Mot de passe oublie?
+                    </a>
+                    <div className="mt-6">
+                    <button type="submit" className='send-button'>Se Connecter</button>
+                    </div>
                 </Form>
             </Formik>
+        </div>
         </div>
     );
 }

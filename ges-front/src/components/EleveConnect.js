@@ -49,23 +49,38 @@ function Elevelogin
     };
 
     return (
-        <div className='createElevelogin
-    Page'>
+        <div className="pannel-connect-1">
+        <div className="pannel-connect-2">
+        <h1 className="titre-connect">
+                   Connexion
+                </h1>
             <Formik initialValues={initialValues} onSubmit={onSubmit} validationSchema={validationSchema}>
-                <Form>
-                    <label>Nom d'utilisateur :</label>
+                <Form className="mt-6">
+                    <div className="mb-2">
+                    <label for="email"
+                            className="block text-sm font-semibold text-gray-800">Nom d'utilisateur :</label>
                     <ErrorMessage name="nomUtilisateur" component="span" />
-                    <Field type="text" id="nomUtilisateur" name="nomUtilisateur" /><br />
-
-                    <label>Mot de passe :</label>
+                    <Field type="text" id="nomUtilisateur" name="nomUtilisateur" className="input-user"/><br />
+                    </div>
+                    <div className="mb-2">
+                    <label for="password"
+                            className="block text-sm font-semibold text-gray-800">Mot de passe :</label>
                     <ErrorMessage name="motDePasse" component="span" />
-                    <Field type="password" id="motDePasse" name="motDePasse" /><br />
-
-
-
-                    <button type="submit">Se Connecter</button>
+                    <Field type="password" id="motDePasse" name="motDePasse"
+                            className="input-password" /><br />
+                    </div>
+                    <a
+                        href="#"
+                        className="forget-password"
+                    >
+                        Mot de passe oublie?
+                    </a>
+                    <div className="mt-6">
+                    <button type="submit" className='send-button'>Se Connecter</button>
+                    </div>
                 </Form>
             </Formik>
+        </div>
         </div>
     );
 }

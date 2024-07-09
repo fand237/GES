@@ -30,11 +30,14 @@ function CoursAll() {
                 Enseignant: enseignantDetails.data,
                 jour: joursDetails.data,
                 classe: classesDetails.data,
+                
               };
             })
           );
   
           setListOfCours(coursesWithDetails);
+          console.log(coursesWithDetails);
+
         })
         .catch((error) => {
           console.error("Erreur lors de la récupération des cours et jours : ", error);

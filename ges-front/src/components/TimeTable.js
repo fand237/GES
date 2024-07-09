@@ -179,7 +179,8 @@ const TimetableDropArea = ({ classes, jours, selectedClass, handleClassChange, t
         timeSlots[rowIndex].heureDebut,
         timeSlots[rowIndex].heureFin,
         draggedItem.course.Enseignant.id,
-        timetableId,)
+        timetableId,
+        draggedItem.course)
       const response = await axios.post('http://localhost:3001/Jour_Cours/create', {
         coursId: draggedItem.course.id,
         jourId: jours[colIndex - 1].id,
@@ -441,12 +442,26 @@ const TimeTable = () => {
   useEffect(() => {
     if (selectedClass) {
       axios
-        .get(`http://localhost:3001/Cours/byclasse/${selectedClass.id}`)
+        .get(`http://localhost:3001/Cours/byclasse/${selectedClass.id}`,
+        {
+          headers:{
+            accessToken: localStorage.getItem("accessToken"),
+          },
+        }
+        )
         .then(async (response) => {
+          if(response.data.error){
+            console.log(response.data.error);
+          }else{
+          
           const coursesWithDetails = await Promise.all(
             response.data.map(async (course) => {
               const enseignantDetails = await axios.get(
-                `http://localhost:3001/Enseignants/${course.Enseignant}`
+                `http://localhost:3001/Enseignants/${course.Enseignant}`,{
+                  headers:{
+                    accessToken: localStorage.getItem("accessToken"),
+                  },
+                }
               );
               const joursDetails = await axios.get(
                 `http://localhost:3001/Jour/${course.jour}`
@@ -460,6 +475,7 @@ const TimeTable = () => {
           );
 
           setListOfCours(coursesWithDetails);
+        }
         })
         .catch((error) => {
           console.error(
