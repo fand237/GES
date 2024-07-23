@@ -7,15 +7,33 @@ import { SHA256 } from 'crypto-js';
 
 function ParentForm() {
   const [indicatifs, setIndicatifs] = useState([]);
+  const [showSuccessMessage, setShowSuccessMessage] = useState(false);
+
 
   useEffect(() => {
     const fetchIndicatifs = async () => {
       try {
         const response = await axios.get('https://restcountries.com/v3.1/all');
-        const indicatifsPays = response.data.map((country) => country.diallingCodes[0]);
-        
+        const indicatifsPays = response.data.flatMap((country) =>
+          country.idd.suffixes
+            ? country.idd.suffixes.map((suffix) => ({
+                name: country.name.common,
+                flag: country.flags.png,
+                code: `${country.idd.root}${suffix}`,
+              }))
+            : []
+        );
+
+        indicatifsPays.sort((a, b) => a.name.localeCompare(b.name));
+
+
         // Ajouter l'indicatif par défaut en haut de la liste
-        indicatifsPays.unshift('+237');
+        indicatifsPays.unshift({
+          name: 'Cameroun',
+          flag: 'https://restcountries.com/v3.1/flag/cmr',
+          code: '+237',
+        });
+
         setIndicatifs(indicatifsPays);
       } catch (error) {
         console.error('Erreur lors de la récupération des indicatifs de pays : ', error);
@@ -47,7 +65,7 @@ function ParentForm() {
       .required('Numéro de téléphone obligatoire'),
   });
 
-  const onSubmit = async (data) => {
+  const onSubmit = async (data, {resetForm}) => {
     try {
         const hashedPassword = SHA256(data.motDePasse).toString();
 
@@ -56,6 +74,12 @@ function ParentForm() {
         ...data,
         motDePasse: hashedPassword,
       });
+      setShowSuccessMessage(true);
+      setTimeout(() => {
+        setShowSuccessMessage(false);
+      }, 2000);
+
+      resetForm();
       console.log("Parent créé avec succès");
     } catch (error) {
         if (error.response) {
@@ -83,45 +107,65 @@ function ParentForm() {
   };
 
   return (
-    <div className='createParentFormPage'>
+    <div className="pannel-connect-1">
+    <div className="pannel-connect-2">
+      <h1 className="titre-connect">Ajouter Parent</h1>
       <Formik initialValues={initialValues} onSubmit={onSubmit} validationSchema={validationSchema}>
-        <Form>
-          <label>Nom d'utilisateur :</label>
-          <ErrorMessage name="nomUtilisateur" component="span" />
-          <Field type="text" id="nomUtilisateur" name="nomUtilisateur" /><br />
-
-          <label>Mot de passe :</label>
-          <ErrorMessage name="motDePasse" component="span" />
-          <Field type="password" id="motDePasse" name="motDePasse" /><br />
-
-          <label>Email :</label>
-          <ErrorMessage name="email" component="span" />
-          <Field type="email" id="email" name="email" /><br />
-
-          <label>Nom :</label>
-          <ErrorMessage name="nom" component="span" />
-          <Field type="text" id="nom" name="nom" /><br />
-
-          <label>Prénom :</label>
-          <ErrorMessage name="prenom" component="span" />
-          <Field type="text" id="prenom" name="prenom" /><br />
-
-          <label>Indicatif du pays :</label>
-          <ErrorMessage name="indicatifPays" component="span" />
-          <Field as="select" id="indicatifPays" name="indicatifPays">
-            {indicatifs.map((indicatif) => (
-              <option key={indicatif} value={indicatif}>{indicatif}</option>
-            ))}
-          </Field><br />
-
-          <label>Numéro de téléphone :</label>
-          <ErrorMessage name="numeroTelephone" component="span" />
-          <Field type="text" id="numeroTelephone" name="numeroTelephone" /><br />
-
-          <button type="submit">Ajouter Parent</button>
+        <Form className="mt-6">
+          <div className="mb-2">
+            <label htmlFor="nomUtilisateur" className="block text-sm font-semibold text-gray-800">Nom d'utilisateur :</label>
+            <ErrorMessage name="nomUtilisateur" component="span" className="text-red-500 text-xs" />
+            <Field type="text" id="nomUtilisateur" name="nomUtilisateur" className="input-user" /><br />
+          </div>
+          <div className="mb-2">
+            <label htmlFor="motDePasse" className="block text-sm font-semibold text-gray-800">Mot de passe :</label>
+            <ErrorMessage name="motDePasse" component="span" className="text-red-500 text-xs" />
+            <Field type="password" id="motDePasse" name="motDePasse" className="input-password" /><br />
+          </div>
+          <div className="mb-2">
+            <label htmlFor="email" className="block text-sm font-semibold text-gray-800">Email :</label>
+            <ErrorMessage name="email" component="span" className="text-red-500 text-xs" />
+            <Field type="email" id="email" name="email" className="input-user" /><br />
+          </div>
+          <div className="mb-2">
+            <label htmlFor="nom" className="block text-sm font-semibold text-gray-800">Nom :</label>
+            <ErrorMessage name="nom" component="span" className="text-red-500 text-xs" />
+            <Field type="text" id="nom" name="nom" className="input-user" /><br />
+          </div>
+          <div className="mb-2">
+            <label htmlFor="prenom" className="block text-sm font-semibold text-gray-800">Prénom :</label>
+            <ErrorMessage name="prenom" component="span" className="text-red-500 text-xs" />
+            <Field type="text" id="prenom" name="prenom" className="input-user" /><br />
+          </div>
+          <div className="mb-2">
+            <label htmlFor="indicatifPays" className="block text-sm font-semibold text-gray-800">Indicatif du pays :</label>
+            <ErrorMessage name="indicatifPays" component="span" className="text-red-500 text-xs" />
+            <Field as="select" id="indicatifPays" name="indicatifPays" className="input-user">
+                {indicatifs.map((indicatif) => (
+                  <option key={indicatif.code} value={indicatif.code}>
+                    <img src={indicatif.flag} alt={indicatif.name} className="inline-block w-5 h-5 mr-2" />
+                    {indicatif.name} ({indicatif.code})
+                  </option>
+                ))}
+              </Field><br />
+          </div>
+          <div className="mb-2">
+            <label htmlFor="numeroTelephone" className="block text-sm font-semibold text-gray-800">Numéro de téléphone :</label>
+            <ErrorMessage name="numeroTelephone" component="span" className="text-red-500 text-xs" />
+            <Field type="text" id="numeroTelephone" name="numeroTelephone" className="input-user" /><br />
+          </div>
+          <div className="mt-6">
+            <button type="submit" className="send-button">Ajouter Parent</button>
+          </div>
         </Form>
       </Formik>
+      {showSuccessMessage && (
+          <div className="success-message">
+            Parent ajouté avec succès !
+          </div>
+        )}
     </div>
+  </div>
   );
 }
 

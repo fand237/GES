@@ -1,14 +1,14 @@
 const express = require('express')
 const router = express.Router();
 const { Eleve, Classe, Parent } = require("../models")
-const { SHA256 } = require('crypto-js');
+const bcrypt = require('bcrypt');
 const {validateToken} = require("../middlewares/AuthMiddleware")
 const { sign } = require('jsonwebtoken')
 
 
 
 
-router.get("/", async (req, res) => {
+router.get("/", validateToken,async (req, res) => {
 
   const listOfEleve = await Eleve.findAll();
   res.json(listOfEleve);
@@ -16,7 +16,15 @@ router.get("/", async (req, res) => {
 
 });
 
-router.get("/:id", async (req, res) => {
+router.get("/auth", validateToken,(req, res) => {
+  console.log("le req user dans auth est ", req.utilisateur);
+
+  return res.json(req.utilisateur);
+
+
+});
+
+router.get("/:id", validateToken,async (req, res) => {
 
   const id = req.params.id;
   const post = await Eleve.findByPk(id);
@@ -74,36 +82,37 @@ router.get('/nopass/:id', async (req, res) => {
 
 // Route pour la mise à jour d'un Eleve
 router.put('/:id', async (req, res) => {
-  try {
-    const { id } = req.params;
-    const { nomUtilisateur, motDePasse, email, nom, prenom } = req.body;
+  const { id } = req.params;
+    const { nomUtilisateur, motDePasse, email, nom, prenom, dateNaissance, classe, parent } = req.body;
 
-    // Récupérer le Eleve existant par son ID
-    const eleve = await Eleve.findByPk(id);
+    try {
+        const eleve = await Eleve.findByPk(id);
+        if (!eleve) {
+            return res.status(404).json({ error: "Élève non trouvé" });
+        }
 
-    if (!eleve) {
-      return res.status(404).json({ error: 'Eleve non trouvé' });
+        const updatedData = {
+            nomUtilisateur,
+            email,
+            nom,
+            prenom,
+            dateNaissance,
+            classe,
+            parent
+        };
+
+        if (motDePasse) {
+            const hashedPassword = await bcrypt.hash(motDePasse, saltRounds);
+            updatedData.motDePasse = hashedPassword;
+        }
+
+        await eleve.update(updatedData);
+        res.json({ message: "Élève mis à jour avec succès" });
+
+    } catch (error) {
+        console.error("Erreur lors de la mise à jour de l'élève :", error);
+        res.status(500).json({ error: "Erreur du serveur" });
     }
-
-    // Mettre à jour les champs fournis dans la requête
-    eleve.nomUtilisateur = nomUtilisateur || eleve.nomUtilisateur;
-    eleve.email = email || eleve.email;
-    eleve.nom = nom || eleve.nom;
-    eleve.prenom = prenom || eleve.prenom;
-
-    // Mettre à jour le mot de passe uniquement s'il est fourni dans la requête
-    if (motDePasse) {
-      eleve.motDePasse = SHA256(motDePasse).toString();
-    }
-
-    // Sauvegarder les modifications
-    await eleve.save();
-
-    res.json({ message: 'Mise à jour réussie' });
-  } catch (error) {
-    console.error('Erreur lors de la mise à jour du Eleve : ', error);
-    res.status(500).json({ error: 'Erreur serveur' });
-  }
 });
 
 router.delete("/:id", async (req, res) => {
@@ -119,7 +128,7 @@ router.delete("/:id", async (req, res) => {
 });
 
 
-router.post("/", async (req, res) => {
+router.post("/", validateToken,async (req, res) => {
 
   try {
     const post = req.body;
@@ -134,10 +143,28 @@ router.post("/", async (req, res) => {
       return res.status(422).json({ error: "Cette adresse e-mail est déjà utilisée." });
     }
 
-    let ele = await Eleve.create(post);
+    const { nomUtilisateur, motDePasse, email, nom, prenom, dateNaissance, classe, parent } = req.body;
 
-    ele.typeuser = "Eleve"; 
-    await ele.save(); 
+    try {
+        const hashedPassword = await bcrypt.hash(motDePasse, 10);
+        const eleve = await Eleve.create({
+            nomUtilisateur,
+            motDePasse: hashedPassword,
+            email,
+            nom,
+            prenom,
+            dateNaissance,
+            classe,
+            parent
+        });
+        eleve.typeuser = "Eleve"; 
+        await eleve.save();
+        res.json(eleve);
+    } catch (error) {
+        console.error("Erreur lors de la création de l'élève :", error);
+        res.status(500).json({ error: "Erreur du serveur" });
+    }
+    
     // Si tout va bien, renvoyer une réponse de succès
     return res.status(200).json({ success: 'Eleve créé avec succès' });
 

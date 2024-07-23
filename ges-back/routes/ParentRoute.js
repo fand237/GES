@@ -1,9 +1,13 @@
 const express = require('express')
 const router = express.Router();
 const {Parent} = require("../models")
+const { getParentsByClasse } = require('../controllers/ParentControllers');
+const { validateToken } = require("../middlewares/AuthMiddleware")
 
 
 
+
+router.get('/byClasse/:classe',validateToken,getParentsByClasse);
 
 router.get("/", async (req, res) => {
 

@@ -19,6 +19,9 @@ router.get("/", async (req, res) => {
 
 });
 
+router.get('/bymatiere', CoursController.getUniqueMatieres);
+
+
 router.get("/:id", async (req, res) => {
 
     const id=req.params.id;

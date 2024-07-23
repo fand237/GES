@@ -17,7 +17,13 @@ module.exports = (sequelize,DataTypes) => {
       },
     });
   
-    
+    Classe.associate = (models) => {
+      Classe.hasMany(models.Eleve, {
+        foreignKey: 'classe',
+        as: 'eleves',
+      });
+    };
+  
 
     return Classe;
   };

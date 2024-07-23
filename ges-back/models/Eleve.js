@@ -52,6 +52,8 @@
       typeuser: {
         type: DataTypes.STRING,
         allowNull: true,
+        defaultValue: "Eleve", // Définir la valeur par défaut ici
+
         
       },
   

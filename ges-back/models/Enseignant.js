@@ -59,11 +59,23 @@ class Enseignant  {
       typeuser: {
         type: DataTypes.STRING,
         allowNull: true,
-        
+        defaultValue: "Enseignant", // Définir la valeur par défaut ici
+
       },
   
   
     });
+
+    Enseignant.associate = (models) => {
+      // autres associations...
+    
+      Enseignant.hasMany(models.Cours, {
+        foreignKey: 'Enseignant',
+        as: 'cours',
+        onUpdate: 'CASCADE',
+        onDelete: 'CASCADE',
+      });
+    };
 
     Enseignant.checkOverlapUsername = async function (nomUtilisateur) {
       try {

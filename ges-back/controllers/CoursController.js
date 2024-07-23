@@ -19,5 +19,20 @@ const deleteCours = async (req, res) => {
   }
 };
 
+const getUniqueMatieres = async (req, res) => {
+  try {
+    const matieres = await Cours.findAll({
+      attributes: [
+        [Cours.sequelize.fn('DISTINCT', Cours.sequelize.col('matiere')), 'matiere']
+      ],
+    });
+    const uniqueMatieres = matieres.map(matiere => matiere.matiere);
+    res.status(200).json(uniqueMatieres);
+  } catch (error) {
+    console.error('Erreur lors de la récupération des matières uniques :', error);
+    res.status(500).json({ error: 'Une erreur est survenue lors de la récupération des matières uniques.' });
+  }
+};
 
-module.exports = { deleteCours };
+
+module.exports = { deleteCours,getUniqueMatieres, };

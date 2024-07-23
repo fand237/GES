@@ -19,7 +19,7 @@ const timetableStyle = {
 const DraggableItem = ({ course, handleDragStart }) => {
   return (
     <div
-      style={{ ...draggableStyle }}
+      className="border border-dashed border-gray-400 bg-white p-2 cursor-move mb-2"
       draggable
       onDragStart={(e) => handleDragStart(e, course)}
     >
@@ -511,28 +511,28 @@ const TimeTable = () => {
   };
 
   return (
-    <div style={{ display: 'flex' }}>
-      <div style={{ position: 'fixed', top: '0', left: '0', width: '200px', height: '100vh', overflowY: 'auto' }}>
-        <h2>Cours</h2>
-        {listOfCours.map((value, key) => (
-          <DraggableItem
-            key={key}
-            course={value}
-            handleDragStart={handleDragStart}
-          />
-        ))}
-      </div>
-      <div style={{ marginLeft: '220px', overflowX: 'auto' }}>
-        <TimetableDropArea
-          classes={classes}
-          jours={jours}
-          selectedClass={selectedClass}
-          handleClassChange={handleClassChange}
-          timetableId={timetableId} // Passer timetableId comme prop
+    <div className="flex">
+  <div className="fixed top-0 left-0 w-52 h-screen overflow-y-auto">
+    <h2>Cours</h2>
+    {listOfCours.map((value, key) => (
+      <DraggableItem
+        key={key}
+        course={value}
+        handleDragStart={handleDragStart}
+      />
+    ))}
+  </div>
+  <div className="ml-56 overflow-x-auto">
+    <TimetableDropArea
+      classes={classes}
+      jours={jours}
+      selectedClass={selectedClass}
+      handleClassChange={handleClassChange}
+      timetableId={timetableId} // Passer timetableId comme prop
+    />
+  </div>
+</div>
 
-        />
-      </div>
-    </div>
   );
 };
 
