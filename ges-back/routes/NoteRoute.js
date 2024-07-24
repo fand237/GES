@@ -7,11 +7,10 @@ const {validateToken} = require("../middlewares/AuthMiddleware")
 
 
 // Route pour créer une nouvelle note
-router.post('/', validateToken,async (req, res) => {
+router.post('/', validateToken, async (req, res) => {
   try {
-
     let { eleve, cours, note, dateEvaluation, type_Evaluation, sequence } = req.body;
-    console.log(req.utilisateur)
+
     // Recherche d'une instance existante
     const existingInstance = await Note.findOne({
       where: {
@@ -19,35 +18,44 @@ router.post('/', validateToken,async (req, res) => {
         cours,
         type_Evaluation,
         sequence,
-
       },
     });
 
     if (existingInstance) {
-
-      if (note == '') { note = null }
-      // Si l'instance existe, mettez à jour le statut
+      if (note == '') { note = null; }
+      // Si l'instance existe, mettez à jour la note
       existingInstance.note = note;
-
       await existingInstance.save();
     } else {
-      if (note == '') { note = null }
-      // Sinon, créez une nouvelle instance
+      if (note == '') { note = null; }
+      // Sinon, créez une nouvelle instance de note
       const newNote = await Note.create({ eleve, cours, note, dateEvaluation, type_Evaluation, sequence });
-      const idannee = 1;
-      const idnote = newNote.id
+
       // Vérifiez si les valeurs requises pour la création du Bulletin sont disponibles
+      const idnote = newNote.id;
+      const idannee = 1; // Vous devez ajuster cela pour obtenir la bonne année
+
       if (idnote && idannee) {
-        const newBulletin = await Bulletin.create({ eleve, note: idnote, annee: idannee });
+        // Recherche d'un bulletin existant pour éviter les doublons
+        const existingBulletin = await Bulletin.findOne({
+          where: {
+            eleve,
+            note: idnote,
+            annee: idannee,
+          },
+        });
+
+        if (!existingBulletin) {
+          await Bulletin.create({ eleve, note: idnote, annee: idannee });
+        } else {
+          console.log('Le bulletin existe déjà.');
+        }
       } else {
         console.error('Valeurs manquantes pour la création du Bulletin.');
       }
-
     }
 
     res.json({ message: 'Mise à jour ou création réussie' });
-
-
 
   } catch (error) {
     console.error('Erreur lors de la création de la note :', error);

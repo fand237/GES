@@ -155,10 +155,10 @@ router.post("/", validateToken,async (req, res) => {
             prenom,
             dateNaissance,
             classe,
-            parent
+            parent,
+            typeuser
         });
-        eleve.typeuser = "Eleve"; 
-        await eleve.save();
+        
         res.json(eleve);
     } catch (error) {
         console.error("Erreur lors de la création de l'élève :", error);
@@ -174,6 +174,7 @@ router.post("/", validateToken,async (req, res) => {
   }
 });
 
+
 router.post("/login", async (req, res) => {
 
   try {
@@ -181,19 +182,20 @@ router.post("/login", async (req, res) => {
     const user = await Eleve.findOne({ where: { nomUtilisateur: nomUtilisateur } })
 
     if (!user) return res.json({ error: "Utilisateur inexistant" });
+    const isPasswordValid = await bcrypt.compare(motDePasse, user.motDePasse);
 
-    if (!(user.motDePasse == SHA256(motDePasse).toString())) {
+    if (!(isPasswordValid)) {
       // Si tout va bien, renvoyer une réponse de succès
       return res.json({ error: "udername ou password incorrrect" });
     }
 
     const accessToken = sign(
-      {nomUtilisateur: user.nomUtilisateur, id: user.id},
+      { nomUtilisateur: user.nomUtilisateur, id: user.id, typeUtilisateur: user.typeuser },
       "importantsecret"
-      );
-    res.json(accessToken)
+    );
 
 
+    return res.json({token: accessToken,nomUtilisateur: user.nomUtilisateur, id: user.id, typeUtilisateur: user.typeuser });
   } catch (error) {
     console.error(error);
     return res.status(500).json({ error: 'Erreur serveur' });

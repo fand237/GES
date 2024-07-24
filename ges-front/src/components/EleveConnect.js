@@ -1,11 +1,16 @@
-import React from 'react';
+import React , {  useContext, useEffect }from 'react';
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
 import axios from 'axios';
+import { AuthContext } from '../helpers/AuthContext';
+import { useNavigate } from 'react-router-dom';
+
 
 
 function Elevelogin
     () {
+        const { setAuthState } = useContext(AuthContext);
+        let navigate = useNavigate();
 
 
     const initialValues = {
@@ -23,16 +28,28 @@ function Elevelogin
     const onSubmit = async (data) => {
         try {
 
-            // Utiliser le mot de passe hashé dans la requête
-            await axios.post("http://localhost:3001/Eleve/login", data).then((response) => {
-                if (response.data.error) {
-                    alert(response.data.error)
-                }
-                else {
-                    localStorage.setItem("accessToken", response.data)
+            await axios
 
-                };
-            });
+                .post("http://localhost:3001/Eleve/login", data, {
+                   
+                })
+
+                .then((response) => {
+                    if (response.data.error) {
+                        alert(response.data.error)
+                    }
+                    else {
+                        localStorage.setItem("accessToken", response.data.token)
+                        setAuthState({
+                            nomUtilisateur: response.data.nomUtilisateur,
+                            id: response.data.id,
+                            typeUtilisateur:response.data.typeUtilisateur,
+                            status: true,
+                          })
+                        navigate(`/DashboardEleve`)
+
+                    };
+                });
         } catch (error) {
             if (error.response) {
                 if (error.response.status === 422) {
@@ -47,6 +64,14 @@ function Elevelogin
             }
         }
     };
+    useEffect(() => {
+        const isAuthenticated = localStorage.getItem('accessToken');
+
+        if (isAuthenticated) {
+            return navigate(`/DashboardEleve`);
+        }
+    }, [navigate]);
+
 
     return (
         <div className="pannel-connect-1">

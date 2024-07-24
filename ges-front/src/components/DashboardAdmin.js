@@ -4,7 +4,6 @@ import TimeTable from './TimeTable';
 import UserAll from './UserAll';
 import CoursForm from './CoursForm'
 import CoursAll from './CoursAll'
-import FicheAppel from './FicheAppel';
 
 const DashboardAdmin = () => {
     const [activeTab, setActiveTab] = useState('FormAll');
@@ -58,14 +57,7 @@ const DashboardAdmin = () => {
                             Enregistrement des Cours
                         </button>
                     </li>
-                    <li>
-                        <button
-                            className={`dashboard-button ${activeTab === 'FicheAppel' ? 'bg-gray-300' : ''}`}
-                            onClick={() => handleTabChange('FicheAppel')}
-                        >
-                            Fiche de presence
-                        </button>
-                    </li>
+                    
                 </ul>
             </div>
             <div className="w-3/4 p-4 bg-white overflow-auto">
@@ -74,7 +66,6 @@ const DashboardAdmin = () => {
                 {activeTab === 'UserAll' && <UserAll />}
                 {activeTab === 'CoursForm' && <CoursForm />}
                 {activeTab === 'CoursAll' && <CoursAll />}
-                {activeTab === 'FicheAppel' && <FicheAppel />}
 
 
             </div>

@@ -14,6 +14,7 @@ import CoursDelete from './components/CoursDelete'
 import TimeTable from './components/TimeTable'
 import TimeTableEnseignant from './components/TimeTableEnseignant'
 import DashboardEnseignant from './components/DashboardEnseignant'
+import DashboardEleve from './components/DashboardEleve'
 
 import EleveAll from './components/EleveAll'
 import EleveUpdate from './components/EleveUpdate'
@@ -161,13 +162,16 @@ function App() {
           <Route path="/EmploisTemps" element={<TimeTable />} />
 
           <Route path="/EmploisTempsEnseignant" element={<TimeTableEnseignant />} />
-          <Route path="/DashboardEnseignant" element={<DashboardEnseignant />} />
+          <Route path="/DashboardEnseignant" element={ <ProtectedRoute requiredRole="Enseignant"> <DashboardEnseignant /> </ProtectedRoute> } />
+
           <Route path="/LoginAll" element={<LoginAll />} />
           <Route path="/Logout" element={<Logout />} />
 
           <Route path="/EleveAll" element={<EleveAll />} />
           <Route path="/EleveUpdate/:id" element={<EleveUpdate />} />
           <Route path="/EleveDelete/:id" element={<EleveDelete />} />
+          <Route path="/DashboardEleve" element={ <ProtectedRoute requiredRole="Eleve"> <DashboardEleve /> </ProtectedRoute> } />
+
 
           <Route
           path="/EnseignantUpdate/:id"
@@ -188,7 +192,8 @@ function App() {
           <Route path="/NoteForm/:idEnseignant" element={<NoteForm />} />
           <Route path="/NoteEval/:idEnseignant" element={<NoteEval />} />
           <Route path="/NoteUpdate/:idCours/:idClasse/:idSequence/:idType/:date" element={<NoteUpdate2 />} />
-          <Route path="/BulletinSequence/:idEleve/:idSequence" element={<BulletinSequence />} />
+          <Route path="/BulletinSequence/:idEleve/:idSequence" element={ <ProtectedRoute requiredRole="Eleve"> <BulletinSequence /> </ProtectedRoute> } />
+
           <Route
           path="/FormAll"
           element={

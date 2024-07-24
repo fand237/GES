@@ -43,7 +43,7 @@ router.get("/byeleve/:idEleve/:idSequence", async (req, res) => {
               attributes: ['matiere', 'coefficient'],
               as: 'coursNote',
               include: [
-                { model: Enseignant, attributes: ['nom', 'prenom'], as: 'EnseignantCours' },
+                { model: Enseignant, attributes: ['nom', 'prenom'], as: 'enseignant' },
                 { model: Groupe, attributes: ['groupe'], as: 'groupeCours' }
               ]
             },
@@ -106,7 +106,7 @@ router.get("/byclasse/:idClasse/:idSequence", async (req, res) => {
       attributes: ['eleve', 'note'],
       include: [
         { model: Eleve, attributes: ['nom', 'prenom', 'dateNaissance'], as: 'eleveBulletin', include: [{ model: Classe, attributes: ['classe'], as: 'classeEleve', where: { id: idClasse }, }] }, // Utilisez l'alias 'coursNote' correspondant à votre association
-        { model: Note, attributes: ['note', 'dateEvaluation'], as: 'noteBulletin', where: { sequence: idSequence }, include: [{ model: Cours, attributes: ['matiere', 'coefficient'], as: 'coursNote', include: [{ model: Enseignant, attributes: ['nom', 'prenom'], as: 'EnseignantCours' }, { model: Groupe, attributes: ['groupe'], as: 'groupeCours' }] }, { model: Type_Evaluation, attributes: ['type'], as: 'TypeNote' }, { model: Sequence, attributes: ['sequence'], as: 'sequenceNote' }], }, // Utilisez l'alias 'sequenceNote' correspondant à votre association
+        { model: Note, attributes: ['note', 'dateEvaluation'], as: 'noteBulletin', where: { sequence: idSequence }, include: [{ model: Cours, attributes: ['matiere', 'coefficient'], as: 'coursNote', include: [{ model: Enseignant, attributes: ['nom', 'prenom'], as: 'enseignant' }, { model: Groupe, attributes: ['groupe'], as: 'groupeCours' }] }, { model: Type_Evaluation, attributes: ['type'], as: 'TypeNote' }, { model: Sequence, attributes: ['sequence'], as: 'sequenceNote' }], }, // Utilisez l'alias 'sequenceNote' correspondant à votre association
       ],
 
     });

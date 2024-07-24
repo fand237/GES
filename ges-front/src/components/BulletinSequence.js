@@ -1,44 +1,79 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useParams } from 'react-router-dom';
+import UseAuthEleve from './UseAuthEleve';
+
 
 
 function BulletinSequence() {
   // États pour stocker les données nécessaires
   const [bulletin, setBulletin] = useState({});
   const [loading, setLoading] = useState(true);
-  const { idEleve, idSequence } = useParams();
+  const { idEleve } = UseAuthEleve();
+  const [sequences, setSequences] = useState([]);
+  const [selectedSequence, setSelectedSequence] = useState('');
+
+  useEffect(() => {
+    const fetchSequences = async () => {
+      try {
+        const response = await axios.get(`http://localhost:3001/Sequence`);
+        console.log("les sequnece sont",response.data);
+        setSequences(response.data);
+        setSelectedSequence(response.data[0]?.id || '');
+      } catch (error) {
+        console.error('Erreur lors de la récupération des séquences :', error);
+      }
+    };
+
+    fetchSequences();
+  }, []);
+
 
 
   // Effet de chargement des données au montage du composant
   useEffect(() => {
-    const fetchBulletin = async () => {
-      try {
-        // Appeler l'API pour récupérer le bulletin pour l'élève et la séquence spécifiés
-        const response = await axios.get(`http://localhost:3001/Bulletin/byeleve/${idEleve}/${idSequence}`);
-        console.log(response.data)
+    if (selectedSequence) {
+      console.log(selectedSequence);
+      const fetchBulletin = async () => {
+        try {
+          setLoading(true);
+          const response = await axios.get(`http://localhost:3001/Bulletin/byeleve/${idEleve}/${selectedSequence}`);
+          console.log("le buleetin est :",response.data);
+          setBulletin(response.data);
+          setLoading(false);
+        } catch (error) {
+          console.error('Erreur lors de la récupération du bulletin :', error);
+          setLoading(false);
+        }
+      };
 
-        // Mettre à jour l'état avec les données du bulletin
-        setBulletin(response.data);
-        setLoading(false);
-      } catch (error) {
-        console.error('Erreur lors de la récupération du bulletin :', error);
-        setLoading(false);
-      }
-    };
-
-    // Appeler la fonction de récupération du bulletin
-    fetchBulletin();
-  }, [idEleve, idSequence]);
+      fetchBulletin();
+    }
+  }, [idEleve, selectedSequence]);
 
   // Afficher un indicateur de chargement si les données sont en cours de chargement
   if (loading) {
-    return <p>Chargement en cours...</p>;
+    return <p className="text-center text-gray-700">Chargement en cours...</p>;
   }
 
   // Afficher le bulletin une fois les données chargées
   return (
-    <div>
+    
+    <div className="container mx-auto p-4">
+      <div className="mb-4">
+        <label className="block text-gray-700">Sélectionner une séquence :</label>
+        <select
+          value={selectedSequence}
+          onChange={(e) => setSelectedSequence(e.target.value)}
+          className="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm"
+        >
+          {sequences.map((sequence) => (
+            <option key={sequence.id} value={sequence.id}>
+              {sequence.nom}
+            </option>
+          ))}
+        </select>
+      </div>
       <h2>Bulletin de l'élève</h2>
       <table>
         <tr>
@@ -214,7 +249,7 @@ function BulletinSequence() {
               return (
                 <tr key={i}>
                   <td></td>
-                  <td>{item.noteBulletin.coursNote.matiere}/{item.noteBulletin.coursNote.EnseignantCours.nom} {item.noteBulletin.coursNote.EnseignantCours.prenom}</td>
+                  <td>{item.noteBulletin.coursNote.matiere}/{item.noteBulletin.coursNote.enseignant.nom} {item.noteBulletin.coursNote.enseignant.prenom}</td>
                   <td>null1</td>
                   <td>{item.noteBulletin.coursNote.coefficient}</td>
                   <td>null1</td>
@@ -302,7 +337,7 @@ function BulletinSequence() {
               return (
                 <tr key={i}>
                   <td></td>
-                  <td>{item.noteBulletin.coursNote.matiere}/{item.noteBulletin.coursNote.EnseignantCours.nom} {item.noteBulletin.coursNote.EnseignantCours.prenom}</td>
+                  <td>{item.noteBulletin.coursNote.matiere}/{item.noteBulletin.coursNote.enseignant.nom} {item.noteBulletin.coursNote.enseignant.prenom}</td>
                   <td>null1</td>
                   <td>{item.noteBulletin.coursNote.coefficient}</td>
                   <td>null1</td>
@@ -385,7 +420,7 @@ function BulletinSequence() {
               return (
                 <tr key={i}>
                   <td></td>
-                  <td>{item.noteBulletin.coursNote.matiere}/{item.noteBulletin.coursNote.EnseignantCours.nom} {item.noteBulletin.coursNote.EnseignantCours.prenom}</td>
+                  <td>{item.noteBulletin.coursNote.matiere}/{item.noteBulletin.coursNote.enseignant.nom} {item.noteBulletin.coursNote.enseignant.prenom}</td>
                   <td>null1</td>
                   <td>{item.noteBulletin.coursNote.coefficient}</td>
                   <td>null1</td>
