@@ -6,7 +6,7 @@ const {validateToken} = require("../middlewares/AuthMiddleware")
 
 // Route pour obtenir tous les classes
 router.get('/', validateToken,async (req, res) => {
-  try {
+  try { 
     const classes = await Classe.findAll({
       attributes: ['id', 'nom'], // Attributs de la table Classe à afficher
       include: {
