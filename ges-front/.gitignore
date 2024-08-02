@@ -21,3 +21,6 @@
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+
+# Ajoutez cette ligne dans .gitignore
+node_modules/public-encrypt/test/test_rsa_privkey.pem

@@ -87,15 +87,16 @@ module.exports = (sequelize, DataTypes) => {
 
     });
 
+
     Cours.belongsTo(models.Enseignant, {
-      foreignKey: 'classe',
-      as: 'EnseignantCours',
-      onUpdate: 'CASCADE', // Active la mise à jour en cascade
-      onDelete: 'CASCADE', // Définir la clé étrangère à NULL lors de la suppression de l'élève
-
+      foreignKey: 'Enseignant',
+      as: 'enseignant',
+      onUpdate: 'CASCADE',
+      onDelete: 'CASCADE',
     });
-
   };
+
+  
 
   Cours.checkOverlap = async function (matiere, classeId) {
     try {

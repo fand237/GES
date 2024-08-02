@@ -1,12 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import axios from 'axios';
+import UseAuth from './UseAuth';
+
 
 const NoteForm = () => {
-  // Récupérer l'ID de l'enseignant depuis les paramètres d'URL
-  const { idEnseignant } = useParams();
-
-  // États pour stocker les données nécessaires
+  const { idens } = UseAuth();
   const [coursList, setCoursList] = useState([]);
   const [selectedCours, setSelectedCours] = useState(null);
   const [eleves, setEleves] = useState([]);
@@ -17,12 +16,10 @@ const NoteForm = () => {
   const [selectedTypeEvaluation, setSelectedTypeEvaluation] = useState('');
   const [dateEvaluation, setDateEvaluation] = useState("");
 
-  // États pour gérer les erreurs
   const [sequenceError, setSequenceError] = useState(false);
   const [typeEvaluationError, setTypeEvaluationError] = useState(false);
   const [dateError, setDateError] = useState(false);
   const [notesError, setNotesError] = useState(false);
-
 
   useEffect(() => {
     const fetchSequenceList = async () => {
@@ -35,13 +32,12 @@ const NoteForm = () => {
     };
 
     fetchSequenceList();
-  }, []); // Effectuer une seule fois au chargement
+  }, []);
 
   useEffect(() => {
     const fetchTypeEvaluationList = async () => {
       try {
         const response = await axios.get('http://localhost:3001/Type_Evaluation');
-
         setTypeEvaluation(response.data);
       } catch (error) {
         console.error('Erreur lors de la récupération de la liste des types d\'évaluation :', error);
@@ -49,110 +45,73 @@ const NoteForm = () => {
     };
 
     fetchTypeEvaluationList();
-  }, []); // Effectuer une seule fois au chargement
+  }, []);
 
-  // Effet pour récupérer la liste des cours au chargement de la page
   useEffect(() => {
     const fetchCoursList = async () => {
       try {
-        // Appeler l'API pour récupérer la liste des cours de l'enseignant
-        const response = await axios.get(`http://localhost:3001/Cours/byens/${idEnseignant}`);
+        const response = await axios.get(`http://localhost:3001/Cours/byens/${idens}`);
         const coursesWithDetails = await Promise.all(
           response.data.map(async (course) => {
             const classeDetails = await axios.get(`http://localhost:3001/Classe/${course.classe}`);
-
-
             return {
               ...course,
               classe: classeDetails.data,
             };
           })
         );
-        // Mettre à jour l'état avec la liste des cours
         setCoursList(coursesWithDetails);
       } catch (error) {
         console.error('Erreur lors de la récupération de la liste des cours :', error);
       }
     };
 
-    // Appeler la fonction pour récupérer la liste des cours
     fetchCoursList();
-  }, [idEnseignant]);
+  }, [idens]);
 
-  // Fonction pour récupérer la liste des élèves pour un cours spécifique
   const fetchElevesForCours = async (classeId) => {
     try {
-      // Appeler l'API pour récupérer la liste des élèves pour le cours spécifié
       const response = await axios.get(`http://localhost:3001/Eleve/byclasse/${classeId}`);
-      // Retourner la liste des élèves
       return response.data;
     } catch (error) {
       console.error('Erreur lors de la récupération des élèves pour le cours :', error);
-      // En cas d'erreur, retourner un tableau vide
       return [];
     }
   };
 
-  // Gérer le changement de cours
   const handleCoursChange = async (coursId) => {
-
-    // Réinitialiser les erreurs
     setSequenceError(false);
     setTypeEvaluationError(false);
     setDateError(false);
     setNotesError(false);
-    // Trouver le cours sélectionné dans la liste des cours
+
     const selectedCours = coursList.find((cours) => cours.id === parseInt(coursId));
-    // Mettre à jour l'état du cours sélectionné
-
     setSelectedCours(selectedCours);
-    // Récupérer la liste des élèves pour le cours sélectionné
+
     const elevesForCours = await fetchElevesForCours(selectedCours.classe.id);
-    // Mettre à jour l'état avec la liste des élèves
     setEleves(elevesForCours);
-
-    console.log("les eleves apres chargement sont", eleves)
-
-    eleves.forEach(eleve => {
-
-      handleNoteChange(eleve.id, null)
-    });
-    console.log("les notes apres chargement sont", notes)
-
-
-
+    
+    elevesForCours.forEach(eleve => handleNoteChange(eleve.id, null));
   };
 
-  const handletypeChange = async (coursId) => {
-    // Trouver le cours sélectionné dans la liste des cours
-    const selectedTypeEvaluation = typesEvaluation.find((typeeval) => typeeval.id === parseInt(coursId));
-    // Mettre à jour l'état du cours sélectionné
+  const handletypeChange = async (typeId) => {
+    const selectedTypeEvaluation = typesEvaluation.find((typeeval) => typeeval.id === parseInt(typeId));
     setSelectedTypeEvaluation(selectedTypeEvaluation);
-
   };
 
-  const handlesequenceChange = async (coursId) => {
-    // Trouver le cours sélectionné dans la liste des cours
-    const selectedSequence = sequences.find((sequence) => sequence.id === parseInt(coursId));
-    console.log("le selection de sequence est ", selectedSequence)
-    // Mettre à jour l'état du cours sélectionné
+  const handlesequenceChange = async (sequenceId) => {
+    const selectedSequence = sequences.find((sequence) => sequence.id === parseInt(sequenceId));
     setSelectedSequence(selectedSequence);
-
   };
 
-
-  // Gérer le changement de note pour un élève
   const handleNoteChange = (eleveId, value) => {
-    // Mettre à jour l'état des notes
     setNotes((prevNotes) => ({
       ...prevNotes,
       [eleveId]: value,
     }));
   };
 
-  // Gérer l'enregistrement des notes
   const handleSaveNotes = async () => {
-
     if (!selectedSequence) {
       setSequenceError(true);
       return;
@@ -173,21 +132,13 @@ const NoteForm = () => {
       return;
     }
 
-    console.log("les donnees sont", selectedCours, selectedSequence, selectedTypeEvaluation,dateEvaluation);
-
-
-    // Réinitialiser les erreurs
     setSequenceError(false);
     setTypeEvaluationError(false);
     setDateError(false);
     setNotesError(false);
 
-    // Enregistrer les retards pour chaque élève
     eleves.forEach(eleve => {
       const note = notes[eleve.id];
-      console.log("la note ", note)
-      
-
       axios.post('http://localhost:3001/Note', {
         eleve: eleve.id,
         cours: selectedCours.id,
@@ -195,111 +146,114 @@ const NoteForm = () => {
         dateEvaluation: dateEvaluation,
         type_Evaluation: selectedTypeEvaluation.id,
         sequence: selectedSequence.id,
-      },
-      {
+      }, {
         headers: {
           accessToken: localStorage.getItem("accessToken"),
         },
-      }
-      )
-        .then(() => {
-          console.log(`note de ${note} minutes enregistré pour l'élève avec l'ID ${eleve.id}`);
-        })
-        .catch((error) => {
-          console.error(`Erreur lors de l'enregistrement de la note : `, error);
-        });
-
-        
+      })
+      .then(() => {
+        console.log(`Note de ${note} enregistrée pour l'élève avec l'ID ${eleve.id}`);
+      })
+      .catch((error) => {
+        console.error(`Erreur lors de l'enregistrement de la note : `, error);
+      });
     });
-
-
-
   };
 
-  // JSX de la page
   return (
-    <div>
-      <h2>Enregistrement des Notes</h2>
-      {/* Indicateurs d'erreurs */}
-      {sequenceError && <p>Veuillez sélectionner une séquence.</p>}
-      {typeEvaluationError && <p>Veuillez sélectionner un type d'évaluation.</p>}
-      {dateError && <p>Veuillez sélectionner une date d'évaluation.</p>}
-      {notesError && <p>Veuillez saisir des notes valides (entre 0 et 20).</p>}
+    <div className="p-4">
+      <h2 className="text-2xl font-bold mb-4">Enregistrement des Notes</h2>
+      {sequenceError && <p className="text-red-500">Veuillez sélectionner une séquence.</p>}
+      {typeEvaluationError && <p className="text-red-500">Veuillez sélectionner un type d'évaluation.</p>}
+      {dateError && <p className="text-red-500">Veuillez sélectionner une date d'évaluation.</p>}
+      {notesError && <p className="text-red-500">Veuillez saisir des notes valides (entre 0 et 20).</p>}
 
-
-      {/* Sélection du cours */}
-      <label>Sélectionnez un cours :</label>
-      <select onChange={(e) => handleCoursChange(e.target.value)}
-        value={selectedCours ? selectedCours.id : ''}>
-        <option value="" disabled>Sélectionnez un Cours</option>
-        {coursList.map((cours) => (
-          <option key={cours.id} value={cours.id}>{cours.matiere} {cours.classe.classe}</option>
-        ))}
-      </select>
-
-      <label>Sélectionnez une séquence :</label>
-      <select
-        onChange={(e) => handlesequenceChange(e.target.value)}
-        value={selectedSequence ? selectedSequence.id : ''}
-      >
-        <option value="" disabled>Sélectionnez une séquence</option>
-        {sequences.map((sequence) => (
-          <option key={sequence.id} value={sequence.id}>{sequence.sequence}</option>
-        ))}
-      </select>
-
-      <label>Date d'évaluation :</label>
-      <input
-        type="date"
-        value={dateEvaluation}
-        onChange={(e) => setDateEvaluation(e.target.value)}
-      />
-
-
-
-      {/* Nouveau champ pour sélectionner le type d'évaluation */}
-      <label>Sélectionnez le type d'évaluation :</label>
-      <select
-        onChange={(e) => handletypeChange(e.target.value)}
-        value={selectedTypeEvaluation ? selectedTypeEvaluation.id : ''}
-      >
-        <option value="" disabled>Sélectionnez le type d'évaluation</option>
-        {typesEvaluation.map((type) => (
-          <option key={type.id} value={type.id}>{type.type}</option>
-        ))}
-      </select>
-
-      {/* Autres champs et sélections nécessaires */}
-      {/* ... */}
-
-      {/* Tableau des élèves avec zones de saisie des notes */}
-      <table>
-        <thead>
-          <tr>
-            <th>Nom de l'élève</th>
-            <th>Note</th>
-          </tr>
-        </thead>
-        <tbody>
-          {eleves.map((eleve) => (
-            <tr key={eleve.id}>
-              <td>{`${eleve.nom} ${eleve.prenom}`}</td>
-              <td>
-                <input
-                  type="number"
-                  min="0"
-                  max="20"
-                  value={notes[eleve.id] || ''}
-                  onChange={(e) => handleNoteChange(eleve.id, e.target.value)}
-                />
-              </td>
-            </tr>
+      <div className="mb-4">
+        <label className="block mb-2 font-medium">Sélectionnez un cours :</label>
+        <select
+          onChange={(e) => handleCoursChange(e.target.value)}
+          value={selectedCours ? selectedCours.id : ''}
+          className="block w-full p-2 border border-gray-300 rounded"
+        >
+          <option value="" disabled>Sélectionnez un Cours</option>
+          {coursList.map((cours) => (
+            <option key={cours.id} value={cours.id}>{cours.matiere} {cours.classe.classe}</option>
           ))}
-        </tbody>
-      </table>
+        </select>
+      </div>
 
-      {/* Bouton d'enregistrement des notes */}
-      <button onClick={handleSaveNotes}>Enregistrer les Notes</button>
+      <div className="mb-4">
+        <label className="block mb-2 font-medium">Sélectionnez une séquence :</label>
+        <select
+          onChange={(e) => handlesequenceChange(e.target.value)}
+          value={selectedSequence ? selectedSequence.id : ''}
+          className="block w-full p-2 border border-gray-300 rounded"
+        >
+          <option value="" disabled>Sélectionnez une séquence</option>
+          {sequences.map((sequence) => (
+            <option key={sequence.id} value={sequence.id}>{sequence.sequence}</option>
+          ))}
+        </select>
+      </div>
+
+      <div className="mb-4">
+        <label className="block mb-2 font-medium">Date d'évaluation :</label>
+        <input
+          type="date"
+          value={dateEvaluation}
+          onChange={(e) => setDateEvaluation(e.target.value)}
+          className="block w-full p-2 border border-gray-300 rounded"
+        />
+      </div>
+
+      <div className="mb-4">
+        <label className="block mb-2 font-medium">Sélectionnez le type d'évaluation :</label>
+        <select
+          onChange={(e) => handletypeChange(e.target.value)}
+          value={selectedTypeEvaluation ? selectedTypeEvaluation.id : ''}
+          className="block w-full p-2 border border-gray-300 rounded"
+        >
+          <option value="" disabled>Sélectionnez le type d'évaluation</option>
+          {typesEvaluation.map((type) => (
+            <option key={type.id} value={type.id}>{type.type}</option>
+          ))}
+        </select>
+      </div>
+
+      <div className="mb-4">
+        <table className="min-w-full bg-white border border-gray-300">
+          <thead>
+            <tr className="bg-gray-200">
+              <th className="p-4 border-b">Nom de l'élève</th>
+              <th className="p-4 border-b">Note</th>
+            </tr>
+          </thead>
+          <tbody>
+            {eleves.map((eleve) => (
+              <tr key={eleve.id} className="border-b">
+                <td className="p-4">{`${eleve.nom} ${eleve.prenom}`}</td>
+                <td className="p-4">
+                  <input
+                    type="number"
+                    min="0"
+                    max="20"
+                    value={notes[eleve.id] || ''}
+                    onChange={(e) => handleNoteChange(eleve.id, e.target.value)}
+                    className="w-full p-1 border border-gray-300 rounded"
+                  />
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+      <button
+        onClick={handleSaveNotes}
+        className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+      >
+        Enregistrer les Notes
+      </button>
     </div>
   );
 };

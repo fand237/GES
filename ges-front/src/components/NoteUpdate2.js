@@ -26,7 +26,6 @@ const NoteUpdate2 = () => {
 
     fetchElevesAndNotes();
 
-    // Cleanup function to cancel any ongoing asynchronous operations
     return () => {
       // Add cleanup logic here if needed
     };
@@ -81,6 +80,10 @@ const NoteUpdate2 = () => {
         dateEvaluation: date,
         type_Evaluation: idType,
         sequence: idSequence,
+      },{
+        headers: {
+          accessToken: localStorage.getItem("accessToken"),
+        },
       })
         .then(() => {
           console.log(`Note de ${note} enregistrée pour l'élève avec l'ID ${eleve.id}`);
@@ -92,29 +95,30 @@ const NoteUpdate2 = () => {
   };
 
   return (
-    <div>
-      <h2>Enregistrement des Notes</h2>
+    <div className="container mx-auto p-4">
+      <h2 className="text-xl font-bold mb-4">Enregistrement des Notes</h2>
 
-      {notesError && <p>Veuillez saisir des notes valides (entre 0 et 20).</p>}
+      {notesError && <p className="text-red-500">Veuillez saisir des notes valides (entre 0 et 20).</p>}
 
-      <table>
+      <table className="min-w-full bg-white border border-gray-300">
         <thead>
-          <tr>
-            <th>Nom de l'élève</th>
-            <th>Note</th>
+          <tr className="bg-gray-200">
+            <th className="py-2 px-4 border-b">Nom de l'élève</th>
+            <th className="py-2 px-4 border-b">Note</th>
           </tr>
         </thead>
         <tbody>
           {eleves.map((eleve) => (
-            <tr key={eleve.id}>
-              <td>{`${eleve.nom} ${eleve.prenom}`}</td>
-              <td>
+            <tr key={eleve.id} className="hover:bg-gray-100">
+              <td className="py-2 px-4 border-b">{`${eleve.nom} ${eleve.prenom}`}</td>
+              <td className="py-2 px-4 border-b">
                 <input
                   type="number"
                   min="0"
                   max="20"
                   value={notes[eleve.id] || ''}
                   onChange={(e) => handleNoteChange(eleve.id, e.target.value)}
+                  className="w-full px-2 py-1 border border-gray-300 rounded"
                 />
               </td>
             </tr>
@@ -122,7 +126,12 @@ const NoteUpdate2 = () => {
         </tbody>
       </table>
 
-      <button onClick={handleSaveNotes}>Modifier les Notes</button>
+      <button
+        onClick={handleSaveNotes}
+        className="mt-4 bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600"
+      >
+        Modifier les Notes
+      </button>
     </div>
   );
 };

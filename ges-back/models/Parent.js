@@ -42,6 +42,32 @@ module.exports = (sequelize,DataTypes) => {
     numeroTelephone: {
       type: DataTypes.STRING,
       allowNull: false,
+    }, profession: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
+    quartier: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
+    civilite: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
+    situationMatriomiale: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
+    numeroIncremental: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      defaultValue: 1,
+    },
+    typeuser: {
+      type: DataTypes.STRING,
+      allowNull: true,
+      defaultValue: "Enseignant", // Définir la valeur par défaut ici
+
     },
 
   });

@@ -1,14 +1,14 @@
 const express = require('express')
 const router = express.Router();
 const { Eleve, Classe, Parent } = require("../models")
-const { SHA256 } = require('crypto-js');
+const bcrypt = require('bcrypt');
 const {validateToken} = require("../middlewares/AuthMiddleware")
 const { sign } = require('jsonwebtoken')
 
 
 
 
-router.get("/", async (req, res) => {
+router.get("/", validateToken,async (req, res) => {
 
   const listOfEleve = await Eleve.findAll();
   res.json(listOfEleve);
@@ -16,7 +16,15 @@ router.get("/", async (req, res) => {
 
 });
 
-router.get("/:id", async (req, res) => {
+router.get("/auth", validateToken,(req, res) => {
+  console.log("le req user dans auth est ", req.utilisateur);
+
+  return res.json(req.utilisateur);
+
+
+});
+
+router.get("/:id", validateToken,async (req, res) => {
 
   const id = req.params.id;
   const post = await Eleve.findByPk(id);
@@ -74,36 +82,37 @@ router.get('/nopass/:id', async (req, res) => {
 
 // Route pour la mise à jour d'un Eleve
 router.put('/:id', async (req, res) => {
-  try {
-    const { id } = req.params;
-    const { nomUtilisateur, motDePasse, email, nom, prenom } = req.body;
+  const { id } = req.params;
+    const { nomUtilisateur, motDePasse, email, nom, prenom, dateNaissance, classe, parent } = req.body;
 
-    // Récupérer le Eleve existant par son ID
-    const eleve = await Eleve.findByPk(id);
+    try {
+        const eleve = await Eleve.findByPk(id);
+        if (!eleve) {
+            return res.status(404).json({ error: "Élève non trouvé" });
+        }
 
-    if (!eleve) {
-      return res.status(404).json({ error: 'Eleve non trouvé' });
+        const updatedData = {
+            nomUtilisateur,
+            email,
+            nom,
+            prenom,
+            dateNaissance,
+            classe,
+            parent
+        };
+
+        if (motDePasse) {
+            const hashedPassword = await bcrypt.hash(motDePasse, saltRounds);
+            updatedData.motDePasse = hashedPassword;
+        }
+
+        await eleve.update(updatedData);
+        res.json({ message: "Élève mis à jour avec succès" });
+
+    } catch (error) {
+        console.error("Erreur lors de la mise à jour de l'élève :", error);
+        res.status(500).json({ error: "Erreur du serveur" });
     }
-
-    // Mettre à jour les champs fournis dans la requête
-    eleve.nomUtilisateur = nomUtilisateur || eleve.nomUtilisateur;
-    eleve.email = email || eleve.email;
-    eleve.nom = nom || eleve.nom;
-    eleve.prenom = prenom || eleve.prenom;
-
-    // Mettre à jour le mot de passe uniquement s'il est fourni dans la requête
-    if (motDePasse) {
-      eleve.motDePasse = SHA256(motDePasse).toString();
-    }
-
-    // Sauvegarder les modifications
-    await eleve.save();
-
-    res.json({ message: 'Mise à jour réussie' });
-  } catch (error) {
-    console.error('Erreur lors de la mise à jour du Eleve : ', error);
-    res.status(500).json({ error: 'Erreur serveur' });
-  }
 });
 
 router.delete("/:id", async (req, res) => {
@@ -118,34 +127,72 @@ router.delete("/:id", async (req, res) => {
   }
 });
 
+// Fonction pour générer le nom d'utilisateur
+const generateUsername = (nom, prenom, numeroTelephone) => {
+  const username = `${nom.slice(0, 2)}${prenom.slice(0, 2)}${numeroTelephone}`;
+  return username;
+};
 
-router.post("/", async (req, res) => {
+router.post("/",validateToken,async (req, res) => {
 
-  try {
     const post = req.body;
 
     const isOverlap = await Eleve.checkOverlapEmail(post.email);
-    const isOverlapUser = await Eleve.checkOverlapUsername(post.nomUtilisateur);
 
     // Si l'unicité n'est pas respectée, renvoyer une réponse avec le statut 422
-    if (isOverlapUser) {
-      return res.status(422).json({ error: "Ce nom d'utilisateur est déjà utilisé." });
-    } else if (isOverlap) {
+   if (isOverlap) {
       return res.status(422).json({ error: "Cette adresse e-mail est déjà utilisée." });
     }
 
-    let ele = await Eleve.create(post);
+    const {  email, nom, prenom, dateNaissance, classe, parent ,civilite} = req.body;
+    try {
+      const motDePasse = 'qwerty237'; // Mot de passe par défaut
 
-    ele.typeuser = "Eleve"; 
-    await ele.save(); 
-    // Si tout va bien, renvoyer une réponse de succès
-    return res.status(200).json({ success: 'Eleve créé avec succès' });
+        const hashedPassword = await bcrypt.hash(motDePasse, 10);
 
-  } catch (error) {
-    console.error(error);
-    return res.status(500).json({ error: 'Erreur serveur' });
-  }
+        // Obtenir l'année en cours
+    const year = new Date().getFullYear().toString().slice(-2);
+const ville = "yaounde";
+    // Obtenir les trois lettres de la ville
+    const city = ville.toUpperCase();
+    const firstLetter = city.charAt(0);
+    const thirdLetter = city.charAt(2);
+    const lastLetter = city.charAt(city.length - 1);
+
+    // Générer le numéro incrémental
+    const lastUser = await Eleve.findOne({
+      order: [['createdAt', 'DESC']],
+      attributes: ['nomUtilisateur'],
+    });
+    const incrementNumber = lastUser ? parseInt(lastUser.nomUtilisateur.match(/\d+$/)) + 1 : 1;
+
+    // Créer le nom d'utilisateur
+    const nomUtilisateur = `${year}${firstLetter}${thirdLetter}${lastLetter}${incrementNumber}`;
+
+  
+        const eleve = await Eleve.create({
+            nomUtilisateur,
+            motDePasse: hashedPassword,
+            email,
+            nom,
+            prenom,
+            dateNaissance,
+            classe,
+            parent,
+            civilite,
+            numeroIncremental: incrementNumber,
+            typeuser:"Eleve",
+          });
+        
+        res.status(201).json({nomUtilisateur});
+    } catch (error) {
+        console.error("Erreur lors de la création de l'élève :", error);
+        res.status(500).json({ error: "Erreur du serveur" });
+    }
+    
+  
 });
+
 
 router.post("/login", async (req, res) => {
 
@@ -154,19 +201,20 @@ router.post("/login", async (req, res) => {
     const user = await Eleve.findOne({ where: { nomUtilisateur: nomUtilisateur } })
 
     if (!user) return res.json({ error: "Utilisateur inexistant" });
+    const isPasswordValid = await bcrypt.compare(motDePasse, user.motDePasse);
 
-    if (!(user.motDePasse == SHA256(motDePasse).toString())) {
+    if (!(isPasswordValid)) {
       // Si tout va bien, renvoyer une réponse de succès
       return res.json({ error: "udername ou password incorrrect" });
     }
 
     const accessToken = sign(
-      {nomUtilisateur: user.nomUtilisateur, id: user.id},
+      { nomUtilisateur: user.nomUtilisateur, id: user.id, typeUtilisateur: user.typeuser },
       "importantsecret"
-      );
-    res.json(accessToken)
+    );
 
 
+    return res.json({token: accessToken,nomUtilisateur: user.nomUtilisateur, id: user.id, typeUtilisateur: user.typeuser });
   } catch (error) {
     console.error(error);
     return res.status(500).json({ error: 'Erreur serveur' });

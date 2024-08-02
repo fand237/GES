@@ -16,8 +16,14 @@ function EleveAll() {
   useEffect(() => {
     const fetchClasses = async () => {
       try {
-        const response = await axios.get("http://localhost:3001/Classe");
+        const response = await axios.get("http://localhost:3001/Classe", {
+          headers: {
+            "accessToken": localStorage.getItem("accessToken"),
+          },
+        }
+      );
         setClasses(response.data);
+        console.log(response.data);
       } catch (error) {
         console.error("Erreur lors de la récupération des classes : ", error);
       }
@@ -40,7 +46,11 @@ function EleveAll() {
     const fetchElevesByClass = async () => {
       if (selectedClass) {
         try {
-          const response = await axios.get(`http://localhost:3001/Eleve/byclasse/${selectedClass}`);
+          const response = await axios.get(`http://localhost:3001/Eleve/byclasse/${selectedClass}`, {
+            headers: {
+              "accessToken": localStorage.getItem("accessToken"),
+            },
+          });
           setEleves(response.data);
           console.log(response.data)
 
@@ -60,51 +70,75 @@ function EleveAll() {
   };
 
   return (
-    <div className='eleveAllPage'>
-      <h1>Liste des Élèves par Salle de Classe</h1>
+    <div className="eleveAllPage p-4">
+  <h1 className="text-2xl font-bold mb-4">Liste des Élèves par Salle de Classe</h1>
 
-      {/* Sélecteur de classe */}
-      <label>Sélectionnez une classe :</label>
-      <select onChange={handleClassChange} value={selectedClass || ''}>
-        <option value="" disabled>Sélectionnez une classe</option>
-        {classes.map((classe) => (
-          <option key={classe.id} value={classe.id}>{classe.classe}</option>
-        ))}
-      </select><br/>
-      <label>Recherche :</label>
-      <input type="text" onChange={(e) => setSearchTerm(e.target.value)} value={searchTerm} />
+  {/* Sélecteur de classe */}
+  <label className="block mb-2">Sélectionnez une classe :</label>
+  <select
+    onChange={handleClassChange}
+    value={selectedClass || ''}
+    className="block w-full p-2 border border-gray-300 rounded mb-4"
+  >
+    <option value="" disabled>Sélectionnez une classe</option>
+    {classes.map((classe) => (
+      <option key={classe.id} value={classe.id}>{classe.classe}</option>
+    ))}
+  </select>
 
-      <table>
-        <thead>
-          <tr>
-            <th>Nom utilisateur</th>
-            <th>Nom</th>
-            <th>Prénom</th>
-            <th>Email</th>
-            <th>Date de naissance </th>
-            <th>Classe</th>
-            <th>Parent</th>
+  <label className="block mb-2">Recherche :</label>
+  <input
+    type="text"
+    onChange={(e) => setSearchTerm(e.target.value)}
+    value={searchTerm}
+    className="block w-full p-2 border border-gray-300 rounded mb-4"
+  />
 
-          </tr>
-        </thead>
-        <tbody>
-          {filteredEleves.map((eleve) => (
-            <tr key={eleve.id}>
-              <td>{eleve.nomUtilisateur}</td>
-              <td>{eleve.nom}</td>
-              <td>{eleve.prenom}</td>
-              <td>{eleve.email}</td>
-              <td>{eleve.dateNaissance}</td>
-              <td>{eleve.classeEleve.classe}</td>
-              <td>{eleve.parentEleve.nom} {eleve.parentEleve.prenom}</td>
-              <button type="button" onClick={() => navigate(`/EleveDelete/${eleve.id}`)}>Supprimer</button>
-              <button type="button" onClick={() => navigate(`/EleveUpdate/${eleve.id}`)}>Modifier</button>
-              {/* Ajoutez d'autres colonnes si nécessaire */}
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
+  <table className="min-w-full bg-white border border-gray-300">
+    <thead>
+      <tr className="bg-gray-200">
+        <th className="p-4 border-b">Nom utilisateur</th>
+        <th className="p-4 border-b">Nom</th>
+        <th className="p-4 border-b">Prénom</th>
+        <th className="p-4 border-b">Email</th>
+        <th className="p-4 border-b">Date de naissance</th>
+        <th className="p-4 border-b">Classe</th>
+        <th className="p-4 border-b">Parent</th>
+        <th className="p-4 border-b">Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      {filteredEleves.map((eleve) => (
+        <tr key={eleve.id} className="border-b">
+          <td className="p-4">{eleve.nomUtilisateur}</td>
+          <td className="p-4">{eleve.nom}</td>
+          <td className="p-4">{eleve.prenom}</td>
+          <td className="p-4">{eleve.email}</td>
+          <td className="p-4">{eleve.dateNaissance}</td>
+          <td className="p-4">{eleve.classeEleve.classe}</td>
+          <td className="p-4">{eleve.parentEleve.nom} {eleve.parentEleve.prenom}</td>
+          <td className="p-4">
+            <button
+              type="button"
+              onClick={() => navigate(`/EleveDelete/${eleve.id}`)}
+              className="delete-button"
+            >
+              Supprimer
+            </button>
+            <button
+              type="button"
+              onClick={() => navigate(`/EleveUpdate/${eleve.id}`)}
+              className="modify-button"
+            >
+              Modifier
+            </button>
+          </td>
+        </tr>
+      ))}
+    </tbody>
+  </table>
+</div>
+
   );
 }
 

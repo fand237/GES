@@ -6,7 +6,6 @@ const { Note, Moyenne, Cours, Sequence, Type_Evaluation, Classe, Bulletin } = re
 const {validateToken} = require("../middlewares/AuthMiddleware")
 
 
-// Route pour créer une nouvelle note
 router.post('/', validateToken,async (req, res) => {
   try {
 
@@ -36,18 +35,19 @@ router.post('/', validateToken,async (req, res) => {
       const newNote = await Note.create({ eleve, cours, note, dateEvaluation, type_Evaluation, sequence });
       const idannee = 1;
       const idnote = newNote.id
+      console.log("l'id de la note cree est ",idnote);
       // Vérifiez si les valeurs requises pour la création du Bulletin sont disponibles
-      if (idnote && idannee) {
-        const newBulletin = await Bulletin.create({ eleve, note: idnote, annee: idannee });
-      } else {
-        console.error('Valeurs manquantes pour la création du Bulletin.');
+        const newbuletin = await Bulletin.create({ eleve, note: idnote, annee: idannee });
+
+      if (newbuletin){
+        console.log("bulletin cree avec succes");
+      }else{
+        console.log("bulletin non cree");
       }
 
     }
 
     res.json({ message: 'Mise à jour ou création réussie' });
-
-
 
   } catch (error) {
     console.error('Erreur lors de la création de la note :', error);

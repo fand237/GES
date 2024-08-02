@@ -52,7 +52,7 @@ module.exports = (sequelize,DataTypes) => {
 
     // models/Moyenne.js
 
-Moyenne.calculateAndSetMoyenne = async function (coursId) {
+Moyenne.calculateAndSetMoyenne = async function (coursId, models) {
     try {
       // Recherche des instances de Moyenne liées au cours spécifié
       const moyennes = await Moyenne.findAll({

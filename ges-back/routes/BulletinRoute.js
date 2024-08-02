@@ -43,7 +43,7 @@ router.get("/byeleve/:idEleve/:idSequence", async (req, res) => {
               attributes: ['matiere', 'coefficient'],
               as: 'coursNote',
               include: [
-                { model: Enseignant, attributes: ['nom', 'prenom'], as: 'EnseignantCours' },
+                { model: Enseignant, attributes: ['nom', 'prenom'], as: 'enseignant' },
                 { model: Groupe, attributes: ['groupe'], as: 'groupeCours' }
               ]
             },
@@ -60,12 +60,19 @@ router.get("/byeleve/:idEleve/:idSequence", async (req, res) => {
       ]
     });
 
+    if (!distinctElements.length) {
+      return res.status(404).json({ message: 'Aucune donnée trouvée' });
+    }
+
     // Convertir les instances Sequelize en objets JSON
     const plainObjects = distinctElements.map(element => element.get({ plain: true }));
 
+    const getMatiere = (element) => element.noteBulletin?.coursNote?.matiere || 'Inconnu';
+
+
     // Regrouper par matière en utilisant JavaScript natif
     const groupedByMatiere = plainObjects.reduce((acc, element) => {
-      const matiere = element.noteBulletin.coursNote.matiere;
+      const matiere = getMatiere(element);
       if (!acc[matiere]) {
         acc[matiere] = [];
       }
@@ -106,7 +113,7 @@ router.get("/byclasse/:idClasse/:idSequence", async (req, res) => {
       attributes: ['eleve', 'note'],
       include: [
         { model: Eleve, attributes: ['nom', 'prenom', 'dateNaissance'], as: 'eleveBulletin', include: [{ model: Classe, attributes: ['classe'], as: 'classeEleve', where: { id: idClasse }, }] }, // Utilisez l'alias 'coursNote' correspondant à votre association
-        { model: Note, attributes: ['note', 'dateEvaluation'], as: 'noteBulletin', where: { sequence: idSequence }, include: [{ model: Cours, attributes: ['matiere', 'coefficient'], as: 'coursNote', include: [{ model: Enseignant, attributes: ['nom', 'prenom'], as: 'EnseignantCours' }, { model: Groupe, attributes: ['groupe'], as: 'groupeCours' }] }, { model: Type_Evaluation, attributes: ['type'], as: 'TypeNote' }, { model: Sequence, attributes: ['sequence'], as: 'sequenceNote' }], }, // Utilisez l'alias 'sequenceNote' correspondant à votre association
+        { model: Note, attributes: ['note', 'dateEvaluation'], as: 'noteBulletin', where: { sequence: idSequence }, include: [{ model: Cours, attributes: ['matiere', 'coefficient'], as: 'coursNote', include: [{ model: Enseignant, attributes: ['nom', 'prenom'], as: 'enseignant' }, { model: Groupe, attributes: ['groupe'], as: 'groupeCours' }] }, { model: Type_Evaluation, attributes: ['type'], as: 'TypeNote' }, { model: Sequence, attributes: ['sequence'], as: 'sequenceNote' }], }, // Utilisez l'alias 'sequenceNote' correspondant à votre association
       ],
 
     });
