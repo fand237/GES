@@ -53,21 +53,45 @@ router.get('/forupdate/:id', validateToken,async (req, res) => {
   }
 });
 
+// Fonction pour générer le nom d'utilisateur
+/*const generateUsername = (nom, prenom, numeroTelephone) => {
+  const username = `${nom.slice(0, 2)}${prenom.slice(0, 2)}${numeroTelephone}`;
+  return username;
+};*/
+
 router.post("/", validateToken,async (req, res) => {
 
   const post = req.body;
   console.log(req);
-  const { nomUtilisateur, motDePasse, email, nom, prenom } = req.body;
+  const { email, nom, prenom, numeroTelephone, indicatif, typeEnseignant, civilite } = req.body;
   const isOverlap = await Enseignant.checkOverlapEmail(post.email);
-  const isOverlapUser = await Enseignant.checkOverlapUsername(post.nomUtilisateur);
+  const isOverlapnumero = await Enseignant.checkOverlapnumero(indicatif, numeroTelephone);
+
+  //const isOverlapUser = await Enseignant.checkOverlapUsername(post.nomUtilisateur);
 
   // Si l'unicité n'est pas respectée, renvoyer une réponse avec le statut 422
-  if (isOverlapUser) {
-    return res.status(422).json({ error: "Ce nom d'utilisateur est déjà utilisé." });
-  } else if (isOverlap) {
+  if (isOverlap) {
     return res.status(422).json({ error: "Cette adresse e-mail est déjà utilisée." });
+  }else if (isOverlapnumero) {
+    return res.status(422).json({ error: "Ce numéro est déjà utilisé." });
   }
   try {
+    // Génération des données
+    const year = new Date().getFullYear().toString().slice(-2);
+    const type = "ENS";
+       
+    
+        // Générer le numéro incrémental
+        const lastUser = await Enseignant.findOne({
+          order: [['createdAt', 'DESC']],
+          attributes: ['numeroIncremental'],
+        });
+        const incrementNumber = lastUser ? lastUser.numeroIncremental+ 1 : 1;
+    
+        // Créer le nom d'utilisateur
+        const nomUtilisateur = `${year}${type}${incrementNumber}`;  
+          const motDePasse = 'qwerty237'; // Mot de passe par défaut
+
     const hashedPassword = await bcrypt.hash(motDePasse, 10);
 
     const newEnseignant = await Enseignant.create({
@@ -76,11 +100,16 @@ router.post("/", validateToken,async (req, res) => {
       email,
       nom,
       prenom,
+      civilite,
+      numeroTelephone,
+      indicatif,
+      typeEnseignant,
+      numeroIncremental: incrementNumber,
       typeuser:"Enseignant",
     });
   
 
-    res.status(201).json(newEnseignant);
+    res.status(201).json({ nomUtilisateur });
   }catch(error){
     console.error(error);
     res.status(500).json({ error: 'Internal server error' });

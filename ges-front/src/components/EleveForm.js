@@ -7,6 +7,8 @@ import { SHA256 } from 'crypto-js';
 function EleveForm() {
   const [classes, setClasses] = useState([]);
   const [parents, setParents] = useState([]);
+  const [civilites] = useState(['Mademoiselle', 'Monsieur']);
+  const [nomUtilisateur, setNomUtilisateur] = useState('');
   const [showSuccessMessage, setShowSuccessMessage] = useState(false); // Ajout de l'état
 
   useEffect(() => {
@@ -36,41 +38,48 @@ function EleveForm() {
   }, []);
 
   const initialValues = {
-    nomUtilisateur: "",
-    motDePasse: "",
+  
     email: "",
     nom: "",
     prenom: "",
     dateNaissance: "",
     classe: "",
     parent: "",
+    civilite: "Monsieur",
+
   };
 
   const validationSchema = Yup.object().shape({
-    nomUtilisateur: Yup.string().min(6).required("Nom d'utilisateur obligatoire"),
-    motDePasse: Yup.string().min(6).required("Mot de passe obligatoire"),
+    
     email: Yup.string().email("Adresse email invalide").required("Email obligatoire"),
     nom: Yup.string().required("Nom obligatoire"),
     prenom: Yup.string().required("Prénom obligatoire"),
     dateNaissance: Yup.date().required("Date de naissance obligatoire"),
     classe: Yup.string().required("Classe obligatoire"),
     parent: Yup.number().required("Parent obligatoire"),
+    civilite: Yup.string().required("Civilité obligatoire"),
+
   });
 
   const onSubmit = async (data, { resetForm }) => {
     try {
 
-      await axios.post("http://localhost:3001/Eleve", {
+      const response = await axios.post("http://localhost:3001/Eleve", {
         ...data,
+      },{
+        headers:{
+          accessToken: localStorage.getItem("accessToken"),
+        },
       });
-
+      const { nomUtilisateur } = response.data;
+      setNomUtilisateur(nomUtilisateur);
       console.log("Élève créé avec succès");
       setShowSuccessMessage(true); // Affichage du message de succès
       setTimeout(() => {
         setShowSuccessMessage(false); // Cacher le message après 2 secondes
-      }, 2000);
+      }, 5000);
 
-     // resetForm(); // Réinitialisation du formulaire
+      resetForm(); // Réinitialisation du formulaire
     } catch (error) {
       if (error.response) {
         if (error.response.status === 422) {
@@ -99,16 +108,19 @@ function EleveForm() {
         <h1 className="titre-connect">Ajouter un élève</h1>
         <Formik initialValues={initialValues} onSubmit={onSubmit} validationSchema={validationSchema}>
           <Form className="mt-6">
-            <div className="mb-2">
-              <label htmlFor="nomUtilisateur" className="block text-sm font-semibold text-gray-800">Nom d'utilisateur :</label>
-              <ErrorMessage name="nomUtilisateur" component="span" className="text-red-500" />
-              <Field type="text" id="nomUtilisateur" name="nomUtilisateur" className="input-user" /><br />
-            </div>
-            <div className="mb-2">
-              <label htmlFor="motDePasse" className="block text-sm font-semibold text-gray-800">Mot de passe :</label>
-              <ErrorMessage name="motDePasse" component="span" className="text-red-500" />
-              <Field type="password" id="motDePasse" name="motDePasse" className="input-password" /><br />
-            </div>
+            
+          <div className="mb-2">
+                <label htmlFor="civilite" className="block text-sm font-semibold text-gray-800">Civilité :</label>
+                <ErrorMessage name="civilite" component="span" className="text-red-500 text-xs" />
+                <Field as="select" id="civilite" name="civilite" className="input-user">
+                  {civilites.map(civilite => (
+                    <option key={civilite} value={civilite}>
+                      {civilite}
+                    </option>
+                  ))}
+                </Field><br />
+              </div>
+
             <div className="mb-2">
               <label htmlFor="email" className="block text-sm font-semibold text-gray-800">Email :</label>
               <ErrorMessage name="email" component="span" className="text-red-500" />
@@ -158,6 +170,9 @@ function EleveForm() {
         {showSuccessMessage && (
           <div className="success-message">
             Élève ajouté avec succès !
+
+            le nom d'utilisateur est: {nomUtilisateur}
+
           </div>
         )}
       </div>

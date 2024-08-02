@@ -18,8 +18,7 @@ function CoursUpdate() {
   const [initialValues, setInitialValues] = useState({
     matiere: '',
     classe: '',
-    heureDebut: '',
-    heureFin: '',
+    
     jour: '',
     Enseignant: '',
     groupe: "",
@@ -36,7 +35,11 @@ function CoursUpdate() {
         console.error("Erreur lors de la récupération des informations du cours : ", error);
       });
 
-    axios.get("http://localhost:3001/Enseignants")
+    axios.get("http://localhost:3001/Enseignants",{
+      headers:{
+        accessToken: localStorage.getItem("accessToken"),
+      },
+    })
       .then((response) => {
         setEnseignants(response.data);
       })
@@ -84,8 +87,7 @@ function CoursUpdate() {
   const validationSchema = Yup.object().shape({
     matiere: Yup.string().required("Matière obligatoire"),
     classe: Yup.number().required("Classe obligatoire"),
-    heureDebut: Yup.string(),
-    heureFin: Yup.string(),
+    
     jour: Yup.number(),
     Enseignant: Yup.number(),
     groupe: Yup.number().required("Groupe obligatoire"),
@@ -161,17 +163,7 @@ function CoursUpdate() {
             </Field><br />
           </div>
 
-          <div className="mb-2">
-            <label htmlFor="heureDebut" className="block text-sm font-semibold text-gray-800">Heure de début :</label>
-            <ErrorMessage name="heureDebut" component="span" className="text-red-500 text-sm" />
-            <Field id="heureDebut" type="time" name="heureDebut" className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm" /><br />
-          </div>
-
-          <div className="mb-2">
-            <label htmlFor="heureFin" className="block text-sm font-semibold text-gray-800">Heure de fin :</label>
-            <ErrorMessage name="heureFin" component="span" className="text-red-500 text-sm" />
-            <Field id="heureFin" type="time" name="heureFin" className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm" /><br />
-          </div>
+          
 
           <div className="mb-2">
             <label htmlFor="jour" className="block text-sm font-semibold text-gray-800">Jour :</label>

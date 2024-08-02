@@ -60,12 +60,19 @@ router.get("/byeleve/:idEleve/:idSequence", async (req, res) => {
       ]
     });
 
+    if (!distinctElements.length) {
+      return res.status(404).json({ message: 'Aucune donnée trouvée' });
+    }
+
     // Convertir les instances Sequelize en objets JSON
     const plainObjects = distinctElements.map(element => element.get({ plain: true }));
 
+    const getMatiere = (element) => element.noteBulletin?.coursNote?.matiere || 'Inconnu';
+
+
     // Regrouper par matière en utilisant JavaScript natif
     const groupedByMatiere = plainObjects.reduce((acc, element) => {
-      const matiere = element.noteBulletin.coursNote.matiere;
+      const matiere = getMatiere(element);
       if (!acc[matiere]) {
         acc[matiere] = [];
       }

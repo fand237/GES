@@ -1,9 +1,7 @@
-// LoginAll.jsx
 import React, { useState } from 'react';
 import EleveAll from './EleveAll';
 import EnseignantAll from './EnseignantAll';
 import ParentAll from './ParentAll';
-
 
 const UserAll = () => {
   const [activeTab, setActiveTab] = useState('enseignant');
@@ -13,18 +11,32 @@ const UserAll = () => {
   };
 
   return (
-    <div>
-      <div className="tab-buttons">
-      <button className={activeTab === 'eleve' ? 'active' : ''} onClick={() => handleTabChange('eleve')}>Élève</button>
-        <button className={activeTab === 'enseignant' ? 'active' : ''} onClick={() => handleTabChange('enseignant')}>Enseignant</button>
-        <button className={activeTab === 'parent' ? 'active' : ''} onClick={() => handleTabChange('parent')}>Parent</button>
-
-
-        
+    <div className="p-6 bg-gray-50 min-h-screen">
+      <div className="mb-6 flex space-x-4">
+        <button
+          onClick={() => handleTabChange('eleve')}
+          className={`px-4 py-2 font-semibold text-sm rounded-md focus:outline-none ${activeTab === 'eleve' ? 'bg-indigo-600 text-white' : 'bg-gray-200 text-gray-700'}`}
+        >
+          Élève
+        </button>
+        <button
+          onClick={() => handleTabChange('enseignant')}
+          className={`px-4 py-2 font-semibold text-sm rounded-md focus:outline-none ${activeTab === 'enseignant' ? 'bg-indigo-600 text-white' : 'bg-gray-200 text-gray-700'}`}
+        >
+          Enseignant
+        </button>
+        <button
+          onClick={() => handleTabChange('parent')}
+          className={`px-4 py-2 font-semibold text-sm rounded-md focus:outline-none ${activeTab === 'parent' ? 'bg-indigo-600 text-white' : 'bg-gray-200 text-gray-700'}`}
+        >
+          Parent
+        </button>
       </div>
-      {activeTab === 'enseignant' && <EnseignantAll />}
-      {activeTab === 'eleve' && <EleveAll />}
-      {activeTab === 'parent' && <ParentAll />}
+      <div className="p-6 bg-white shadow-md rounded-lg">
+        {activeTab === 'enseignant' && <EnseignantAll />}
+        {activeTab === 'eleve' && <EleveAll />}
+        {activeTab === 'parent' && <ParentAll />}
+      </div>
     </div>
   );
 };

@@ -4,6 +4,9 @@ import TimeTable from './TimeTable';
 import UserAll from './UserAll';
 import CoursForm from './CoursForm'
 import CoursAll from './CoursAll'
+import CyClass from './CyClass'
+import CyClassAll from './CyClassAll'
+
 
 const DashboardAdmin = () => {
     const [activeTab, setActiveTab] = useState('FormAll');
@@ -57,6 +60,22 @@ const DashboardAdmin = () => {
                             Enregistrement des Cours
                         </button>
                     </li>
+                    <li>
+                        <button
+                            className={`dashboard-button ${activeTab === 'CyClass' ? 'bg-gray-300' : ''}`}
+                            onClick={() => handleTabChange('CyClass')}
+                        >
+                            Enregistrement des Cycles et Classes
+                        </button>
+                    </li>
+                    <li>
+                        <button
+                            className={`dashboard-button ${activeTab === 'CyClassAll' ? 'bg-gray-300' : ''}`}
+                            onClick={() => handleTabChange('CyClassAll')}
+                        >
+                            Gerer les Cycles et Classes
+                        </button>
+                    </li>
                     
                 </ul>
             </div>
@@ -66,6 +85,8 @@ const DashboardAdmin = () => {
                 {activeTab === 'UserAll' && <UserAll />}
                 {activeTab === 'CoursForm' && <CoursForm />}
                 {activeTab === 'CoursAll' && <CoursAll />}
+                {activeTab === 'CyClass' && <CyClass />}
+                {activeTab === 'CyClassAll' && <CyClassAll />}
 
 
             </div>

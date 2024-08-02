@@ -23,8 +23,8 @@ const DraggableItem = ({ course, handleDragStart }) => {
       draggable
       onDragStart={(e) => handleDragStart(e, course)}
     >
-      <p>{course.matiere}</p>
-      <p>{course.Enseignant.nom}</p>
+      <p className="text-sm font-medium">{course.matiere}</p>
+      <p className="text-xs text-gray-500">{course.Enseignant.nom}</p>
     </div>
   );
 };
@@ -64,7 +64,11 @@ const TimetableDropArea = ({ classes, jours, selectedClass, handleClassChange, t
             const coursDetails = await axios.get(`http://localhost:3001/Cours/${course.cours}`);
 
             const enseignantDetails = await axios.get(
-              `http://localhost:3001/Enseignants/${coursDetails.data.Enseignant}`
+              `http://localhost:3001/Enseignants/${coursDetails.data.Enseignant}`, {
+                headers: {
+                  accessToken: localStorage.getItem("accessToken"),
+                },
+              }
             );
 
             return {
@@ -92,14 +96,14 @@ const TimetableDropArea = ({ classes, jours, selectedClass, handleClassChange, t
 
   const renderDayHeaders = (jours) => {
     return (
-      <div style={{ display: 'flex', borderBottom: '1px solid black' }}>
-        <div
-          style={{ ...draggableStyle, width: '100px', height: '50px' }}
-        ></div>
+      <div className="flex border-b border-gray-300">
+        <div className="w-32 h-16 border-r border-gray-300 flex items-center justify-center bg-gray-100 font-medium">
+          <p>Heures</p>
+        </div>
         {jours.map((jour, index) => (
           <div
             key={index}
-            style={{ ...draggableStyle, width: '80px', height: '50px' }}
+            className="w-32 h-16 border-r border-gray-300 flex items-center justify-center bg-gray-200 font-medium"
           >
             <p>{jour.jour}</p>
           </div>
@@ -297,33 +301,29 @@ const TimetableDropArea = ({ classes, jours, selectedClass, handleClassChange, t
             <div
               key={colIndex}
               id={cellId}
-              style={{
-                ...draggableStyle,
-                width: colIndex === 0 ? '100px' : '80px',
-                height: '50px',
-              }}
+              className={`w-32 h-16 border-r border-gray-300 flex items-center justify-center ${isPauseRow ? 'bg-gray-200' : 'bg-white'}`}
               onDrop={(e) => handleDrop(e, rowIndex, colIndex)}
               onDragOver={(e) => e.preventDefault()}
               onClick={() => handleCellClick(rowIndex, colIndex, preFilledCourse)} // Ajoutez un gestionnaire de clic pour la suppression
 
             >
               {isPauseRow ? (
-                <p>Pause</p>
+                <p className="text-base font-medium">Pause</p>
               ) : (
                 <>
                   {colIndex === 0 && rowIndex !== -1 ? (
-                    <p>{`${timeSlots[rowIndex].heureDebut} - ${timeSlots[rowIndex].heureFin}`}</p>
+                    <p className="text-base font-medium">{`${timeSlots[rowIndex].heureDebut} - ${timeSlots[rowIndex].heureFin}`}</p>
                   ) : (
                     <div>
                       {preFilledCourse ? (
                         // Si le cours pré-rempli existe, affichez-le
                         <>
-                          <p>{preFilledCourse.Enseignant.nom}</p>
-                          <p>{preFilledCourse.cours.matiere}</p>
+                          <p className="text-base font-medium">{preFilledCourse.Enseignant.nom}</p>
+                          <p className="text-sm text-gray-500">{preFilledCourse.cours.matiere}</p>
 
                         </>
                       ) : (
-                        <p>Vide</p>
+                        <p className="text-sm text-gray-400">Vide</p>
                       )}
                     </div>
                   )}
@@ -338,30 +338,29 @@ const TimetableDropArea = ({ classes, jours, selectedClass, handleClassChange, t
   };
 
   return (
-    <div>
+    <div className="p-4">
+      <div className="mb-4">
 
       <h2>Emploi du temps</h2>
-      <label htmlFor="classSelect">Sélectionner la classe : </label>
+      <label htmlFor="class-select" className="block text-sm font-medium text-gray-700">Sélectionner la classe : </label>
       <select
-        id="classSelect"
+        id="class-select"
+        name="class"
+          className="mt-1 block w-full bg-gray-100 border border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
         onChange={(e) => handleClassChange(e.target.value)}
         value={selectedClass ? selectedClass.id : ''}
       >
-        {classes.map((classe) => (
-          <option key={classe.id} value={classe.id}>
-            {classe.classe}
-          </option>
+        <option value="" disabled>Sélectionnez une classe</option>
+          {classes.map((cl) => (
+            <option key={cl.id} value={cl.id}>{cl.classe}</option>
         ))}
       </select>
-      <div style={{ ...timetableStyle, border: '1px solid black', padding: '5px', position: 'relative' }}>
 
-        <div>
+      </div>
 
-        </div>
         {renderDayHeaders(jours)}
         {renderTimetableRows()}
 
-      </div>
     </div>
   );
 };
@@ -512,8 +511,8 @@ const TimeTable = () => {
 
   return (
     <div className="flex">
-  <div className="fixed top-0 left-0 w-52 h-screen overflow-y-auto">
-    <h2>Cours</h2>
+  <div className="w-60 h-screen bg-gray-50 border-r border-gray-300 overflow-y-auto p-4 flex-shrink-0">
+    <h2 className="text-lg font-semibold mb-4">Cours</h2>
     {listOfCours.map((value, key) => (
       <DraggableItem
         key={key}
@@ -522,7 +521,7 @@ const TimeTable = () => {
       />
     ))}
   </div>
-  <div className="ml-56 overflow-x-auto">
+  <div className="flex-1 p-4">
     <TimetableDropArea
       classes={classes}
       jours={jours}

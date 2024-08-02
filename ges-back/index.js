@@ -90,6 +90,10 @@ app.use("/Bulletin",BulletinRoute);
 const MoyenneRoute = require("./routes/MoyenneRoute");
 app.use("/Moyenne",MoyenneRoute);
 
+//Routes Cycle
+const CycleRoute = require("./routes/CycleRoute");
+app.use("/Cycle",CycleRoute);
+
 
 app.get('/', (req, res) => {
   res.send('Backend de votre application React');

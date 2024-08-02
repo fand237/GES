@@ -146,9 +146,13 @@ function EnseignantAll() {
         <thead>
           <tr className="bg-gray-200">
             <th className="p-4 border-b">Nom utilisateur</th>
+            <th className="p-4 border-b">Civilite</th>
             <th className="p-4 border-b">Nom</th>
             <th className="p-4 border-b">Prénom</th>
             <th className="p-4 border-b">Email</th>
+            <th className="p-4 border-b">Type</th>
+            <th className="p-4 border-b">Indicatif</th>
+            <th className="p-4 border-b">Numero de telephone</th>
             <th className="p-4 border-b">Actions</th>
           </tr>
         </thead>
@@ -156,9 +160,15 @@ function EnseignantAll() {
           {filteredEnseignants.map((enseignant) => (
             <tr key={enseignant.id} className="border-b">
               <td className="p-4">{enseignant.nomUtilisateur}</td>
+              <td className="p-4">{enseignant.civilite}</td>
               <td className="p-4">{enseignant.nom}</td>
               <td className="p-4">{enseignant.prenom}</td>
               <td className="p-4">{enseignant.email}</td>
+              <td className="p-4">{enseignant.typeEnseignant}</td>
+              <td className="p-4">{enseignant.indicatif}</td>
+              <td className="p-4">{enseignant.numeroTelephone}</td>
+
+
               <td className="p-4">
                 <button
                   type="button"

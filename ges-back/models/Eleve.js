@@ -49,6 +49,21 @@
         type: DataTypes.INTEGER,
         
       },
+      civilite: {
+        type: DataTypes.STRING,
+        allowNull: true,
+      },
+      ville: {
+        type: DataTypes.STRING,
+        allowNull: false,
+        defaultValue: "yaounde",
+
+      },
+      numeroIncremental: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+        defaultValue: 1,
+      },
       typeuser: {
         type: DataTypes.STRING,
         allowNull: true,

@@ -3,6 +3,7 @@ const router = express.Router();
 const {Parent} = require("../models")
 const { getParentsByClasse } = require('../controllers/ParentControllers');
 const { validateToken } = require("../middlewares/AuthMiddleware")
+const bcrypt = require('bcrypt');
 
 
 
@@ -97,36 +98,68 @@ router.put('/:id', async (req, res) => {
   }
 });
 
+// Fonction pour générer le nom d'utilisateur
+const generateUsername = (nom, prenom, numeroTelephone) => {
+  const username = `${nom.slice(0, 2)}${prenom.slice(0, 2)}${numeroTelephone}`;
+  return username;
+};
 
-router.post("/", async(req, res) => {
-   try{
-    const post=req.body;
-
-
-    const isOverlap = await Parent.checkOverlapEmail( post.email);
-    const isOverlapUser = await Parent.checkOverlapUsername( post.nomUtilisateur);
-    const isOverlapnumero = await Parent.checkOverlapnumero( post.indicatif, post.numeroTelephone);
-
-
-    // Si l'unicité n'est pas respectée, renvoyer une réponse avec le statut 422
-    if (isOverlapUser) {
-        return res.status(422).json({ error: "Ce nom d'utilisateur est déjà utilisé." });
-      } else if (isOverlap) {
-        return res.status(422).json({ error: "Cette adresse e-mail est déjà utilisée." });
-      }else if (isOverlapnumero) {
-        return res.status(422).json({ error: "Ce numero est déjà utilisée." });
-      }
-
-    await Parent.create(post);
+// routes/parent.js
+router.post("/", validateToken,async (req, res) => {
+  const post = req.body;
+  const { email, nom, prenom, indicatif, numeroTelephone, profession, quartier, civilite, situationMatriomiale } = req.body;
   
-      // Si tout va bien, renvoyer une réponse de succès
-      return res.status(200).json({ success: 'Parent créé avec succès' });
+  try {
+    const isOverlap = await Parent.checkOverlapEmail(email);
+    //const isOverlapUser = await Parent.checkOverlapUsername(nomUtilisateur);
+    const isOverlapnumero = await Parent.checkOverlapnumero(indicatif, numeroTelephone);
 
-   }catch(error){
+    if (isOverlap) {
+      return res.status(422).json({ error: "Cette adresse e-mail est déjà utilisée." });
+    } else if (isOverlapnumero) {
+      return res.status(422).json({ error: "Ce numéro est déjà utilisé." });
+    }
+
+     // Génération des données
+    const year = new Date().getFullYear().toString().slice(-2);
+    const type = "PAR";
+       
+    
+        // Générer le numéro incrémental
+        const lastUser = await Parent.findOne({
+          order: [['createdAt', 'DESC']],
+          attributes: ['numeroIncremental'],
+        });
+        const incrementNumber = lastUser ? lastUser.numeroIncremental+ 1 : 1;
+    
+        // Créer le nom d'utilisateur
+        const nomUtilisateur = `${year}${type}${incrementNumber}`; 
+     const motDePasse = 'qwerty237'; // Mot de passe par défaut
+
+    const hashedPassword = await bcrypt.hash(motDePasse, 10);
+
+    const newParent = await Parent.create({
+      nomUtilisateur,
+      motDePasse: hashedPassword,
+      email, 
+      nom,
+      prenom,
+      indicatif,
+      numeroTelephone,
+      profession,
+      quartier,
+      civilite,
+      situationMatriomiale,
+    });
+
+    res.status(201).json({ nomUtilisateur });
+  } catch (error) {
     console.error(error);
-    return res.status(500).json({ error: 'Erreur serveur' });
-   }
+    res.status(500).json({ error: 'Erreur serveur' });
+  }
 });
+
+
 
 
 

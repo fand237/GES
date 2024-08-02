@@ -6,11 +6,11 @@ const { Note, Moyenne, Cours, Sequence, Type_Evaluation, Classe, Bulletin } = re
 const {validateToken} = require("../middlewares/AuthMiddleware")
 
 
-// Route pour créer une nouvelle note
-router.post('/', validateToken, async (req, res) => {
+router.post('/', validateToken,async (req, res) => {
   try {
-    let { eleve, cours, note, dateEvaluation, type_Evaluation, sequence } = req.body;
 
+    let { eleve, cours, note, dateEvaluation, type_Evaluation, sequence } = req.body;
+    console.log(req.utilisateur)
     // Recherche d'une instance existante
     const existingInstance = await Note.findOne({
       where: {
@@ -18,41 +18,33 @@ router.post('/', validateToken, async (req, res) => {
         cours,
         type_Evaluation,
         sequence,
+
       },
     });
 
     if (existingInstance) {
-      if (note == '') { note = null; }
-      // Si l'instance existe, mettez à jour la note
+
+      if (note == '') { note = null }
+      // Si l'instance existe, mettez à jour le statut
       existingInstance.note = note;
+
       await existingInstance.save();
     } else {
-      if (note == '') { note = null; }
-      // Sinon, créez une nouvelle instance de note
+      if (note == '') { note = null }
+      // Sinon, créez une nouvelle instance
       const newNote = await Note.create({ eleve, cours, note, dateEvaluation, type_Evaluation, sequence });
-
+      const idannee = 1;
+      const idnote = newNote.id
+      console.log("l'id de la note cree est ",idnote);
       // Vérifiez si les valeurs requises pour la création du Bulletin sont disponibles
-      const idnote = newNote.id;
-      const idannee = 1; // Vous devez ajuster cela pour obtenir la bonne année
+        const newbuletin = await Bulletin.create({ eleve, note: idnote, annee: idannee });
 
-      if (idnote && idannee) {
-        // Recherche d'un bulletin existant pour éviter les doublons
-        const existingBulletin = await Bulletin.findOne({
-          where: {
-            eleve,
-            note: idnote,
-            annee: idannee,
-          },
-        });
-
-        if (!existingBulletin) {
-          await Bulletin.create({ eleve, note: idnote, annee: idannee });
-        } else {
-          console.log('Le bulletin existe déjà.');
-        }
-      } else {
-        console.error('Valeurs manquantes pour la création du Bulletin.');
+      if (newbuletin){
+        console.log("bulletin cree avec succes");
+      }else{
+        console.log("bulletin non cree");
       }
+
     }
 
     res.json({ message: 'Mise à jour ou création réussie' });

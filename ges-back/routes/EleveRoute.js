@@ -127,26 +127,49 @@ router.delete("/:id", async (req, res) => {
   }
 });
 
+// Fonction pour générer le nom d'utilisateur
+const generateUsername = (nom, prenom, numeroTelephone) => {
+  const username = `${nom.slice(0, 2)}${prenom.slice(0, 2)}${numeroTelephone}`;
+  return username;
+};
 
-router.post("/", validateToken,async (req, res) => {
+router.post("/",validateToken,async (req, res) => {
 
-  try {
     const post = req.body;
 
     const isOverlap = await Eleve.checkOverlapEmail(post.email);
-    const isOverlapUser = await Eleve.checkOverlapUsername(post.nomUtilisateur);
 
     // Si l'unicité n'est pas respectée, renvoyer une réponse avec le statut 422
-    if (isOverlapUser) {
-      return res.status(422).json({ error: "Ce nom d'utilisateur est déjà utilisé." });
-    } else if (isOverlap) {
+   if (isOverlap) {
       return res.status(422).json({ error: "Cette adresse e-mail est déjà utilisée." });
     }
 
-    const { nomUtilisateur, motDePasse, email, nom, prenom, dateNaissance, classe, parent } = req.body;
-
+    const {  email, nom, prenom, dateNaissance, classe, parent ,civilite} = req.body;
     try {
+      const motDePasse = 'qwerty237'; // Mot de passe par défaut
+
         const hashedPassword = await bcrypt.hash(motDePasse, 10);
+
+        // Obtenir l'année en cours
+    const year = new Date().getFullYear().toString().slice(-2);
+const ville = "yaounde";
+    // Obtenir les trois lettres de la ville
+    const city = ville.toUpperCase();
+    const firstLetter = city.charAt(0);
+    const thirdLetter = city.charAt(2);
+    const lastLetter = city.charAt(city.length - 1);
+
+    // Générer le numéro incrémental
+    const lastUser = await Eleve.findOne({
+      order: [['createdAt', 'DESC']],
+      attributes: ['nomUtilisateur'],
+    });
+    const incrementNumber = lastUser ? parseInt(lastUser.nomUtilisateur.match(/\d+$/)) + 1 : 1;
+
+    // Créer le nom d'utilisateur
+    const nomUtilisateur = `${year}${firstLetter}${thirdLetter}${lastLetter}${incrementNumber}`;
+
+  
         const eleve = await Eleve.create({
             nomUtilisateur,
             motDePasse: hashedPassword,
@@ -156,22 +179,18 @@ router.post("/", validateToken,async (req, res) => {
             dateNaissance,
             classe,
             parent,
-            typeuser
-        });
+            civilite,
+            numeroIncremental: incrementNumber,
+            typeuser:"Eleve",
+          });
         
-        res.json(eleve);
+        res.status(201).json({nomUtilisateur});
     } catch (error) {
         console.error("Erreur lors de la création de l'élève :", error);
         res.status(500).json({ error: "Erreur du serveur" });
     }
     
-    // Si tout va bien, renvoyer une réponse de succès
-    return res.status(200).json({ success: 'Eleve créé avec succès' });
-
-  } catch (error) {
-    console.error(error);
-    return res.status(500).json({ error: 'Erreur serveur' });
-  }
+  
 });
 
 

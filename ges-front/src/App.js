@@ -23,6 +23,12 @@ import EleveDelete from './components/EleveDelete'
 import EnseignantUpdate from './components/EnseignantUpdate';
 import EnseignantDelete from './components/EnseignantDelete';
 
+import CycleUpdate from './components/CycleUpdate';
+import CycleDelete from './components/CycleDelete';
+
+import ClasseUpdate from './components/ClasseUpdate';
+import ClasseDelete from './components/ClasseDelete';
+
 
 
 import ParentForm from './components/ParentForm'
@@ -171,6 +177,12 @@ function App() {
           <Route path="/EleveUpdate/:id" element={<EleveUpdate />} />
           <Route path="/EleveDelete/:id" element={<EleveDelete />} />
           <Route path="/DashboardEleve" element={ <ProtectedRoute requiredRole="Eleve"> <DashboardEleve /> </ProtectedRoute> } />
+
+          <Route path="/CycleUpdate/:id" element={ <ProtectedRoute requiredRole="Administrateur"> <CycleUpdate /> </ProtectedRoute> } />
+          <Route path="/CycleDelete/:id" element={ <ProtectedRoute requiredRole="Administrateur"> <CycleDelete /> </ProtectedRoute> } />
+          
+          <Route path="/ClasseUpdate/:id" element={ <ProtectedRoute requiredRole="Administrateur"> <ClasseUpdate /> </ProtectedRoute> } />
+          <Route path="/ClasseDelete/:id" element={ <ProtectedRoute requiredRole="Administrateur"> <ClasseDelete /> </ProtectedRoute> } />
 
 
           <Route
