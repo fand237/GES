@@ -131,14 +131,14 @@ function ParentAll() {
               <td className="p-4">
                 <button
                   type="button"
-                  onClick={() => navigate(`/ParentDelete/${parent.id}`)}
+                  onClick={() => navigate(`/DashboardAdmin/ParentDelete/${parent.id}`)}
                   className="delete-button"
                 >
                   Supprimer
                 </button>
                 <button
                   type="button"
-                  onClick={() => navigate(`/ParentUpdate/${parent.id}`)}
+                  onClick={() => navigate(`/DashboardAdmin/ParentUpdate/${parent.id}`)}
                   className="modify-button"
                 >
                   Modifier

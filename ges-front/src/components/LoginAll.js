@@ -15,19 +15,19 @@ const LoginAll = () => {
       <div className="mb-6 flex space-x-4">
         <button
           onClick={() => handleTabChange('eleve')}
-          className={`px-4 py-2 font-semibold text-sm rounded-md focus:outline-none ${activeTab === 'eleve' ? 'bg-indigo-600 text-white' : 'bg-gray-200 text-gray-700'}`}
+          className={`px-4 py-2 font-semibold text-sm rounded-md focus:outline-none ${activeTab === 'eleve' ? 'bg-purple-700 text-white' : 'bg-gray-200 text-gray-700'}`}
         >
           Élève
         </button>
         <button
           onClick={() => handleTabChange('enseignant')}
-          className={`px-4 py-2 font-semibold text-sm rounded-md focus:outline-none ${activeTab === 'enseignant' ? 'bg-indigo-600 text-white' : 'bg-gray-200 text-gray-700'}`}
+          className={`px-4 py-2 font-semibold text-sm rounded-md focus:outline-none ${activeTab === 'enseignant' ? 'bg-purple-700 text-white' : 'bg-gray-200 text-gray-700'}`}
         >
           Enseignant
         </button>
         <button
           onClick={() => handleTabChange('admin')}
-          className={`px-4 py-2 font-semibold text-sm rounded-md focus:outline-none ${activeTab === 'admin' ? 'bg-indigo-600 text-white' : 'bg-gray-200 text-gray-700'}`}
+          className={`px-4 py-2 font-semibold text-sm rounded-md focus:outline-none ${activeTab === 'admin' ? 'bg-purple-700 text-white' : 'bg-gray-200 text-gray-700'}`}
         >
           Administrateur
         </button>

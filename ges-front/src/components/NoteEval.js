@@ -45,8 +45,8 @@ const NoteEval = () => {
                             <td className="p-4">
                                 <button
                                     type="button"
-                                    onClick={() => navigate(`/NoteUpdate/${evaluation.cours}/${evaluation.coursNote.classeCours.id}/${evaluation.sequence}/${evaluation.type_Evaluation}/${evaluation.dateEvaluation}`)}
-                                    className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+                                    onClick={() => navigate(`/DashboardEnseignant/NoteUpdate/${evaluation.cours}/${evaluation.coursNote.classeCours.id}/${evaluation.sequence}/${evaluation.type_Evaluation}/${evaluation.dateEvaluation}`)}
+                                    className="save-button"
                                 >
                                     Modifier
                                 </button>

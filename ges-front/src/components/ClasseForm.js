@@ -6,6 +6,8 @@ import { useNavigate } from 'react-router-dom';
 
 const ClasseForm = () => {
   const [cycles, setCycles] = useState([]);
+  const [enseignants, setEnseignants] = useState([]); // Ajout de l'état pour les enseignants
+
   const [showSuccessMessage, setShowSuccessMessage] = useState(false); // Ajout de l'état
 
   const navigate = useNavigate();
@@ -24,15 +26,31 @@ const ClasseForm = () => {
       }
     };
 
+    const fetchEnseignants = async () => {
+      try {
+        const response = await axios.get('http://localhost:3001/Enseignants', {
+          headers: {
+            accessToken: localStorage.getItem("accessToken"),
+          },
+        });
+        setEnseignants(response.data);
+      } catch (error) {
+        console.error('Erreur lors du chargement des enseignants', error);
+      }
+    };
+
     fetchCycles();
+    fetchEnseignants();
   }, []);
 
-  const initialValues = { classe: '', capacite: '', cycle: '' };
+  const initialValues = { classe: '', capacite: '', cycle: '' , responsable: '' };
 
   const validationSchema = Yup.object({
     classe: Yup.string().required('Nom de la classe est requis'),
     capacite: Yup.number().required('Capacité est requise').positive().integer(),
     cycle: Yup.number().required('Cycle est requis'),
+    responsable: Yup.number().required('Responsable est requis'),
+
   });
 
   const handleSubmit = async (values, { resetForm }) => {
@@ -109,6 +127,18 @@ const ClasseForm = () => {
                 ))}
               </Field>
               <ErrorMessage name="cycle" component="div" className="text-red-500 text-sm" />
+            </div>
+            <div className="mb-4">
+              <label htmlFor="responsable" className="block text-sm font-medium text-gray-700">Responsable</label>
+              <Field as="select" id="responsable" name="responsable" className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
+                <option value="" label="Sélectionner un responsable" />
+                {enseignants.map(enseignant => (
+                  <option key={enseignant.id} value={enseignant.id}>
+                    {enseignant.nom} {enseignant.prenom} ({enseignant.nomUtilisateur})
+                  </option>
+                ))}
+              </Field>
+              <ErrorMessage name="responsable" component="div" className="text-red-500 text-sm" />
             </div>
             <button
               type="submit"

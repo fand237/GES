@@ -22,6 +22,10 @@ module.exports = (sequelize,DataTypes) => {
       cycle: {
         type: DataTypes.INTEGER,
       },
+      responsable: {
+        type: DataTypes.INTEGER,
+        
+      }
     });
   
     Classe.associate = (models) => {
@@ -33,6 +37,10 @@ module.exports = (sequelize,DataTypes) => {
       Classe.belongsTo(models.Cycle, {
         foreignKey: 'cycle',
         as: 'CycleClasse',
+      });
+      Classe.belongsTo(models.Enseignant, { // Association avec Enseignant
+        foreignKey: 'responsable',
+        as: 'ResponsableClasse',
       });
     };
 

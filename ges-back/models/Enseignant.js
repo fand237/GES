@@ -98,6 +98,11 @@ class Enseignant  {
         onUpdate: 'CASCADE',
         onDelete: 'CASCADE',
       });
+
+      Enseignant.hasMany(models.Classe, { // Relation inverse avec Classe
+        foreignKey: 'responsable',
+        as: 'ResponsableClasse',
+      });
     };
 
     Enseignant.checkOverlapUsername = async function (nomUtilisateur) {

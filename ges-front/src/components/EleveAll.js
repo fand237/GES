@@ -120,14 +120,14 @@ function EleveAll() {
           <td className="p-4">
             <button
               type="button"
-              onClick={() => navigate(`/EleveDelete/${eleve.id}`)}
+              onClick={() => navigate(`/DashboardAdmin/EleveDelete/${eleve.id}`)}
               className="delete-button"
             >
               Supprimer
             </button>
             <button
               type="button"
-              onClick={() => navigate(`/EleveUpdate/${eleve.id}`)}
+              onClick={() => navigate(`/DashboardAdmin/EleveUpdate/${eleve.id}`)}
               className="modify-button"
             >
               Modifier

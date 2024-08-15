@@ -9,7 +9,7 @@ function CoursDelete() {
     axios.delete(`http://localhost:3001/Cours/${id}`)
       .then(() => {
         console.log("Cours supprimé avec succès");
-        navigate(`/CoursAll`); // Utilisation de navigate pour la navigation
+        navigate(`/DashboardAdmin/CoursAll`); // Utilisation de navigate pour la navigation
       })
       .catch((error) => {
         console.error("Erreur lors de la suppression du cours : ", error);

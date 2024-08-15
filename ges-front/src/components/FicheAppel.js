@@ -22,13 +22,20 @@ function FicheAppel() {
         });
         const coursesWithDetails = await Promise.all(
           response.data.map(async (course) => {
-            const classeDetails = await axios.get(`http://localhost:3001/Classe/${course.classe}`);
+            const classeDetails = await axios.get(`http://localhost:3001/Classe/${course.classe}`,
+              {
+                headers: {
+                  accessToken: localStorage.getItem("accessToken"),
+                },
+              }
+            );
             return {
               ...course,
               classe: classeDetails.data,
             };
           })
         );
+        console.log(coursesWithDetails);
         setCoursList(coursesWithDetails);
       } catch (error) {
         console.error('Erreur lors de la récupération de la liste des cours : ', error);
@@ -153,7 +160,7 @@ function FicheAppel() {
       >
         <option value="" disabled>Sélectionnez un cours</option>
         {coursList.map((cours) => (
-          <option key={cours.id} value={cours.id}>{cours.matiere} {cours.classe.classe}</option>
+          <option key={cours.id} value={cours.id}>{cours.matiere}  ({cours.classe.classe})</option>
         ))}
       </select>
       {selectedCours && (
@@ -212,7 +219,7 @@ function FicheAppel() {
       )}
       <button
         onClick={handleEnregistrer}
-        className="mt-4 bg-blue-500 text-white py-2 px-4 rounded"
+        className="save-button"
       >
         Enregistrer
       </button>

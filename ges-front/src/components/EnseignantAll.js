@@ -172,14 +172,14 @@ function EnseignantAll() {
               <td className="p-4">
                 <button
                   type="button"
-                  onClick={() => navigate(`/EnseignantDelete/${enseignant.id}`)}
+                  onClick={() => navigate(`/DashboardAdmin/EnseignantDelete/${enseignant.id}`)}
                   className="delete-button"
                 >
                   Supprimer
                 </button>
                 <button
                   type="button"
-                  onClick={() => navigate(`/EnseignantUpdate/${enseignant.id}`)}
+                  onClick={() => navigate(`/DashboardAdmin/EnseignantUpdate/${enseignant.id}`)}
                   className="modify-button"
                 >
                   Modifier

@@ -14,7 +14,11 @@ function EleveForm() {
   useEffect(() => {
     const fetchClasses = async () => {
       try {
-        const response = await axios.get("http://localhost:3001/Classe");
+        const response = await axios.get("http://localhost:3001/Classe",{
+          headers:{
+            accessToken: localStorage.getItem("accessToken"),
+          },
+        });
         setClasses(response.data);
       } catch (error) {
         console.error("Erreur lors de la récupération des classe : ", error);

@@ -16,6 +16,11 @@ import TimeTableEnseignant from './components/TimeTableEnseignant'
 import DashboardEnseignant from './components/DashboardEnseignant'
 import DashboardEleve from './components/DashboardEleve'
 
+import CyClass from './components/CyClass'
+import CyClassAll from './components/CyClassAll'
+
+import CycleAll from './components/CycleAll'
+
 import EleveAll from './components/EleveAll'
 import EleveUpdate from './components/EleveUpdate'
 import EleveDelete from './components/EleveDelete'
@@ -40,6 +45,8 @@ import NoteForm from './components/NoteForm'
 import NoteUpdate2 from './components/NoteUpdate2'
 import LoginAll from './components/LoginAll'
 import FormAll from './components/FormAll'
+
+import UserAll from './components/UserAll'
 
 import Logout from './components/Logout'
 
@@ -151,69 +158,52 @@ function App() {
 
         <Routes>
           <Route path="/Home" element={<Home />} />
-          <Route path="/AdminForm" element={<AdminForm />} />
-          <Route
-          path="/DashboardAdmin"
-          element={
-            <ProtectedRoute requiredRole="Administrateur">
-              <DashboardAdmin />
-            </ProtectedRoute>
-          }
-        />
-          <Route path="/CoursForm" element={ <ProtectedRoute requiredRole="Administrateur"> <CoursForm /> </ProtectedRoute> } />
-          <Route path="/CoursAll" element={<CoursAll />} />
-          <Route path="/CoursUpdate/:id" element={<CoursUpdate />} />
-          <Route path="/CoursDelete/:id" element={<CoursDelete />} />
+          
 
-          <Route path="/EmploisTemps" element={<TimeTable />} />
+          <Route path="/DashboardEnseignant" element={ <ProtectedRoute requiredRole="Enseignant"> <DashboardEnseignant /> </ProtectedRoute> } >
+            <Route path="FicheAppel/:idens" element={ <ProtectedRoute requiredRole="Enseignant"> <FicheAppel /> </ProtectedRoute>} />
+            <Route path="NoteForm/:idEnseignant" element={ <ProtectedRoute requiredRole="Enseignant"> <NoteForm /> </ProtectedRoute>} />
+            <Route path="NoteEval/:idEnseignant" element={ <ProtectedRoute requiredRole="Enseignant"> <NoteEval /> </ProtectedRoute>} />
+            <Route path="NoteUpdate/:idCours/:idClasse/:idSequence/:idType/:date" element={ <ProtectedRoute requiredRole="Enseignant"> <NoteUpdate2 /> </ProtectedRoute>} />
+            <Route path="EmploisTempsEnseignant" element={ <ProtectedRoute requiredRole="Enseignant"> <TimeTableEnseignant /> </ProtectedRoute>} />
 
-          <Route path="/EmploisTempsEnseignant" element={<TimeTableEnseignant />} />
-          <Route path="/DashboardEnseignant" element={ <ProtectedRoute requiredRole="Enseignant"> <DashboardEnseignant /> </ProtectedRoute> } />
+          </Route>
 
           <Route path="/LoginAll" element={<LoginAll />} />
           <Route path="/Logout" element={<Logout />} />
 
-          <Route path="/EleveAll" element={<EleveAll />} />
-          <Route path="/EleveUpdate/:id" element={<EleveUpdate />} />
-          <Route path="/EleveDelete/:id" element={<EleveDelete />} />
+          <Route  path="/DashboardAdmin"  element={  <ProtectedRoute requiredRole="Administrateur"> <DashboardAdmin /></ProtectedRoute>}>
+            <Route path="UserAll" element={ <ProtectedRoute requiredRole="Administrateur"> <UserAll /> </ProtectedRoute> } />
+            <Route path="AdminForm" element={ <ProtectedRoute requiredRole="Administrateur"> <AdminForm /> </ProtectedRoute>} />
+            <Route path="EleveAll" element={ <ProtectedRoute requiredRole="Administrateur"> <EleveAll /> </ProtectedRoute>} />
+            <Route path="EleveUpdate/:id" element={ <ProtectedRoute requiredRole="Administrateur"> <EleveUpdate /> </ProtectedRoute>} />
+            <Route path="EleveDelete/:id" element={ <ProtectedRoute requiredRole="Administrateur"> <EleveDelete /> </ProtectedRoute>} />
+            <Route path="CycleUpdate/:id" element={ <ProtectedRoute requiredRole="Administrateur"> <CycleUpdate /> </ProtectedRoute> } />
+            <Route path="CycleDelete/:id" element={ <ProtectedRoute requiredRole="Administrateur"> <CycleDelete /> </ProtectedRoute> } />
+            <Route path="ClasseUpdate/:id" element={ <ProtectedRoute requiredRole="Administrateur"> <ClasseUpdate /> </ProtectedRoute> } />
+            <Route path="ClasseDelete/:id" element={ <ProtectedRoute requiredRole="Administrateur"> <ClasseDelete /> </ProtectedRoute> } />
+            <Route path="EnseignantUpdate/:id" element={<ProtectedRoute requiredRole="Administrateur"><EnseignantUpdate /></ProtectedRoute>}/>
+            <Route path="EnseignantDelete/:id" element={ <ProtectedRoute requiredRole="Administrateur"> <EnseignantDelete /> </ProtectedRoute> } />
+            <Route path="CyClass" element={ <ProtectedRoute requiredRole="Administrateur"> <CyClass /> </ProtectedRoute> } />
+            <Route path="CyClassAll" element={ <ProtectedRoute requiredRole="Administrateur"> <CyClassAll /> </ProtectedRoute> } />
+            <Route path="CycleAll" element={ <ProtectedRoute requiredRole="Administrateur"> <CycleAll /> </ProtectedRoute> } />
+            <Route path="ParentForm" element={ <ProtectedRoute requiredRole="Administrateur"> <ParentForm /> </ProtectedRoute>} />
+            <Route path="ParentUpdate/:id" element={<ProtectedRoute requiredRole="Administrateur"> <ParentUpdate /> </ProtectedRoute>} />
+            <Route path="ParentDelete/:id" element={<ProtectedRoute requiredRole="Administrateur"> <ParentDelete /> </ProtectedRoute>} />
+            <Route path="ParentAll" element={<ProtectedRoute requiredRole="Administrateur"> <ParentAll /> </ProtectedRoute>} />
+            <Route path="CoursForm" element={ <ProtectedRoute requiredRole="Administrateur"> <CoursForm /> </ProtectedRoute> } />
+            <Route path="CoursAll" element={<ProtectedRoute requiredRole="Administrateur"> <CoursAll /> </ProtectedRoute>} />
+            <Route path="CoursUpdate/:id" element={<ProtectedRoute requiredRole="Administrateur"> <CoursUpdate /> </ProtectedRoute>} />
+            <Route path="CoursDelete/:id" element={<ProtectedRoute requiredRole="Administrateur"> <CoursDelete /> </ProtectedRoute>} />
+            <Route path="EmploisTemps" element={<ProtectedRoute requiredRole="Administrateur"> <TimeTable /> </ProtectedRoute>} />
+            <Route path="FormAll"element={<ProtectedRoute requiredRole="Administrateur"><FormAll /></ProtectedRoute>  } />
+
+          </Route>
           <Route path="/DashboardEleve" element={ <ProtectedRoute requiredRole="Eleve"> <DashboardEleve /> </ProtectedRoute> } />
 
-          <Route path="/CycleUpdate/:id" element={ <ProtectedRoute requiredRole="Administrateur"> <CycleUpdate /> </ProtectedRoute> } />
-          <Route path="/CycleDelete/:id" element={ <ProtectedRoute requiredRole="Administrateur"> <CycleDelete /> </ProtectedRoute> } />
           
-          <Route path="/ClasseUpdate/:id" element={ <ProtectedRoute requiredRole="Administrateur"> <ClasseUpdate /> </ProtectedRoute> } />
-          <Route path="/ClasseDelete/:id" element={ <ProtectedRoute requiredRole="Administrateur"> <ClasseDelete /> </ProtectedRoute> } />
-
-
-          <Route
-          path="/EnseignantUpdate/:id"
-          element={
-            <ProtectedRoute requiredRole="Administrateur">
-              <EnseignantUpdate />
-            </ProtectedRoute>
-          }
-        />
-              <Route path="/EnseignantDelete/:id" element={ <ProtectedRoute requiredRole="Administrateur"> <EnseignantDelete /> </ProtectedRoute> } />
-
-
-          <Route path="/ParentForm" element={<ParentForm />} />
-          <Route path="/ParentUpdate/:id" element={<ParentUpdate />} />
-          <Route path="/ParentDelete/:id" element={<ParentDelete />} />
-          <Route path="/ParentAll" element={<ParentAll />} />
-          <Route path="/FicheAppel/:idens" element={<FicheAppel />} />
-          <Route path="/NoteForm/:idEnseignant" element={<NoteForm />} />
-          <Route path="/NoteEval/:idEnseignant" element={<NoteEval />} />
-          <Route path="/NoteUpdate/:idCours/:idClasse/:idSequence/:idType/:date" element={<NoteUpdate2 />} />
           <Route path="/BulletinSequence/:idEleve/:idSequence" element={ <ProtectedRoute requiredRole="Eleve"> <BulletinSequence /> </ProtectedRoute> } />
 
-          <Route
-          path="/FormAll"
-          element={
-            <ProtectedRoute requiredRole="Administrateur">
-              <FormAll />
-            </ProtectedRoute>
-          }
-        />
 
         </Routes>
       </Router>

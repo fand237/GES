@@ -14,13 +14,13 @@ const CyClassAll = () => {
       <div className="mb-6 flex space-x-4">
         <button
           onClick={() => handleTabChange('CycleAll')}
-          className={`px-4 py-2 font-semibold text-sm rounded-md focus:outline-none ${activeTab === 'CycleAll' ? 'bg-indigo-600 text-white' : 'bg-gray-200 text-gray-700'}`}
+          className={`px-4 py-2 font-semibold text-sm rounded-md focus:outline-none ${activeTab === 'CycleAll' ? ' bg-purple-700 text-white' : 'bg-gray-200 text-gray-700'}`}
         >
           Cycles
         </button>
         <button
           onClick={() => handleTabChange('ClasseAll')}
-          className={`px-4 py-2 font-semibold text-sm rounded-md focus:outline-none ${activeTab === 'ClasseAll' ? 'bg-indigo-600 text-white' : 'bg-gray-200 text-gray-700'}`}
+          className={`px-4 py-2 font-semibold text-sm rounded-md focus:outline-none ${activeTab === 'ClasseAll' ? ' bg-purple-700 text-white' : 'bg-gray-200 text-gray-700'}`}
         >
           Classes
         </button>

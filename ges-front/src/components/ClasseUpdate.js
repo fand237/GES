@@ -8,12 +8,15 @@ const ClasseUpdate = () => {
   const { id } = useParams();
 
   const [cycles, setCycles] = useState([]);
+  const [enseignants, setEnseignants] = useState([]); // Ajout de l'état pour les enseignants
+
   const navigate = useNavigate();
 
   const [initialValues, setInitialValues] = useState({
     classe:"",
     capacite:"",
     cycle:"",
+    responsable: "",
   });
   useEffect(() => {
     const fetchCycles = async () => {
@@ -29,6 +32,20 @@ const ClasseUpdate = () => {
       }
     };
 
+    const fetchEnseignants = async () => {
+      try {
+        const response = await axios.get('http://localhost:3001/Enseignants', {
+          headers: {
+            accessToken: localStorage.getItem("accessToken"),
+          },
+        });
+        setEnseignants(response.data);
+      } catch (error) {
+        console.error('Erreur lors du chargement des enseignants', error);
+      }
+    };
+
+    fetchEnseignants();
     fetchCycles();
   }, []);
 
@@ -56,18 +73,19 @@ const ClasseUpdate = () => {
     classe: Yup.string().required('Nom de la classe est requis'),
     capacite: Yup.number().required('Capacité est requise').positive().integer(),
     cycle: Yup.number().required('Cycle est requis'),
+    responsable: Yup.number().required('Responsable est requis'),
+
   });
 
   const handleSubmit = async (values) => {
     try {
-      console.log(cycles);
-      console.log(values);
+      
       await axios.put(`http://localhost:3001/Classe/${id}`, values, {
         headers: {
           accessToken: localStorage.getItem("accessToken"),
         },
       });
-      //navigate('/DashboardAdmin');
+      navigate('/DashboardAdmin');
     } catch (error) {
       console.error('Erreur lors de la mise à jour de la classe', error);
     }
@@ -120,6 +138,20 @@ const ClasseUpdate = () => {
 
             <ErrorMessage name="cycle" component="div" className="text-red-500 text-sm" />
           </div>
+
+          <div className="mb-4">
+              <label htmlFor="responsable" className="block text-sm font-medium text-gray-700">Responsable</label>
+              <Field as="select" id="responsable" name="responsable" className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
+                <option value="" label="Sélectionner un responsable" />
+                {enseignants.map(enseignant => (
+                  <option key={enseignant.id} value={enseignant.id}>
+                    {enseignant.nom} {enseignant.prenom} ({enseignant.nomUtilisateur})
+                  </option>
+                ))}
+              </Field>
+              <ErrorMessage name="responsable" component="div" className="text-red-500 text-sm" />
+            </div>
+
           <button
             type="submit"
             className="send-button"

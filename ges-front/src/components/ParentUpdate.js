@@ -16,7 +16,11 @@ function ParentUpdate() {
   });
 
   useEffect(() => {
-    axios.get(`http://localhost:3001/Parent/nopass/${id}`)
+    axios.get(`http://localhost:3001/Parent/nopass/${id}`,{
+      headers:{
+        accessToken: localStorage.getItem("accessToken"),
+      },
+    })
       .then((response) => {
         console.log("Response from API:", response.data);
         setInitialValues(response.data);
@@ -35,7 +39,11 @@ function ParentUpdate() {
 
   const onSubmit = async (data) => {
     try {
-      await axios.put(`http://localhost:3001/Parent/${id}`, data);
+      await axios.put(`http://localhost:3001/Parent/${id}`, data,{
+        headers:{
+          accessToken: localStorage.getItem("accessToken"),
+        },
+      });
       console.log("Parent mis à jour avec succès");
       navigate(`/ParentAll`);
     } catch (error) {

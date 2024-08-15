@@ -14,7 +14,6 @@ const ClasseAll = () => {
             accessToken: localStorage.getItem("accessToken"),
           },
         });
-        console.log(response.data);
         setClasses(response.data);
       } catch (error) {
         console.error('Erreur lors du chargement des classes', error);
@@ -33,24 +32,28 @@ const ClasseAll = () => {
             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nom de la Classe</th>
             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Capacité</th>
             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Cycle</th>
+            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Responsable</th>
+            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nombre d'Élèves</th>
             <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
           </tr>
         </thead>
         <tbody className="bg-white divide-y divide-gray-200">
-          {classes.map(cls => (
-            <tr key={cls.id}>
+          {classes.map(cls => ( 
+            <tr key={cls.id}> 
               <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{cls.classe}</td>
               <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{cls.capacite}</td>
-              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{cls.CycleClasse}</td>
+              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{cls.cycle}</td>
+              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{cls.nom} {cls.prenom}</td>
+              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{cls.nombreEleves}</td>
               <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                 <button
-                  onClick={() => navigate(`/ClasseUpdate/${cls.id}`)}
+                  onClick={() => navigate(`/DashboardAdmin/ClasseUpdate/${cls.id}`)}
                   className="modify-button"
                 >
                   Modifier
                 </button>
                 <button
-                  onClick={() => navigate(`/ClasseDelete/${cls.id}`)}
+                  onClick={() => navigate(`/DashboardAdmin/ClasseDelete/${cls.id}`)}
                   className="delete-button"
                 >
                   Supprimer

@@ -413,7 +413,13 @@ const TimeTable = () => {
   useEffect(() => {
     const fetchClasse = async () => {
       try {
-        const response = await axios.get("http://localhost:3001/Classe");
+        const response = await axios.get("http://localhost:3001/Classe",
+          {
+            headers: {
+              accessToken: localStorage.getItem("accessToken"),
+            },
+          }
+        );
         setClasse(response.data);
         // Mettre à jour la classe sélectionnée avec la première classe
         setSelectedClass(response.data.length > 0 ? response.data[0] : null);

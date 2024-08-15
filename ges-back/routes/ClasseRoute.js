@@ -1,22 +1,54 @@
 const express = require('express');
 const router = express.Router();
-const { Classe , Cycle} = require('../models');
+const { Classe , Cycle , Enseignant , Eleve} = require('../models');
 const {validateToken} = require("../middlewares/AuthMiddleware")
+const sequelize = require('sequelize'); 
+
 
 
 // Route pour obtenir tous les classes
 router.get('/', validateToken,async (req, res) => {
+
   try { 
-    const classes = await Classe.findAll({
-      attributes: ['id', 'nom'], // Attributs de la table Classe à afficher
-      include: {
+    const classes = await Classe.findAll({ 
+      attributes: ['id', 'classe','capacite',
+        [sequelize.literal('(SELECT COUNT(*) FROM Eleves WHERE Eleves.classe = Classe.id)'), 'nombreEleves'],
+      ], // Attributs de la table Classe à afficher
+      include: [{
         model: Cycle,
         as: 'CycleClasse', // Utilisez l'alias défini dans votre association
         attributes: ['cycle'], // Attributs du modèle Cycle à afficher
-      }, 
-    });   
-     res.json(classes);
+      },
+     {
+        model: Enseignant,
+        as: 'ResponsableClasse',
+        attributes: ['nom','prenom'], // Changez 'nom' par le champ correspondant
+      },
+     {
+        model: Eleve,
+        as: 'eleves',
+        attributes: [], // Nous ne voulons pas afficher d'informations sur les élèves ici
+        required: false // Permet d'inclure les classes même si elles n'ont pas d'élèves
+
+      }, ] ,
+      group: ['Classe.id', 'ResponsableClasse.id'], // Group by the class id and responsible id
+    }); 
+// Formatez les données pour le frontend
+const formattedClasses = classes.map(cls => ({
+  id: cls.id,
+  classe: cls.classe,
+  capacite: cls.capacite,
+  cycle: cls.CycleClasse ? cls.CycleClasse.cycle : 'nom defini',
+  nom: cls.ResponsableClasse ? cls.ResponsableClasse.nom : 'N/A',
+  prenom: cls.ResponsableClasse ? cls.ResponsableClasse.prenom : 'N/A',
+  nombreEleves: cls.dataValues.nombreEleves,
+
+
+}));
+
+res.json(formattedClasses);
   } catch (error) {
+    console.log(error);
     res.status(500).json({ error: 'Erreur lors de la récupération des classes' });
   }
 });
@@ -49,7 +81,8 @@ router.post('/', validateToken,async (req, res) => {
     const newClasse = await Classe.create({ 
         classe,
         capacite,
-        cycle });
+        cycle,
+        responsable });
     res.status(201).json(newClasse);
   } catch (error) {
     res.status(500).json({ error: 'Erreur lors de la création du classe' });
@@ -59,11 +92,12 @@ router.post('/', validateToken,async (req, res) => {
 // Route pour mettre à jour un classe
 router.put('/:id', validateToken,async (req, res) => {
   try {
-    const { classe, capacite, cycle } = req.body;
+    const { classe, capacite, cycle ,responsable} = req.body;
     const [updated] = await Classe.update({ 
         classe,
         capacite,
-        cycle
+        cycle,
+        responsable,
      }, { where: { id: req.params.id } });
     if (updated) {
       const updatedClasse = await Classe.findByPk(req.params.id);
@@ -72,6 +106,7 @@ router.put('/:id', validateToken,async (req, res) => {
       res.status(404).json({ error: 'Classe non trouvé' });
     }
   } catch (error) {
+    console.log(error);
     res.status(500).json({ error: 'Erreur lors de la mise à jour du classe' });
   }
 });

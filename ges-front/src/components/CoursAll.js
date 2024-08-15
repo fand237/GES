@@ -24,8 +24,16 @@ function CoursAll() {
               },
             }) : null;
 
-            const joursDetails = course.jour ? await axios.get(`http://localhost:3001/Jour/${course.jour}`) : null;
-            const classesDetails = course.classe ? await axios.get(`http://localhost:3001/Classe/${course.classe}`) : null;
+            const joursDetails = course.jour ? await axios.get(`http://localhost:3001/Jour/${course.jour},{
+          headers: {
+            accessToken: localStorage.getItem("accessToken"),
+          },
+        }`) : null;
+            const classesDetails = course.classe ? await axios.get(`http://localhost:3001/Classe/${course.classe}`,{
+              headers: {
+                accessToken: localStorage.getItem("accessToken"),
+              },
+            }) : null;
 
             return {
               ...course,
@@ -57,7 +65,13 @@ function CoursAll() {
 
     const fetchClasses = async () => {
       try {
-        const response = await axios.get("http://localhost:3001/Classe");
+        const response = await axios.get("http://localhost:3001/Classe",
+          {
+            headers: {
+              accessToken: localStorage.getItem("accessToken"),
+            },
+          }
+        );
         setClasses(response.data);
       } catch (error) {
         console.error("Erreur lors de la récupération des classes : ", error);
@@ -137,14 +151,14 @@ function CoursAll() {
             <div className="flex space-x-4">
               <button
                 type="button"
-                onClick={() => navigate(`/CoursUpdate/${value.id}`)}
+                onClick={() => navigate(`/DashboardAdmin/CoursUpdate/${value.id}`)}
                 className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-400"
               >
                 Modifier
               </button>
               <button
                 type="button"
-                onClick={() => navigate(`/CoursDelete/${value.id}`)}
+                onClick={() => navigate(`/DashboardAdmin/CoursDelete/${value.id}`)}
                 className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-400"
               >
                 Supprimer

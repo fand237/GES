@@ -48,13 +48,13 @@ const CycleAll = () => {
               <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                 <button
               type="button"
-              onClick={() => navigate(`/CycleUpdate/${cycle.id}`)}
+              onClick={() => navigate(`/DashboardAdmin/CycleUpdate/${cycle.id}`)}
               className="modify-button"
             >
               Modifier
             </button>
                 <button
-                onClick={() => navigate(`/CycleDelete/${cycle.id}`)}                  
+                onClick={() => navigate(`/DashboardAdmin/CycleDelete/${cycle.id}`)}                  
                 className="delete-button"
                 >
                   Supprimer

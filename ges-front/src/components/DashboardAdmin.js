@@ -1,94 +1,68 @@
-import React, { useState } from 'react';
-import FormAll from './FormAll';
-import TimeTable from './TimeTable';
-import UserAll from './UserAll';
-import CoursForm from './CoursForm'
-import CoursAll from './CoursAll'
-import CyClass from './CyClass'
-import CyClassAll from './CyClassAll'
-
+import React from 'react';
+import { Outlet, Link } from 'react-router-dom';
 
 const DashboardAdmin = () => {
-    const [activeTab, setActiveTab] = useState('FormAll');
-
-    const handleTabChange = (tab) => {
-        setActiveTab(tab);
-    };
-
     return (
         <div className="flex h-screen">
-            <div className="w-1/4 bg-gray-200 p-4">
+            {/* Sidebar */}
+            <div className="w-64 bg-gray-200 p-4 fixed top-15 left-0 h-full">
                 <h1 className="text-xl font-bold mb-4">Tableau de bord de l'Administrateur</h1>
                 <ul>
                     <li>
-                        <button
-                            className={`dashboard-button ${activeTab === 'FormAll' ? 'bg-gray-300' : ''}`}
-                            onClick={() => handleTabChange('FormAll')}
-                        >
-                            Enregistrement utilisateurs
-                        </button>
+                        <Link to="/DashboardAdmin/FormAll">
+                            <button className="block w-full text-left py-2 px-4 rounded-lg hover:bg-gray-300">
+                                Enregistrement utilisateurs
+                            </button>
+                        </Link>
                     </li>
                     <li>
-                        <button
-                            className={`dashboard-button ${activeTab === 'TimeTable' ? 'bg-gray-300' : ''}`}
-                            onClick={() => handleTabChange('TimeTable')}
-                        >
-                            Gérer les emplois de temps
-                        </button>
+                        <Link to="/DashboardAdmin/EmploisTemps">
+                            <button className="block w-full text-left py-2 px-4 rounded-lg hover:bg-gray-300">
+                                Gérer les emplois de temps
+                            </button>
+                        </Link>
                     </li>
                     <li>
-                        <button
-                            className={`dashboard-button ${activeTab === 'UserAll' ? 'bg-gray-300' : ''}`}
-                            onClick={() => handleTabChange('UserAll')}
-                        >
-                            Gérer les Utilisateurs
-                        </button>
+                        <Link to="/DashboardAdmin/UserAll">
+                            <button className="block w-full text-left py-2 px-4 rounded-lg hover:bg-gray-300">
+                                Gérer les Utilisateurs
+                            </button>
+                        </Link>
                     </li>
                     <li>
-                        <button
-                            className={`dashboard-button ${activeTab === 'CoursAll' ? 'bg-gray-300' : ''}`}
-                            onClick={() => handleTabChange('CoursAll')}
-                        >
-                            Gérer les cours
-                        </button>
+                        <Link to="/DashboardAdmin/CoursAll">
+                            <button className="block w-full text-left py-2 px-4 rounded-lg hover:bg-gray-300">
+                                Gérer les cours
+                            </button>
+                        </Link>
                     </li>
                     <li>
-                        <button
-                            className={`dashboard-button ${activeTab === 'CoursForm' ? 'bg-gray-300' : ''}`}
-                            onClick={() => handleTabChange('CoursForm')}
-                        >
-                            Enregistrement des Cours
-                        </button>
+                        <Link to="/DashboardAdmin/CoursForm">
+                            <button className="block w-full text-left py-2 px-4 rounded-lg hover:bg-gray-300">
+                                Enregistrement des Cours
+                            </button>
+                        </Link>
                     </li>
                     <li>
-                        <button
-                            className={`dashboard-button ${activeTab === 'CyClass' ? 'bg-gray-300' : ''}`}
-                            onClick={() => handleTabChange('CyClass')}
-                        >
-                            Enregistrement des Cycles et Classes
-                        </button>
+                        <Link to="/DashboardAdmin/CyClass">
+                            <button className="block w-full text-left py-2 px-4 rounded-lg hover:bg-gray-300">
+                                Enregistrement des Cycles et Classes
+                            </button>
+                        </Link>
                     </li>
                     <li>
-                        <button
-                            className={`dashboard-button ${activeTab === 'CyClassAll' ? 'bg-gray-300' : ''}`}
-                            onClick={() => handleTabChange('CyClassAll')}
-                        >
-                            Gerer les Cycles et Classes
-                        </button>
+                        <Link to="/DashboardAdmin/CyClassAll">
+                            <button className="block w-full text-left py-2 px-4 rounded-lg hover:bg-gray-300">
+                                Gérer les Cycles et Classes
+                            </button>
+                        </Link>
                     </li>
-                    
                 </ul>
             </div>
-            <div className="w-3/4 p-4 bg-white overflow-auto">
-                {activeTab === 'TimeTable' && <TimeTable />}
-                {activeTab === 'FormAll' && <FormAll />}
-                {activeTab === 'UserAll' && <UserAll />}
-                {activeTab === 'CoursForm' && <CoursForm />}
-                {activeTab === 'CoursAll' && <CoursAll />}
-                {activeTab === 'CyClass' && <CyClass />}
-                {activeTab === 'CyClassAll' && <CyClassAll />}
 
-
+            {/* Main Content */}
+            <div className="flex-1 ml-64 p-6 bg-white">
+                <Outlet />
             </div>
         </div>
     );
