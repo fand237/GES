@@ -3,7 +3,7 @@ import axios from 'axios';
 import { saveAs } from 'file-saver';
 
 const RapportPresence = () => {
-  const [presences, setPresences] = useState([]);
+  const [presences, setPresences] = useState({});
   const [classes, setClasses] = useState([]);
   const [eleves, setEleves] = useState([]);
   const [filter, setFilter] = useState({
@@ -55,12 +55,7 @@ const RapportPresence = () => {
   useEffect(() => {
     const fetchPresences = async () => {
       try {
-        const response = await axios.get('http://localhost:3001/Presence/rapport', { 
-          params: filter,
-          headers: {
-            accessToken: localStorage.getItem("accessToken"),
-          },
-        });
+        const response = await axios.get('http://localhost:3001/Presence/rapport', { params: filter });
         setPresences(response.data);
       } catch (error) {
         console.error('Erreur lors de la récupération des présences:', error);
@@ -72,13 +67,7 @@ const RapportPresence = () => {
 
   const handleDownload = async () => {
     try {
-      const response = await axios.get('http://localhost:3001/Presence/rapport/download', { 
-        params: filter,
-        responseType: 'blob',
-        headers: {
-          accessToken: localStorage.getItem("accessToken"),
-        },
-      });
+      const response = await axios.get('http://localhost:3001/Presence/rapport/download', { params: filter, responseType: 'blob' });
       saveAs(response.data, `rapport_presence_${filter.typeRapport}.pdf`);
     } catch (error) {
       console.error('Erreur lors du téléchargement du rapport:', error);
@@ -164,7 +153,7 @@ const RapportPresence = () => {
         </select>
       </div>
 
-      <button onClick={handleDownload} className="bg-blue-500 text-white p-2 rounded">
+      <button onClick={handleDownload} className="save-button">
         Télécharger le Rapport
       </button>
 
@@ -182,15 +171,21 @@ const RapportPresence = () => {
             </tr>
           </thead>
           <tbody>
-            {presences.map((presence) => (
-              <tr key={presence.id}>
-                <td className="border px-4 py-2">{presence.elevePresence.nom} {presence.elevePresence.prenom}</td>
-                <td className="border px-4 py-2">{presence.coursPresence.matiere}</td>
-                <td className="border px-4 py-2">{presence.jour}</td>
-                <td className="border px-4 py-2">{presence.statut}</td>
-                <td className="border px-4 py-2">{presence.retard}</td>
-                <td className="border px-4 py-2">{presence.participation}</td>
-              </tr>
+            {Object.keys(presences).map((eleveId) => (
+              <React.Fragment key={eleveId}>
+                {Object.keys(presences[eleveId].cours).map((coursId) => (
+                  presences[eleveId].cours[coursId].dates.map((date, index) => (
+                    <tr key={index}>
+                      <td className="border px-4 py-2">{presences[eleveId].nom} {presences[eleveId].prenom}</td>
+                      <td className="border px-4 py-2">{presences[eleveId].cours[coursId].matiere}</td>
+                      <td className="border px-4 py-2">{date.jour}</td>
+                      <td className="border px-4 py-2">{date.statut}</td>
+                      <td className="border px-4 py-2">{date.retard}</td>
+                      <td className="border px-4 py-2">{date.participation}</td>
+                    </tr>
+                  ))
+                ))}
+              </React.Fragment>
             ))}
           </tbody>
         </table>

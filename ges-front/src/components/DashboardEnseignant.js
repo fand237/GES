@@ -33,6 +33,13 @@ const DashboardEnseignant = () => {
                             </button>
                         </Link>
                     </li>
+                    <li>
+                        <Link to={`/DashboardEnseignant/EmploisTempsEnseignant`}>
+                            <button className="block w-full text-left py-2 px-4 rounded-lg hover:bg-gray-300">
+                                Mon Emplois de temps
+                            </button>
+                        </Link>
+                    </li>
                 </ul>
             </div>
 

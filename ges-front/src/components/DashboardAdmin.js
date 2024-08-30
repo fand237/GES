@@ -57,6 +57,13 @@ const DashboardAdmin = () => {
                             </button>
                         </Link>
                     </li>
+                    <li>
+                        <Link to="/DashboardAdmin/PresenceRapport">
+                            <button className="block w-full text-left py-2 px-4 rounded-lg hover:bg-gray-300">
+                                Rapport des presences
+                            </button>
+                        </Link>
+                    </li>
                 </ul>
             </div>
 

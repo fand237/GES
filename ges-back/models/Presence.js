@@ -29,6 +29,19 @@ module.exports = (sequelize,DataTypes) => {
       type: DataTypes.INTEGER,
       allowNull: true,
     },
+    resumeCours: {  // Nouveau champ pour les grandes lignes du cours
+      type: DataTypes.TEXT,  
+      allowNull: true,  
+    },
+    participation: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      defaultValue: 0,
+      validate: {
+        min: 0,
+        max: 5
+      }
+    },
 
   });
 

@@ -11,7 +11,7 @@ const CycleUpdate = () => {
   const [showSuccessMessage, setShowSuccessMessage] = useState(false); // Ajout de l'état
 
   
-  useEffect(() => {
+  useEffect(() => { 
     const fetchCycle = async () => {
       try {
         const response = await axios.get(`http://localhost:3001/Cycle/${id}`,{

@@ -14,6 +14,8 @@ import CoursDelete from './components/CoursDelete'
 import TimeTable from './components/TimeTable'
 import TimeTableEnseignant from './components/TimeTableEnseignant'
 import DashboardEnseignant from './components/DashboardEnseignant'
+import PresenceRapport from './components/PresenceRapport'
+
 import DashboardEleve from './components/DashboardEleve'
 
 import CyClass from './components/CyClass'
@@ -197,6 +199,7 @@ function App() {
             <Route path="CoursDelete/:id" element={<ProtectedRoute requiredRole="Administrateur"> <CoursDelete /> </ProtectedRoute>} />
             <Route path="EmploisTemps" element={<ProtectedRoute requiredRole="Administrateur"> <TimeTable /> </ProtectedRoute>} />
             <Route path="FormAll"element={<ProtectedRoute requiredRole="Administrateur"><FormAll /></ProtectedRoute>  } />
+            <Route path="PresenceRapport"element={<ProtectedRoute requiredRole="Administrateur"><PresenceRapport /></ProtectedRoute>  } />
 
           </Route>
           <Route path="/DashboardEleve" element={ <ProtectedRoute requiredRole="Eleve"> <DashboardEleve /> </ProtectedRoute> } />
