@@ -4,15 +4,15 @@ const jwt = require('jsonwebtoken');
 const path = require('path');
 
 const app = express();
-const port = process.env.port || 3001; // Choisissez un port selon vos préférences
+const port = 3001; // Choisissez un port selon vos préférences
 
 const db=require("./models");
 db.sequelize.sync().then(()=>{
   app.listen(port, () => {
     console.log(`Serveur backend démarré sur le port ${port}`);
   });
-});
-
+}); 
+/*
 // Serve the static files from the React app
 app.use(express.static(path.join(__dirname, 'client/build')));
 
@@ -20,7 +20,7 @@ app.use(express.static(path.join(__dirname, 'client/build')));
 app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname + '/client/build/index.html'));
 });
-
+*/
 app.use(express.json());
 
 // Utilisez le middleware cors

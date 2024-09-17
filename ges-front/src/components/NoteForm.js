@@ -24,7 +24,11 @@ const NoteForm = () => {
   useEffect(() => {
     const fetchSequenceList = async () => {
       try {
-        const response = await axios.get('http://localhost:3001/Sequence');
+        const response = await axios.get('http://localhost:3001/Sequence',{
+          headers: {
+            accessToken: localStorage.getItem("accessToken"),
+          },
+        });
         setSequences(response.data);
       } catch (error) {
         console.error('Erreur lors de la récupération de la liste des séquences :', error);
@@ -37,7 +41,11 @@ const NoteForm = () => {
   useEffect(() => {
     const fetchTypeEvaluationList = async () => {
       try {
-        const response = await axios.get('http://localhost:3001/Type_Evaluation');
+        const response = await axios.get('http://localhost:3001/Type_Evaluation',{
+          headers: {
+            accessToken: localStorage.getItem("accessToken"),
+          },
+        });
         setTypeEvaluation(response.data);
       } catch (error) {
         console.error('Erreur lors de la récupération de la liste des types d\'évaluation :', error);
@@ -50,16 +58,25 @@ const NoteForm = () => {
   useEffect(() => {
     const fetchCoursList = async () => {
       try {
-        const response = await axios.get(`http://localhost:3001/Cours/byens/${idens}`);
+        const response = await axios.get(`http://localhost:3001/Cours/byens/${idens}`,{
+          headers: {
+            accessToken: localStorage.getItem("accessToken"),
+          },
+        });
         const coursesWithDetails = await Promise.all(
           response.data.map(async (course) => {
-            const classeDetails = await axios.get(`http://localhost:3001/Classe/${course.classe}`);
+            const classeDetails = await axios.get(`http://localhost:3001/Classe/${course.classe}`,{
+              headers: {
+                accessToken: localStorage.getItem("accessToken"),
+              },
+            });
             return {
               ...course,
               classe: classeDetails.data,
             };
           })
         );
+        console.log("les cours sont:",coursesWithDetails);
         setCoursList(coursesWithDetails);
       } catch (error) {
         console.error('Erreur lors de la récupération de la liste des cours :', error);

@@ -61,6 +61,7 @@ const RapportPresence = () => {
             accessToken: localStorage.getItem("accessToken"),
           },
         });
+        console.log("la liste des presence est :",response.data);
         setPresences(response.data);
       } catch (error) {
         console.error('Erreur lors de la récupération des présences:', error);
@@ -182,16 +183,26 @@ const RapportPresence = () => {
             </tr>
           </thead>
           <tbody>
-            {presences.map((presence) => (
-              <tr key={presence.id}>
-                <td className="border px-4 py-2">{presence.elevePresence.nom} {presence.elevePresence.prenom}</td>
-                <td className="border px-4 py-2">{presence.coursPresence.matiere}</td>
-                <td className="border px-4 py-2">{presence.jour}</td>
-                <td className="border px-4 py-2">{presence.statut}</td>
-                <td className="border px-4 py-2">{presence.retard}</td>
-                <td className="border px-4 py-2">{presence.participation}</td>
+            {Object.keys(presences).length === 0 ? (
+              <tr>
+                <td colSpan="6" className="border px-4 py-2 text-center">Aucune présence trouvée</td>
               </tr>
-            ))}
+            ) : (
+              Object.values(presences).map((eleve, eleveIndex) => (
+                Object.values(eleve.cours).map((cours, coursIndex) => (
+                  cours.dates.map((dateInfo, dateIndex) => (
+                    <tr key={`${eleveIndex}-${coursIndex}-${dateIndex}`}>
+                      <td className="border px-4 py-2">{eleve.nom} {eleve.prenom}</td>
+                      <td className="border px-4 py-2">{cours.matiere}</td>
+                      <td className="border px-4 py-2">{dateInfo.jour}</td>
+                      <td className="border px-4 py-2">{dateInfo.statut}</td>
+                      <td className="border px-4 py-2">{dateInfo.retard}</td>
+                      <td className="border px-4 py-2">{dateInfo.participation}</td>
+                    </tr>
+                  ))
+                ))
+              ))
+            )}
           </tbody>
         </table>
       </div>
