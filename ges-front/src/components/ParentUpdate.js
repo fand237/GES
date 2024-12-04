@@ -7,12 +7,20 @@ import { useParams, useNavigate } from 'react-router-dom';
 function ParentUpdate() {
   let { id } = useParams();
   let navigate = useNavigate();
+  const [civilites] = useState(['Mademoiselle', 'Monsieur', 'Madame']);
+  const [situations] = useState(['Célibataire', 'Marié(e)', 'Divorcé(e)', 'Veuf(ve)']);
 
   const [initialValues, setInitialValues] = useState({
     nomUtilisateur: '',
     nom: '',
     email: '',
     prenom: '',
+    indicatif: "+237",
+    numeroTelephone: "",
+    profession: "",
+    quartier: "",
+    civilite: "",
+    situationMatriomiale: "",
   });
 
   useEffect(() => {
@@ -35,6 +43,13 @@ function ParentUpdate() {
     email: Yup.string().email("Adresse email invalide").required("Email obligatoire"),
     nom: Yup.string().required("Nom obligatoire"),
     prenom: Yup.string().required("Prénom obligatoire"),
+    numeroTelephone: Yup.string()
+      .matches(/^\d{6,14}$/, 'Le numéro de téléphone doit contenir de 6 à 14 chiffres')
+      .required('Numéro de téléphone obligatoire'),
+    civilite: Yup.string().required("Civilité obligatoire"),
+    situationMatriomiale: Yup.string().required("Situation matrimoniale obligatoire"),
+    profession: Yup.string().required("Profession obligatoire"),
+    quartier: Yup.string().required("Quartier obligatoire"),
   });
 
   const onSubmit = async (data) => {
@@ -74,10 +89,22 @@ function ParentUpdate() {
         <h1 className="titre-connect">Mettre à jour un parent</h1>
         <Formik key={JSON.stringify(initialValues)} initialValues={initialValues} onSubmit={onSubmit} validationSchema={validationSchema}>
           <Form className="mt-6">
+          <div className="mb-2">
+                <label htmlFor="civilite" className="block text-sm font-semibold text-gray-800">Civilité :</label>
+                <ErrorMessage name="civilite" component="span" className="text-red-500 text-xs" />
+                <Field as="select" id="civilite" name="civilite" className="input-user">
+                  <option>selectionner une civilite</option>
+                  {civilites.map(civilite => (
+                    <option key={civilite} value={civilite}>
+                      {civilite}
+                    </option>
+                  ))}
+                </Field><br />
+              </div>
             <div className="mb-2">
               <label htmlFor="nomUtilisateur" className="block text-sm font-semibold text-gray-800">Nom d'utilisateur :</label>
               <ErrorMessage name="nomUtilisateur" component="span" className="text-red-500" />
-              <Field type="text" id="nomUtilisateur" name="nomUtilisateur" className="input-user" /><br />
+              <Field type="text" id="nomUtilisateur" name="nomUtilisateur" className="input-user" disabled={true} /><br />
             </div>
             <div className="mb-2">
               <label htmlFor="email" className="block text-sm font-semibold text-gray-800">Email :</label>
@@ -94,6 +121,32 @@ function ParentUpdate() {
               <ErrorMessage name="prenom" component="span" className="text-red-500" />
               <Field type="text" id="prenom" name="prenom" className="input-user" /><br />
             </div>
+            <div className="mb-2">
+                <label htmlFor="numeroTelephone" className="block text-sm font-semibold text-gray-800">Numéro de téléphone :</label>
+                <ErrorMessage name="numeroTelephone" component="span" className="text-red-500 text-xs" />
+                <Field type="text" id="numeroTelephone" name="numeroTelephone" className="input-user"/><br />
+              </div>
+              <div className="mb-2">
+                <label htmlFor="profession" className="block text-sm font-semibold text-gray-800">Profession :</label>
+                <ErrorMessage name="profession" component="span" className="text-red-500 text-xs" />
+                <Field type="text" id="profession" name="profession" className="input-user" /><br />
+              </div>
+              <div className="mb-2">
+                <label htmlFor="quartier" className="block text-sm font-semibold text-gray-800">Quartier :</label>
+                <ErrorMessage name="quartier" component="span" className="text-red-500 text-xs" />
+                <Field type="text" id="quartier" name="quartier" className="input-user" /><br />
+              </div>
+              <div className="mb-2">
+                <label htmlFor="situationMatriomiale" className="block text-sm font-semibold text-gray-800">Situation matrimoniale :</label>
+                <ErrorMessage name="situationMatriomiale" component="span" className="text-red-500 text-xs" />
+                <Field as="select" id="situationMatriomiale" name="situationMatriomiale" className="input-user">
+                  {situations.map(situation => (
+                    <option key={situation} value={situation}>
+                      {situation}
+                    </option>
+                  ))}
+                </Field><br />
+              </div>
             <div className="mt-6">
               <button type="submit" className="send-button">Enregistrer</button>
             </div>

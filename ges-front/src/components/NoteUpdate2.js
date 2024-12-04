@@ -8,6 +8,8 @@ const NoteUpdate2 = () => {
   const [eleves, setEleves] = useState([]);
   const [notes, setNotes] = useState({});
   const [notesError, setNotesError] = useState(false);
+  const [showSuccessMessage, setShowSuccessMessage] = useState(false); // Ajout de l'état
+
 
   useEffect(() => {
     const fetchElevesAndNotes = async () => {
@@ -92,6 +94,11 @@ const NoteUpdate2 = () => {
           console.error('Erreur lors de l\'enregistrement de la note :', error);
         });
     });
+    console.log("notes mis a jour avec succès");
+      setShowSuccessMessage(true); // Affichage du message de succès
+      setTimeout(() => {
+        setShowSuccessMessage(false); // Cacher le message après 2 secondes
+      }, 5000);
   };
 
   return (
@@ -116,7 +123,7 @@ const NoteUpdate2 = () => {
                   type="number"
                   min="0"
                   max="20"
-                  value={notes[eleve.id] || ''}
+                  value={notes[eleve.id] !== undefined ? notes[eleve.id] : ''}
                   onChange={(e) => handleNoteChange(eleve.id, e.target.value)}
                   className="w-full px-2 py-1 border border-gray-300 rounded"
                 />
@@ -128,10 +135,16 @@ const NoteUpdate2 = () => {
 
       <button
         onClick={handleSaveNotes}
-        className="mt-4 bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600"
+        className="save-button"
       >
         Modifier les Notes
       </button>
+
+      {showSuccessMessage && (
+          <div className="success-message">
+            Notes mis a jour avec succès !
+          </div>
+        )}
     </div>
   );
 };

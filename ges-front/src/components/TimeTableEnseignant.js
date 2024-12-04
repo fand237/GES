@@ -29,7 +29,11 @@ const TimetableDropArea = ({ classes, jours, ensId, enseignantNom }) => {
   const fetchPreFilledCourses = useCallback(async () => {
     if (ensId) {
       try {
-        const response = await axios.get(`http://localhost:3001/Jour_Cours/byens/${ensId}`);
+        const response = await axios.get(`http://localhost:3001/Jour_Cours/byens/${ensId}`,{
+          headers: {
+            accessToken: localStorage.getItem("accessToken"),
+          },
+        });
         const coursesWithDetails = await Promise.all(
           response.data.map(async (course) => {
             const coursDetails = await axios.get(`http://localhost:3001/Cours/${course.cours}`, {
@@ -210,7 +214,8 @@ const TimeTableEnseignant = () => {
             accessToken: localStorage.getItem("accessToken"),
           },
         });
-        const nom = response.data.nom+' '+response.data.prenom;
+        console.log("le resultat de enseignant",response.data)
+        const nom = response.data.civilite+' '+response.data.nom+' '+response.data.prenom;
         setEnseignantNom(nom);
       } catch (error) {
         console.error('Erreur lors de la récupération du nom de l\'enseignant : ', error);

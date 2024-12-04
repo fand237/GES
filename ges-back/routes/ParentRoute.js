@@ -68,7 +68,7 @@ router.delete("/:id", async (req, res) => {
 router.put('/:id', async (req, res) => {
   try {
     const { id } = req.params;
-    const { nomUtilisateur, motDePasse, email, nom, prenom } = req.body;
+    const { nomUtilisateur, motDePasse, email, nom, prenom ,indicatif, numeroTelephone, profession, quartier, civilite, situationMatriomiale} = req.body;
  
     // Récupérer le parent existant par son ID
     const parent = await Parent.findByPk(id);
@@ -82,6 +82,12 @@ router.put('/:id', async (req, res) => {
     parent.email = email || parent.email;
     parent.nom = nom || parent.nom;
     parent.prenom = prenom || parent.prenom;
+    parent.indicatif = indicatif || parent.indicatif;
+    parent.numeroTelephone = numeroTelephone || parent.numeroTelephone;
+    parent.profession = profession || parent.profession;
+    parent.quartier = quartier || parent.quartier;
+    parent.civilite = civilite || parent.civilite;
+    parent.situationMatriomiale = situationMatriomiale || parent.situationMatriomiale;
 
     // Mettre à jour le mot de passe uniquement s'il est fourni dans la requête
     if (motDePasse) {

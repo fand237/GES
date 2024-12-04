@@ -132,7 +132,9 @@ router.delete("/:id", validateToken, async (req, res) => {
 // Route pour la mise à jour d'un Parent
 router.put("/:id", validateToken, async (req, res) => {
   const { id } = req.params;
-  const { nomUtilisateur, motDePasse, email, nom, prenom } = req.body;
+  const { nomUtilisateur, motDePasse, email, nom, prenom , civilite, numeroTelephone, indicatif, typeEnseignant,} = req.body;
+
+    console.log(req.body);
 
   try {
       const enseignant = await Enseignant.findByPk(id);
@@ -145,6 +147,10 @@ router.put("/:id", validateToken, async (req, res) => {
           email,
           nom,
           prenom,
+          civilite,
+          numeroTelephone,
+          indicatif,
+          typeEnseignant, 
       };
 
       if (motDePasse) {

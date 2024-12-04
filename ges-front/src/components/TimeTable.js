@@ -57,11 +57,19 @@ const TimetableDropArea = ({ classes, jours, selectedClass, handleClassChange, t
   const fetchPreFilledCourses = useCallback(async () => {
     if (timetableId) {
       try {
-        const response = await axios.get(`http://localhost:3001/Jour_Cours/byemplois/${timetableId}`);
+        const response = await axios.get(`http://localhost:3001/Jour_Cours/byemplois/${timetableId}`,{
+          headers: {
+            accessToken: localStorage.getItem("accessToken"),
+          },
+        });
 
         const coursesWithDetails = await Promise.all(
           response.data.map(async (course) => {
-            const coursDetails = await axios.get(`http://localhost:3001/Cours/${course.cours}`);
+            const coursDetails = await axios.get(`http://localhost:3001/Cours/${course.cours}`,{
+              headers: {
+                accessToken: localStorage.getItem("accessToken"),
+              },
+            });
 
             const enseignantDetails = await axios.get(
               `http://localhost:3001/Enseignants/${coursDetails.data.Enseignant}`, {
@@ -115,7 +123,11 @@ const TimetableDropArea = ({ classes, jours, selectedClass, handleClassChange, t
   const deleteJour_Cours = async (jourCoursId) => {
     try {
       // Faites une requête DELETE pour supprimer le Jour_Cours côté serveur
-      const response = await axios.delete(`http://localhost:3001/Jour_Cours/${jourCoursId}`);
+      const response = await axios.delete(`http://localhost:3001/Jour_Cours/${jourCoursId}`,{
+        headers: {
+          accessToken: localStorage.getItem("accessToken"),
+        },
+      });
 
       if (response.data.success) {
         console.log('Jour_Cours supprimé avec succès.');
@@ -192,6 +204,10 @@ const TimetableDropArea = ({ classes, jours, selectedClass, handleClassChange, t
         heureFin: timeSlots[rowIndex].heureFin,
         enseignantId: draggedItem.course.Enseignant.id,
         emplois_TempsId: timetableId,
+      },{
+        headers: {
+          accessToken: localStorage.getItem("accessToken"),
+        },
       });
 
       if (response.data.error) {

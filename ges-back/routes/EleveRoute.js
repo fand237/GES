@@ -83,7 +83,7 @@ router.get('/nopass/:id', async (req, res) => {
 // Route pour la mise à jour d'un Eleve
 router.put('/:id', async (req, res) => {
   const { id } = req.params;
-    const { nomUtilisateur, motDePasse, email, nom, prenom, dateNaissance, classe, parent } = req.body;
+    const { nomUtilisateur, motDePasse, email, nom, prenom, dateNaissance, classe, parent,civilite } = req.body;
 
     try {
         const eleve = await Eleve.findByPk(id);
@@ -98,7 +98,8 @@ router.put('/:id', async (req, res) => {
             prenom,
             dateNaissance,
             classe,
-            parent
+            parent,
+            civilite,
         };
 
         if (motDePasse) {

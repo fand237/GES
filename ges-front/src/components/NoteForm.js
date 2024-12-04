@@ -20,6 +20,8 @@ const NoteForm = () => {
   const [typeEvaluationError, setTypeEvaluationError] = useState(false);
   const [dateError, setDateError] = useState(false);
   const [notesError, setNotesError] = useState(false);
+  const [showSuccessMessage, setShowSuccessMessage] = useState(false); // Ajout de l'état
+
 
   useEffect(() => {
     const fetchSequenceList = async () => {
@@ -175,6 +177,11 @@ const NoteForm = () => {
         console.error(`Erreur lors de l'enregistrement de la note : `, error);
       });
     });
+    console.log("notes ajoute avec succès");
+      setShowSuccessMessage(true); // Affichage du message de succès
+      setTimeout(() => {
+        setShowSuccessMessage(false); // Cacher le message après 2 secondes
+      }, 5000);
   };
 
   return (
@@ -185,57 +192,70 @@ const NoteForm = () => {
       {dateError && <p className="text-red-500">Veuillez sélectionner une date d'évaluation.</p>}
       {notesError && <p className="text-red-500">Veuillez saisir des notes valides (entre 0 et 20).</p>}
 
-      <div className="mb-4">
-        <label className="block mb-2 font-medium">Sélectionnez un cours :</label>
-        <select
-          onChange={(e) => handleCoursChange(e.target.value)}
-          value={selectedCours ? selectedCours.id : ''}
-          className="block w-full p-2 border border-gray-300 rounded"
-        >
-          <option value="" disabled>Sélectionnez un Cours</option>
-          {coursList.map((cours) => (
-            <option key={cours.id} value={cours.id}>{cours.matiere} {cours.classe.classe}</option>
-          ))}
-        </select>
-      </div>
+      <div className="flex flex-wrap items-center space-x-4 mb-4">
+  {/* Sélectionnez un cours */}
+  <div className="flex-1">
+    <label className="block font-medium mb-2">Sélectionnez un cours :</label>
+    <select
+      onChange={(e) => handleCoursChange(e.target.value)}
+      value={selectedCours ? selectedCours.id : ''}
+      className="block w-full p-2 border border-gray-300 rounded"
+    >
+      <option value="" disabled>Sélectionnez un Cours</option>
+      {coursList.map((cours) => (
+        <option key={cours.id} value={cours.id}>
+          {cours.matiere} {cours.classe.classe}
+        </option>
+      ))}
+    </select>
+  </div>
 
-      <div className="mb-4">
-        <label className="block mb-2 font-medium">Sélectionnez une séquence :</label>
-        <select
-          onChange={(e) => handlesequenceChange(e.target.value)}
-          value={selectedSequence ? selectedSequence.id : ''}
-          className="block w-full p-2 border border-gray-300 rounded"
-        >
-          <option value="" disabled>Sélectionnez une séquence</option>
-          {sequences.map((sequence) => (
-            <option key={sequence.id} value={sequence.id}>{sequence.sequence}</option>
-          ))}
-        </select>
-      </div>
+  {/* Sélectionnez une séquence */}
+  <div className="flex-1">
+    <label className="block font-medium mb-2">Sélectionnez une séquence :</label>
+    <select
+      onChange={(e) => handlesequenceChange(e.target.value)}
+      value={selectedSequence ? selectedSequence.id : ''}
+      className="block w-full p-2 border border-gray-300 rounded"
+    >
+      <option value="" disabled>Sélectionnez une séquence</option>
+      {sequences.map((sequence) => (
+        <option key={sequence.id} value={sequence.id}>
+          {sequence.sequence}
+        </option>
+      ))}
+    </select>
+  </div>
 
-      <div className="mb-4">
-        <label className="block mb-2 font-medium">Date d'évaluation :</label>
-        <input
-          type="date"
-          value={dateEvaluation}
-          onChange={(e) => setDateEvaluation(e.target.value)}
-          className="block w-full p-2 border border-gray-300 rounded"
-        />
-      </div>
+  {/* Date d'évaluation */}
+  <div className="flex-1">
+    <label className="block font-medium mb-2">Date d'évaluation :</label>
+    <input
+      type="date"
+      value={dateEvaluation}
+      onChange={(e) => setDateEvaluation(e.target.value)}
+      className="block w-full p-2 border border-gray-300 rounded"
+    />
+  </div>
 
-      <div className="mb-4">
-        <label className="block mb-2 font-medium">Sélectionnez le type d'évaluation :</label>
-        <select
-          onChange={(e) => handletypeChange(e.target.value)}
-          value={selectedTypeEvaluation ? selectedTypeEvaluation.id : ''}
-          className="block w-full p-2 border border-gray-300 rounded"
-        >
-          <option value="" disabled>Sélectionnez le type d'évaluation</option>
-          {typesEvaluation.map((type) => (
-            <option key={type.id} value={type.id}>{type.type}</option>
-          ))}
-        </select>
-      </div>
+  {/* Sélectionnez le type d'évaluation */}
+  <div className="flex-1">
+    <label className="block font-medium mb-2">Sélectionnez le type d'évaluation :</label>
+    <select
+      onChange={(e) => handletypeChange(e.target.value)}
+      value={selectedTypeEvaluation ? selectedTypeEvaluation.id : ''}
+      className="block w-full p-2 border border-gray-300 rounded"
+    >
+      <option value="" disabled>Sélectionnez le type d'évaluation</option>
+      {typesEvaluation.map((type) => (
+        <option key={type.id} value={type.id}>
+          {type.type}
+        </option>
+      ))}
+    </select>
+  </div>
+</div>
+
 
       <div className="mb-4">
         <table className="min-w-full bg-white border border-gray-300">
@@ -271,7 +291,13 @@ const NoteForm = () => {
       >
         Enregistrer les Notes
       </button>
+      {showSuccessMessage && (
+          <div className="success-message">
+            Notes ajoutés avec succès !
+          </div>
+        )}
     </div>
+    
   );
 };
 

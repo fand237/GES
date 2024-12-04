@@ -107,9 +107,10 @@ function EnseignantAll() {
   return (
     <div className="enseignantAllPage p-4">
       <h1 className="text-2xl font-bold mb-4">Liste des Enseignants par matière et classe</h1>
-
-      {/* Sélecteur de matière */}
-      <label className="block mb-2">Sélectionnez une matière :</label>
+      <div className="flex flex-wrap items-center space-x-4 mb-4">
+        <div className="flex-1">
+{/* Sélecteur de matière */}
+<label className="block mb-2">Sélectionnez une matière :</label>
       <select
         onChange={(e) => setSelectedMatiere(e.target.value)}
         value={selectedMatiere}
@@ -120,8 +121,9 @@ function EnseignantAll() {
           <option key={matiere} value={matiere}>{matiere}</option>
         ))}
       </select>
-
-      {/* Sélecteur de classe */}
+        </div>
+        <div className="flex-1">
+           {/* Sélecteur de classe */}
       <label className="block mb-2">Sélectionnez une classe :</label>
       <select
         onChange={(e) => setSelectedClasse(e.target.value)}
@@ -133,6 +135,12 @@ function EnseignantAll() {
           <option key={classe.id} value={classe.id}>{classe.classe}</option>
         ))}
       </select>
+        </div>
+
+
+     
+        </div>
+      
 
       <label className="block mb-2">Recherche :</label>
       <input

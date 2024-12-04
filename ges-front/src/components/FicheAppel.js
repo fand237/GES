@@ -1,213 +1,275 @@
 import React, { useState, useEffect } from 'react';
+import { useParams } from 'react-router-dom';
+import { format } from 'date-fns';
 import axios from 'axios';
-import { saveAs } from 'file-saver';
+import UseAuth from './UseAuth';
 
-const RapportPresence = () => {
-  const [presences, setPresences] = useState([]);
-  const [classes, setClasses] = useState([]);
-  const [eleves, setEleves] = useState([]);
-  const [filter, setFilter] = useState({
-    eleveId: '',
-    classeId: '',
-    dateDebut: '',
-    dateFin: '',
-    typeRapport: 'journalier',
-  });
+function FicheAppel() {
+  const { idens } = UseAuth();
+  const [coursList, setCoursList] = useState([]);
+  const [selectedCours, setSelectedCours] = useState(null);
+  const [elevesList, setElevesList] = useState([]);
+  const [presenceStatus, setPresenceStatus] = useState({});
+  const [retardMinutes, setRetardMinutes] = useState({});
+  const [resumeCours, setResumeCours] = useState('');
+  const [participation, setParticipation] = useState({});
 
   useEffect(() => {
-    const fetchClasses = async () => {
+    const fetchCoursList = async () => {
       try {
-        const response = await axios.get('http://localhost:3001/Classe', {
+        const response = await axios.get(`http://localhost:3001/Cours/byens/${idens}`, {
           headers: {
             accessToken: localStorage.getItem("accessToken"),
           },
         });
-        setClasses(response.data);
+
+        const coursesWithDetails = await Promise.all(
+          response.data.map(async (course) => {
+            const classeDetails = await axios.get(`http://localhost:3001/Classe/${course.classe}`, {
+              headers: {
+                accessToken: localStorage.getItem("accessToken"),
+              },
+            });
+            return {
+              ...course,
+              classe: classeDetails.data,
+            };
+          })
+        );
+
+        setCoursList(coursesWithDetails);
       } catch (error) {
-        console.error('Erreur lors de la récupération des classes:', error);
+        console.error('Erreur lors de la récupération de la liste des cours : ', error);
       }
     };
 
-    fetchClasses();
-  }, []);
+    fetchCoursList();
+  }, [idens]);
 
   useEffect(() => {
-    if (filter.classeId) {
-      const fetchEleves = async () => {
+    const fetchElevesByCours = async () => {
+      if (selectedCours) {
         try {
-          const response = await axios.get(`http://localhost:3001/Eleve/byclasse/${filter.classeId}`, {
+          const response = await axios.get(`http://localhost:3001/Eleve/byclasse/${selectedCours.classe.id}`, {
             headers: {
               accessToken: localStorage.getItem("accessToken"),
             },
           });
-          setEleves(response.data);
+          setElevesList(response.data);
         } catch (error) {
-          console.error('Erreur lors de la récupération des élèves:', error);
+          console.error('Erreur lors de la récupération des élèves pour le cours : ', error);
         }
-      };
-
-      fetchEleves();
-    } else {
-      setEleves([]);
-    }
-  }, [filter.classeId]);
-
-  useEffect(() => {
-    const fetchPresences = async () => {
-      try {
-        const response = await axios.get('http://localhost:3001/Presence/rapport', { 
-          params: filter,
-          headers: {
-            accessToken: localStorage.getItem("accessToken"),
-          },
-        });
-        console.log("la liste des presence est :",response.data);
-        setPresences(response.data);
-      } catch (error) {
-        console.error('Erreur lors de la récupération des présences:', error);
       }
     };
 
-    fetchPresences();
-  }, [filter]);
+    fetchElevesByCours();
+  }, [selectedCours]);
 
-  const handleDownload = async () => {
+  const handleCoursChange = (event) => {
+    const selectedCoursId = event.target.value;
+    const selectedCours = coursList.find((cours) => cours.id === Number(selectedCoursId));
+    setSelectedCours(selectedCours);
+    setPresenceStatus({});
+    setRetardMinutes({});
+    setResumeCours('');
+    setParticipation({});
+  };
+
+  const handlePresenceChange = async (eleve, statut) => {
+    const dateDuJour = format(new Date(), 'yyyy-MM-dd');
     try {
-      const response = await axios.get('http://localhost:3001/Presence/rapport/download', { 
-        params: filter,
-        responseType: 'blob',
+      await axios.post('http://localhost:3001/Presence/updateOrCreate', {
+        eleve: eleve.id,
+        cours: selectedCours.id,
+        jour: dateDuJour,
+        statut: statut,
+        retard: statut === 'Présent(e)' ? (retardMinutes[eleve.id] || 0) : null,
+        resumeCours: resumeCours,
+        participation: participation[eleve.id] || 0,
+      }, {
         headers: {
           accessToken: localStorage.getItem("accessToken"),
         },
       });
-      saveAs(response.data, `rapport_presence_${filter.typeRapport}.pdf`);
+
+      setPresenceStatus((prevState) => ({
+        ...prevState,
+        [eleve.id]: statut,
+      }));
+
+      if (statut === 'Absent(e)') {
+        const MessageParent = `Bonjour M./Mme ${eleve.parentEleve.nom} ${eleve.parentEleve.prenom}, votre enfant ${eleve.nom} ${eleve.prenom} de la ${selectedCours.classe.classe} a été absent(e) au cours ${selectedCours.matiere}. Veuillez nous contacter pour plus d'informations.`;
+
+        await axios.post('http://localhost:3001/Notification/absence', {
+          numeroTelephone: eleve.parentEleve.indicatif.concat(eleve.parentEleve.numeroTelephone),
+          message: MessageParent,
+        });
+      }
     } catch (error) {
-      console.error('Erreur lors du téléchargement du rapport:', error);
+      console.error(`Erreur lors de la mise à jour du statut de présence : `, error);
     }
   };
 
-  const handleChange = (e) => {
-    setFilter({
-      ...filter,
-      [e.target.name]: e.target.value,
+  const handleKeyDown = (event, eleve) => {
+    if (event.key === 'Enter') {
+      handlePresenceChange(eleve, 'Présent(e)');
+    }
+  };
+
+  const handleRetardMinutesChange = (eleveId, value) => {
+    setRetardMinutes((prevState) => ({
+      ...prevState,
+      [eleveId]: value,
+    }));
+  };
+
+  const handleParticipationChange = (eleveId, value) => {
+    setParticipation((prevState) => ({
+      ...prevState,
+      [eleveId]: value,
+    }));
+  };
+
+  const handleEnregistrer = () => {
+    const dateDuJour = format(new Date(), 'yyyy-MM-dd');
+    const elevesAvecRetard = elevesList.filter((eleve) => presenceStatus[eleve.id] === 'Présent(e)' && retardMinutes[eleve.id]);
+
+    elevesAvecRetard.forEach((eleve) => {
+      const retard = retardMinutes[eleve.id];
+      axios.post('http://localhost:3001/Presence/updateOrCreate', {
+        eleve: eleve.id,
+        cours: selectedCours.id,
+        jour: dateDuJour,
+        statut: 'Présent(e)',
+        retard: retard,
+        resumeCours: resumeCours,
+        participation: participation[eleve.id] || 0,
+      }, {
+        headers: {
+          accessToken: localStorage.getItem("accessToken"),
+        }
+      }).then(() => {
+        console.log(`Données enregistrées pour l'élève ${eleve.nom} ${eleve.prenom}`);
+      }).catch((error) => {
+        console.error(`Erreur lors de l'enregistrement du retard : `, error);
+      });
     });
+    
+
+    setPresenceStatus({});
+    setRetardMinutes({});
+    setResumeCours('');
+    setParticipation({});
   };
 
   return (
-    <div className="container mx-auto p-4">
-      <h2 className="text-2xl font-bold mb-4">Rapport des Présences</h2>
+    <div className="ficheAppelPage p-4">
+      <h2 className="text-2xl font-bold mb-4">Fiche d'appel</h2>
+      <label className="block mb-2">Sélectionnez un cours :</label>
+      <select
+        onChange={handleCoursChange}
+        value={selectedCours ? selectedCours.id : ''}
+        className="block w-full p-2 border border-gray-300 rounded mb-4"
+      >
+        <option value="" disabled>Sélectionnez un cours</option>
+        {coursList.map((cours) => (
+          <option key={cours.id} value={cours.id}>
+            {cours.matiere} ({cours.classe.classe})
+          </option>
+        ))}
+      </select>
 
-      <div className="mb-4">
-        <label className="block mb-2">Sélectionner la classe:</label>
-        <select
-          name="classeId"
-          value={filter.classeId}
-          onChange={handleChange}
-          className="p-2 border rounded w-full"
-        >
-          <option value="">Toutes les classes</option>
-          {classes.map(classe => (
-            <option key={classe.id} value={classe.id}>{classe.classe}</option>
-          ))}
-        </select>
-      </div>
+      {selectedCours && (
+        <>
+          <label className="block mb-2">Résumé du cours :</label>
+          <textarea
+            value={resumeCours}
+            onChange={(e) => setResumeCours(e.target.value)}
+            className="block w-full p-2 border border-gray-300 rounded mb-4"
+          />
 
-      <div className="mb-4">
-        <label className="block mb-2">Sélectionner l'élève:</label>
-        <select
-          name="eleveId"
-          value={filter.eleveId}
-          onChange={handleChange}
-          className="p-2 border rounded w-full"
-          disabled={!filter.classeId}
-        >
-          <option value="">Tous les élèves</option>
-          {eleves.map(eleve => (
-            <option key={eleve.id} value={eleve.id}>{eleve.nom} {eleve.prenom}</option>
-          ))}
-        </select>
-      </div>
-
-      <div className="mb-4">
-        <label className="block mb-2">Date de début:</label>
-        <input
-          type="date"
-          name="dateDebut"
-          value={filter.dateDebut}
-          onChange={handleChange}
-          className="p-2 border rounded w-full"
-        />
-      </div>
-
-      <div className="mb-4">
-        <label className="block mb-2">Date de fin:</label>
-        <input
-          type="date"
-          name="dateFin"
-          value={filter.dateFin}
-          onChange={handleChange}
-          className="p-2 border rounded w-full"
-        />
-      </div>
-
-      <div className="mb-4">
-        <label className="block mb-2">Type de Rapport:</label>
-        <select
-          name="typeRapport"
-          value={filter.typeRapport}
-          onChange={handleChange}
-          className="p-2 border rounded w-full"
-        >
-          <option value="journalier">Journalier</option>
-          <option value="mensuel">Mensuel</option>
-          <option value="trimestriel">Trimestriel</option>
-          <option value="annuel">Annuel</option>
-        </select>
-      </div>
-
-      <button onClick={handleDownload} className="bg-blue-500 text-white p-2 rounded">
-        Télécharger le Rapport
-      </button>
-
-      <div className="mt-4">
-        <h3 className="text-xl font-semibold">Liste des Présences</h3>
-        <table className="w-full border">
-          <thead>
-            <tr>
-              <th className="border px-4 py-2">Élève</th>
-              <th className="border px-4 py-2">Cours</th>
-              <th className="border px-4 py-2">Date</th>
-              <th className="border px-4 py-2">Statut</th>
-              <th className="border px-4 py-2">Retard (minutes)</th>
-              <th className="border px-4 py-2">Participation</th>
-            </tr>
-          </thead>
-          <tbody>
-            {Object.keys(presences).length === 0 ? (
+          <table className="min-w-full table-auto">
+            <thead>
               <tr>
-                <td colSpan="6" className="border px-4 py-2 text-center">Aucune présence trouvée</td>
+                <th className="px-4 py-2">Nom</th>
+                <th className="px-4 py-2">Prénom</th>
+                <th className="px-4 py-2">Présence</th>
+                <th className="px-4 py-2">Participation</th>
+                <th className="px-4 py-2">Retard (min)</th>
               </tr>
-            ) : (
-              Object.values(presences).map((eleve, eleveIndex) => (
-                Object.values(eleve.cours).map((cours, coursIndex) => (
-                  cours.dates.map((dateInfo, dateIndex) => (
-                    <tr key={`${eleveIndex}-${coursIndex}-${dateIndex}`}>
-                      <td className="border px-4 py-2">{eleve.nom} {eleve.prenom}</td>
-                      <td className="border px-4 py-2">{cours.matiere}</td>
-                      <td className="border px-4 py-2">{dateInfo.jour}</td>
-                      <td className="border px-4 py-2">{dateInfo.statut}</td>
-                      <td className="border px-4 py-2">{dateInfo.retard}</td>
-                      <td className="border px-4 py-2">{dateInfo.participation}</td>
-                    </tr>
-                  ))
-                ))
-              ))
-            )}
-          </tbody>
-        </table>
-      </div>
+            </thead>
+            <tbody>
+              {elevesList.map((eleve) => (
+                <tr key={eleve.id}>
+                  <td className="border px-4 py-2">{eleve.nom}</td>
+                  <td className="border px-4 py-2">{eleve.prenom}</td>
+                  <td className="border px-4 py-2">
+                  <div className="flex space-x-4">
+  <label className="inline-flex items-center">
+    <input
+      type="radio"
+      name={`presence-${eleve.id}`}
+      value="Présent(e)"
+      checked={presenceStatus[eleve.id] === 'Présent(e)'}
+      onChange={(e) => handlePresenceChange(eleve, e.target.value)}
+      className="form-radio"
+    />
+    <span className="ml-2">Présent(e)</span>
+  </label>
+  
+  <label className="inline-flex items-center">
+    <input
+      type="radio"
+      name={`presence-${eleve.id}`}
+      value="Absent(e)"
+      checked={presenceStatus[eleve.id] === 'Absent(e)'}
+      onChange={(e) => handlePresenceChange(eleve, e.target.value)}
+      className="form-radio"
+    />
+    <span className="ml-2">Absent(e)</span>
+  </label>
+</div>
+
+                  </td>
+                  <td className="border px-4 py-2">
+  <input
+    type="number"
+    min="1"
+    max="5"
+    value={participation[eleve.id] || ''}
+    onChange={(e) => handleParticipationChange(eleve.id, e.target.value)}
+    className="block w-full p-2 border border-gray-300 rounded"
+    disabled={presenceStatus[eleve.id] === 'Absent(e)'}
+  />
+</td>
+
+                  <td className="border px-4 py-2">
+                    {presenceStatus[eleve.id] === 'Présent(e)' && (
+                      <input
+                        type="number"
+                        min="0"
+                        value={retardMinutes[eleve.id] || ''}
+                        onChange={(e) => handleRetardMinutesChange(eleve.id, e.target.value)}
+                        onKeyDown={(e) => handleKeyDown(e, eleve)}
+                        className="form-input w-full"
+                      />
+                    )}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+
+          <button
+            onClick={handleEnregistrer}
+            className="mt-4 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+          >
+            Enregistrer
+          </button>
+        </>
+      )}
     </div>
   );
-};
+}
 
-export default RapportPresence;
+export default FicheAppel;

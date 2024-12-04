@@ -9,7 +9,7 @@ const Logout = () => {
   const [authState, setAuthState] = useState({
     nomUtilisateur: "",
     id: 0,
-    typeUtilisateur:"",
+    typeUtilisateur: "",
     status: false,
   });
 
@@ -27,7 +27,7 @@ const Logout = () => {
     });
 
     // Rediriger vers la page de connexion
-    navigate('/LoginAll');
+    navigate('/Home');
   };
 
   return (

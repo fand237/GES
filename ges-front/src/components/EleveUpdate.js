@@ -9,6 +9,8 @@ function EleveUpdate() {
 
   const [classes, setClasses] = useState([]);
   const [parents, setParents] = useState([]);
+  const [civilites] = useState(['Mademoiselle', 'Monsieur']);
+
   let { id } = useParams();
   let navigate = useNavigate();
 
@@ -21,6 +23,8 @@ function EleveUpdate() {
     classe: "",
     parent: "",
     motDePasse:"",
+    civilite: "",
+
 
   });
 
@@ -83,22 +87,22 @@ function EleveUpdate() {
     classe: Yup.number().required("Classe obligatoire"),
     parent: Yup.number().required("Parent obligatoire"),
     motDePasse: Yup.string(), // Mot de passe n'est pas obligatoire
+    civilite: Yup.string().required("Civilité obligatoire"),
 
   });
 
   const onSubmit = async (data) => {
     try {
-      await axios.put(`http://localhost:3001/Eleve/${id}`, {
+      await axios.put(`http://localhost:3001/Eleve/${id}`,data, {
         headers:{
           accessToken: localStorage.getItem("accessToken"),
         },
-      },data);
+      });
       console.log("Élève mis à jour avec succès");
       setShowSuccessMessage(true); // Affichage du message de succès
       setTimeout(() => {
         setShowSuccessMessage(false); // Cacher le message après 2 secondes
       }, 2000);
-      navigate(`/EleveAll`);
     } catch (error) {
       // Gestion des erreurs
     }
@@ -110,10 +114,22 @@ function EleveUpdate() {
         <h1 className="titre-connect">Mise à Jour Élève</h1>
         <Formik key={JSON.stringify(initialValues)} initialValues={initialValues} onSubmit={onSubmit} validationSchema={validationSchema}>
           <Form className="mt-6">
+          <div className="mb-2">
+                <label htmlFor="civilite" className="block text-sm font-semibold text-gray-800">Civilité :</label>
+                <ErrorMessage name="civilite" component="span" className="text-red-500 text-xs" />
+                <Field as="select" id="civilite" name="civilite" className="input-user">
+                <option> Selectionner une civilite </option>
+                  {civilites.map(civilite => (
+                    <option key={civilite} value={civilite}>
+                      {civilite}
+                    </option>
+                  ))}
+                </Field><br />
+              </div>
             <div className="mb-2">
               <label htmlFor="nomUtilisateur" className="block text-sm font-semibold text-gray-800">Nom d'utilisateur :</label>
               <ErrorMessage name="nomUtilisateur" component="span" className="error-message" />
-              <Field type="text" id="nomUtilisateur" name="nomUtilisateur" className="input-user" /><br />
+              <Field type="text" id="nomUtilisateur" name="nomUtilisateur" className="input-user" disabled={true} /><br />
             </div>
             <div className="mb-2">
               <label htmlFor="email" className="block text-sm font-semibold text-gray-800">Email :</label>
