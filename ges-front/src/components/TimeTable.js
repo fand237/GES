@@ -111,7 +111,7 @@ const TimetableDropArea = ({ classes, jours, selectedClass, handleClassChange, t
         {jours.map((jour, index) => (
           <div
             key={index}
-            className="w-32 h-16 border-r border-gray-300 flex items-center justify-center bg-gray-200 font-medium"
+            className="w-32 h-16 border-r border-gray-300 flex items-center justify-center bg-gray-100 font-medium"
           >
             <p>{jour.jour}</p>
           </div>
@@ -357,7 +357,7 @@ const TimetableDropArea = ({ classes, jours, selectedClass, handleClassChange, t
     <div className="p-4">
       <div className="mb-4">
 
-      <h2>Emploi du temps</h2>
+      <h2>Emploi du temps de </h2>
       <label htmlFor="class-select" className="block text-sm font-medium text-gray-700">Sélectionner la classe : </label>
       <select
         id="class-select"

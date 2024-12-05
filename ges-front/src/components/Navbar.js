@@ -2,6 +2,10 @@
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { jwtDecode } from 'jwt-decode'; // Assurez-vous d'importer jwt-decode correctement
+import svgUser from "../assets/images/user.svg";
+import svgDisconnect from "../assets/images/disconnect svg.svg";
+
+
 
 const Navbar = ({ authState, logout }) => {
   const token = localStorage.getItem('accessToken');
@@ -27,7 +31,7 @@ const Navbar = ({ authState, logout }) => {
         navigate('/DashboardEleve');
       }
     } else {
-      navigate('/');
+      navigate('/Home');
     }
   };
 
@@ -44,7 +48,7 @@ const Navbar = ({ authState, logout }) => {
 
                 <Link to="/LoginAll">
                   <img
-                    src="ges-front/images/user-svgrepo-com.svg"
+                    src={svgUser}
                     alt="Compte utilisateur"
                     className="w-6 h-6"
                   />
@@ -54,35 +58,40 @@ const Navbar = ({ authState, logout }) => {
           </div>
         </div>
       ) : (
-        <div className="navbar flex justify-between items-center p-4 bg-purple-700 text-white">
-          <div className="flex items-center">
-            <button
-              onClick={handleHomeClick}
-              className="text-lg font-semibold hover:text-gray-300"
-            >
-              Accueil
-            </button>
-          </div>
-          <div className="flex items-center space-x-4">
-            <button onClick={logout} className="text-lg hover:text-gray-300">
-              Déconnexion
-            </button>
-            <h1
-              onClick={() => {
-                if (userRole === 'Administrateur') {
-                  navigate('/DashboardAdmin');
-                } else if (userRole === 'Enseignant') {
-                  navigate('/DashboardEnseignant');
-                } else if (userRole === 'Eleve') {
-                  navigate('/DashboardEleve');
-                }
-              }}
-              className="text-lg cursor-pointer hover:text-gray-300"
-            >
-              {authState.nomUtilisateur}
-            </h1>
-          </div>
-        </div>
+        <nav className="fixed top-0 left-0 w-full h-16 bg-gradient-to-r from-purple-500 to-purple-800 text-white shadow-lg z-50">
+  <div className="container mx-auto flex justify-between items-center py-4 px-6">
+    <button
+      onClick={handleHomeClick}
+      className="text-lg font-semibold hover:text-gray-300"
+    >
+      Accueil
+    </button>
+    <div className="flex items-center space-x-4">
+      <button onClick={logout} className="hover:text-gray-300">
+        <img
+          src={svgDisconnect}
+          alt="Déconnexion"
+          className="w-6 h-6"
+        />
+      </button>
+      <h1
+        onClick={() => {
+          if (userRole === 'Administrateur') {
+            navigate('/DashboardAdmin');
+          } else if (userRole === 'Enseignant') {
+            navigate('/DashboardEnseignant');
+          } else if (userRole === 'Eleve') {
+            navigate('/DashboardEleve');
+          }
+        }}
+        className="text-lg font-semibold cursor-pointer hover:text-gray-300"
+      >
+        {authState.nomUtilisateur}
+      </h1>
+    </div>
+  </div>
+</nav>
+
       )}
     </div>
 

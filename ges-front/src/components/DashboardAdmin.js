@@ -1,78 +1,136 @@
-import React from 'react';
-import { Outlet, Link } from 'react-router-dom';
+import React, { useState } from 'react';
+import { Outlet, useNavigate } from 'react-router-dom';
 
 const DashboardAdmin = () => {
+    const [activeTab, setActiveTab] = useState('');
+    const navigate = useNavigate();
+
+    const handleTabChange = (tab, path) => {
+        setActiveTab(tab);
+        navigate(path);
+    };
+
     return (
         <div className="flex h-screen">
             {/* Sidebar */}
-            <div className="w-64 bg-gray-200 p-4 fixed top-15 left-0 h-full">
-                <h1 className="text-xl font-bold mb-4">Tableau de bord de l'Administrateur</h1>
-                <ul>
-                    <li>
-                        <Link to="/DashboardAdmin/FormAll">
-                            <button className="block w-full text-left py-2 px-4 rounded-lg hover:bg-gray-300">
+            <nav className="fixed top-16 left-0 h-[calc(100%-4rem)] w-64 bg-gradient-to-b from-purple-500 to-purple-800 text-white shadow-lg">
+                <div className="p-4">
+                    <h1 className="text-xl font-bold mb-6 text-center">
+                        Admin Dashboard
+                    </h1>
+                    <ul className="space-y-4">
+                        <li>
+                            <button
+                                className={`w-full text-left px-4 py-2 rounded-lg transition ${
+                                    activeTab === 'FormAll'
+                                        ? 'bg-purple-600 font-semibold'
+                                        : 'hover:bg-purple-700'
+                                }`}
+                                onClick={() => handleTabChange('FormAll', '/DashboardAdmin/FormAll')}
+                            >
                                 Enregistrement utilisateurs
                             </button>
-                        </Link>
-                    </li>
-                    <li>
-                        <Link to="/DashboardAdmin/EmploisTemps">
-                            <button className="block w-full text-left py-2 px-4 rounded-lg hover:bg-gray-300">
+                        </li>
+                        <li>
+                            <button
+                                className={`w-full text-left px-4 py-2 rounded-lg transition ${
+                                    activeTab === 'EmploisTemps'
+                                        ? 'bg-purple-600 font-semibold'
+                                        : 'hover:bg-purple-700'
+                                }`}
+                                onClick={() => handleTabChange('EmploisTemps', '/DashboardAdmin/EmploisTemps')}
+                            >
                                 Gérer les emplois de temps
                             </button>
-                        </Link>
-                    </li>
-                    <li>
-                        <Link to="/DashboardAdmin/UserAll">
-                            <button className="block w-full text-left py-2 px-4 rounded-lg hover:bg-gray-300">
+                        </li>
+                        <li>
+                            <button
+                                className={`w-full text-left px-4 py-2 rounded-lg transition ${
+                                    activeTab === 'UserAll'
+                                        ? 'bg-purple-600 font-semibold'
+                                        : 'hover:bg-purple-700'
+                                }`}
+                                onClick={() => handleTabChange('UserAll', '/DashboardAdmin/UserAll')}
+                            >
                                 Gérer les Utilisateurs
                             </button>
-                        </Link>
-                    </li>
-                    <li>
-                        <Link to="/DashboardAdmin/CoursAll">
-                            <button className="block w-full text-left py-2 px-4 rounded-lg hover:bg-gray-300">
+                        </li>
+                        <li>
+                            <button
+                                className={`w-full text-left px-4 py-2 rounded-lg transition ${
+                                    activeTab === 'CoursAll'
+                                        ? 'bg-purple-600 font-semibold'
+                                        : 'hover:bg-purple-700'
+                                }`}
+                                onClick={() => handleTabChange('CoursAll', '/DashboardAdmin/CoursAll')}
+                            >
                                 Gérer les cours
                             </button>
-                        </Link>
-                    </li>
-                    <li>
-                        <Link to="/DashboardAdmin/CoursForm">
-                            <button className="block w-full text-left py-2 px-4 rounded-lg hover:bg-gray-300">
+                        </li>
+                        <li>
+                            <button
+                                className={`w-full text-left px-4 py-2 rounded-lg transition ${
+                                    activeTab === 'CoursForm'
+                                        ? 'bg-purple-600 font-semibold'
+                                        : 'hover:bg-purple-700'
+                                }`}
+                                onClick={() => handleTabChange('CoursForm', '/DashboardAdmin/CoursForm')}
+                            >
                                 Enregistrement des Cours
                             </button>
-                        </Link>
-                    </li>
-                    <li>
-                        <Link to="/DashboardAdmin/CyClass">
-                            <button className="block w-full text-left py-2 px-4 rounded-lg hover:bg-gray-300">
+                        </li>
+                        <li>
+                            <button
+                                className={`w-full text-left px-4 py-2 rounded-lg transition ${
+                                    activeTab === 'CyClass'
+                                        ? 'bg-purple-600 font-semibold'
+                                        : 'hover:bg-purple-700'
+                                }`}
+                                onClick={() => handleTabChange('CyClass', '/DashboardAdmin/CyClass')}
+                            >
                                 Enregistrement des Cycles et Classes
                             </button>
-                        </Link>
-                    </li>
-                    <li>
-                        <Link to="/DashboardAdmin/CyClassAll">
-                            <button className="block w-full text-left py-2 px-4 rounded-lg hover:bg-gray-300">
+                        </li>
+                        <li>
+                            <button
+                                className={`w-full text-left px-4 py-2 rounded-lg transition ${
+                                    activeTab === 'CyClassAll'
+                                        ? 'bg-purple-600 font-semibold'
+                                        : 'hover:bg-purple-700'
+                                }`}
+                                onClick={() => handleTabChange('CyClassAll', '/DashboardAdmin/CyClassAll')}
+                            >
                                 Gérer les Cycles et Classes
                             </button>
-                        </Link>
-                    </li>
-                    <li>
-                        <Link to="/DashboardAdmin/PresenceRapport">
-                            <button className="block w-full text-left py-2 px-4 rounded-lg hover:bg-gray-300">
-                                Rapport des presences
+                        </li>
+                        <li>
+                            <button
+                                className={`w-full text-left px-4 py-2 rounded-lg transition ${
+                                    activeTab === 'PresenceRapport'
+                                        ? 'bg-purple-600 font-semibold'
+                                        : 'hover:bg-purple-700'
+                                }`}
+                                onClick={() => handleTabChange('PresenceRapport', '/DashboardAdmin/PresenceRapport')}
+                            >
+                                Rapport des présences
                             </button>
-                        </Link>
-                    </li>
-                </ul>
-            </div>
+                        </li>
+                    </ul>
+                </div>
+                <footer className="absolute bottom-4 w-full text-center text-sm">
+                    <p>
+                        &copy; {new Date().getFullYear()} Tous droits réservés.{' '}
+                        Gestionnaire d'établissement scolaire
+                    </p>
+                </footer>
+            </nav>
 
             {/* Main Content */}
-            <div className="flex-1 ml-64 p-6 bg-white">
+            <div className="ml-64 mt-16 flex-1 bg-gray-100 p-6 overflow-auto">
                 <Outlet />
             </div>
         </div>
     );
-}
+};
 
 export default DashboardAdmin;

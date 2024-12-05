@@ -32,7 +32,7 @@ const AdminLogin = () => {
                         typeUtilisateur: response.data.typeUtilisateur,
                         status: true,
                     });
-                    navigate("/DashboardAdmin");
+                    navigate("/DashboardAdmin/");
                 }
             });
         } catch (error) {

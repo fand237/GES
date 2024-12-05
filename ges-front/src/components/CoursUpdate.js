@@ -105,7 +105,7 @@ function CoursUpdate() {
       setShowSuccessMessage(true); // Affichage du message de succès
       setTimeout(() => {
         setShowSuccessMessage(false); // Cacher le message après 2 secondes
-        histotique(`/CoursAll`);
+        histotique(`/DashboardAdmin/CoursAll`);
       }, 2000);
     } catch (error) {
       console.error("Erreur lors de la mise à jour du cours : ", error.response.data);

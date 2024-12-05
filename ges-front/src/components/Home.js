@@ -1,5 +1,8 @@
 import React from "react";
 import { Link } from "react-router-dom";
+import imgPresentation from "../assets/images/img-presentation.png";
+
+
 
 
 const Home = () => {
@@ -33,7 +36,7 @@ const Home = () => {
           </div>
           <div className="lg:w-1/2 mt-10 lg:mt-0">
             <img
-              src="/home/fand/Documents/GES/ges-front/images/img-presentation.png"
+              src={imgPresentation}
               alt="Image de présentation"
               className="w-full h-auto"
             />
@@ -54,7 +57,7 @@ const Home = () => {
             <div className="service-item text-center p-6 bg-gray-100 rounded-lg shadow-md">
               <h3 className="text-xl font-bold mb-2">Gestion des Élèves</h3>
               <p>
-              SISOKO permet une gestion efficace des données des élèves, y compris les inscriptions, les transferts et les résultats académiques.
+                SISOKO permet une gestion efficace des données des élèves, y compris les inscriptions, les transferts et les résultats académiques.
               </p>
             </div>
             <div className="service-item text-center p-6 bg-gray-100 rounded-lg shadow-md">
