@@ -11,8 +11,11 @@ const DashboardEleve = () => {
     return (
         <div className="flex h-screen">
             {/* Sidebar */}
-            <nav className="fixed top-15 left-0 h-[calc(100%-3.5rem)] w-64 bg-gradient-to-b from-purple-500 to-purple-800 text-white shadow-lg">
+            <nav className="fixed top-16 left-0 h-[calc(100%-4rem)] w-64 bg-gradient-to-b from-purple-500 to-purple-800 text-white shadow-lg">
                 <div className="p-4">
+                <h1 className="text-xl font-bold mb-6 text-center">
+                        Eleve Dashboard
+                    </h1>
                     <ul className="space-y-4">
                         <li>
                             <button

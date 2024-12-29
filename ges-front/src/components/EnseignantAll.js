@@ -55,7 +55,7 @@ function EnseignantAll() {
           accessToken: localStorage.getItem("accessToken"),
         },
       });
-
+console.log(response.data);
       setEnseignants(response.data);
     } catch (error) {
       console.error("Erreur lors de la récupération des enseignants : ", error);
@@ -105,100 +105,133 @@ function EnseignantAll() {
   );
 
   return (
-    <div className="enseignantAllPage p-4">
-      <h1 className="text-2xl font-bold mb-4">Liste des Enseignants par matière et classe</h1>
-      <div className="flex flex-wrap items-center space-x-4 mb-4">
+    <div className="enseignantAllPage p-6 bg-gray-50 min-h-screen">
+      <h1 className="text-3xl font-bold text-gray-800 mb-6">Liste des Enseignants par matière et classe</h1>
+  
+      {/* Filtres */}
+      <div className="flex flex-wrap items-center gap-6 mb-6">
+        {/* Sélecteur de matière */}
         <div className="flex-1">
-{/* Sélecteur de matière */}
-<label className="block mb-2">Sélectionnez une matière :</label>
-      <select
-        onChange={(e) => setSelectedMatiere(e.target.value)}
-        value={selectedMatiere}
-        className="block w-full p-2 border border-gray-300 rounded mb-4"
-      >
-        <option value="">Toutes les matières</option>
-        {matieres.map((matiere) => (
-          <option key={matiere} value={matiere}>{matiere}</option>
-        ))}
-      </select>
+          <label htmlFor="matiere" className="block text-gray-600 font-medium mb-2">
+            Sélectionnez une matière :
+          </label>
+          <select
+            id="matiere"
+            value={selectedMatiere}
+            onChange={(e) => setSelectedMatiere(e.target.value)}
+            className="block w-full p-3 border border-gray-300 rounded shadow-sm focus:ring-blue-500 focus:border-blue-500"
+          >
+            <option value="">Toutes les matières</option>
+            {matieres.map((matiere) => (
+              <option key={matiere} value={matiere}>
+                {matiere}
+              </option>
+            ))}
+          </select>
         </div>
+  
+        {/* Sélecteur de classe */}
         <div className="flex-1">
-           {/* Sélecteur de classe */}
-      <label className="block mb-2">Sélectionnez une classe :</label>
-      <select
-        onChange={(e) => setSelectedClasse(e.target.value)}
-        value={selectedClasse}
-        className="block w-full p-2 border border-gray-300 rounded mb-4"
-      >
-        <option value="">Toutes les classes</option>
-        {classes.map((classe) => (
-          <option key={classe.id} value={classe.id}>{classe.classe}</option>
-        ))}
-      </select>
+          <label htmlFor="classe" className="block text-gray-600 font-medium mb-2">
+            Sélectionnez une classe :
+          </label>
+          <select
+            id="classe"
+            value={selectedClasse}
+            onChange={(e) => setSelectedClasse(e.target.value)}
+            className="block w-full p-3 border border-gray-300 rounded shadow-sm focus:ring-blue-500 focus:border-blue-500"
+          >
+            <option value="">Toutes les classes</option>
+            {classes.map((classe) => (
+              <option key={classe.id} value={classe.id}>
+                {classe.classe}
+              </option>
+            ))}
+          </select>
         </div>
-
-
-     
-        </div>
-      
-
-      <label className="block mb-2">Recherche :</label>
-      <input
-        type="text"
-        onChange={(e) => setSearchTerm(e.target.value)}
-        value={searchTerm}
-        className="block w-full p-2 border border-gray-300 rounded mb-4"
-      />
-
-      <table className="min-w-full bg-white border border-gray-300">
-        <thead>
-          <tr className="bg-gray-200">
-            <th className="p-4 border-b">Nom utilisateur</th>
-            <th className="p-4 border-b">Civilite</th>
-            <th className="p-4 border-b">Nom</th>
-            <th className="p-4 border-b">Prénom</th>
-            <th className="p-4 border-b">Email</th>
-            <th className="p-4 border-b">Type</th>
-            <th className="p-4 border-b">Indicatif</th>
-            <th className="p-4 border-b">Numero de telephone</th>
-            <th className="p-4 border-b">Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          {filteredEnseignants.map((enseignant) => (
-            <tr key={enseignant.id} className="border-b">
-              <td className="p-4">{enseignant.nomUtilisateur}</td>
-              <td className="p-4">{enseignant.civilite}</td>
-              <td className="p-4">{enseignant.nom}</td>
-              <td className="p-4">{enseignant.prenom}</td>
-              <td className="p-4">{enseignant.email}</td>
-              <td className="p-4">{enseignant.typeEnseignant}</td>
-              <td className="p-4">{enseignant.indicatif}</td>
-              <td className="p-4">{enseignant.numeroTelephone}</td>
-
-
-              <td className="p-4">
-                <button
-                  type="button"
-                  onClick={() => navigate(`/DashboardAdmin/EnseignantDelete/${enseignant.id}`)}
-                  className="delete-button"
-                >
-                  Supprimer
-                </button>
-                <button
-                  type="button"
-                  onClick={() => navigate(`/DashboardAdmin/EnseignantUpdate/${enseignant.id}`)}
-                  className="modify-button"
-                >
-                  Modifier
-                </button>
-              </td>
+      </div>
+  
+      {/* Recherche */}
+      <div className="mb-6">
+        <label htmlFor="search" className="block text-gray-600 font-medium mb-2">
+          Recherche :
+        </label>
+        <input
+          id="search"
+          type="text"
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          className="block w-full p-3 border border-gray-300 rounded shadow-sm focus:ring-blue-500 focus:border-blue-500"
+          placeholder="Rechercher un enseignant..."
+        />
+      </div>
+  
+      {/* Tableau */}
+      <div className="overflow-x-auto">
+        <table className="min-w-full bg-white shadow-md rounded border border-gray-300">
+          <thead className="bg-gray-100 text-gray-700 text-left">
+            <tr>
+              <th className="p-4">Nom utilisateur</th>
+              <th className="p-4">Civilité</th>
+              <th className="p-4">Nom</th>
+              <th className="p-4">Prénom</th>
+              <th className="p-4">Email</th>
+              <th className="p-4">Type</th>
+              <th className="p-4">Indicatif</th>
+              <th className="p-4">Numéro de téléphone</th>
+              <th className="p-4">Classes responsables</th>
+              <th className="p-4">Actions</th>
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {filteredEnseignants.length > 0 ? (
+              filteredEnseignants.map((enseignant) => (
+                <tr key={enseignant.id} className="border-b hover:bg-gray-50">
+                  <td className="p-4">{enseignant.nomUtilisateur}</td>
+                  <td className="p-4">{enseignant.civilite}</td>
+                  <td className="p-4">{enseignant.nom}</td>
+                  <td className="p-4">{enseignant.prenom}</td>
+                  <td className="p-4">{enseignant.email}</td>
+                  <td className="p-4">{enseignant.typeEnseignant}</td>
+                  <td className="p-4">{enseignant.indicatif}</td>
+                  <td className="p-4">{enseignant.numeroTelephone}</td>
+                  <td className="p-4">
+          {enseignant.ResponsableClasse && enseignant.ResponsableClasse.length > 0 ? (
+            enseignant.ResponsableClasse.map((classe) => classe.classe).join(', ')
+          ) : (
+            <span className="text-gray-500">Aucune classe</span>
+          )}
+        </td>
+                  <td className="p-4 flex gap-2">
+                    <button
+                      onClick={() => navigate(`/DashboardAdmin/EnseignantDelete/${enseignant.id}`)}
+                      className="text-red-600 hover:text-red-800 font-medium"
+                    >
+                      Supprimer
+                    </button>
+                    <button
+                      onClick={() => navigate(`/DashboardAdmin/EnseignantUpdate/${enseignant.id}`)}
+                      className="text-blue-600 hover:text-blue-800 font-medium"
+                    >
+                      Modifier
+                    </button>
+                  </td>
+                </tr>
+              ))
+            ) : (
+              <tr>
+                <td colSpan="9" className="text-center text-gray-500 p-6">
+                  Aucun enseignant trouvé.
+                </td>
+              </tr>
+            )}
+          </tbody>
+        </table>
+      </div>
     </div>
   );
+  
+  
 }
 
 export default EnseignantAll;

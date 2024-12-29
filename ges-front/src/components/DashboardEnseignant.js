@@ -1,51 +1,86 @@
-import React from 'react';
-import { Outlet, Link } from 'react-router-dom';
+import React, { useState } from 'react';
+import { Outlet, Link, useNavigate } from 'react-router-dom';
 import UseAuth from './UseAuth';
-
 
 const DashboardEnseignant = () => {
     const { idens } = UseAuth();
+    const [activeTab, setActiveTab] = useState('');
+    const navigate = useNavigate();
+
+    const handleTabChange = (tab, path) => {
+        setActiveTab(tab);
+        navigate(path);
+    };
 
     return (
         <div className="flex h-screen">
             {/* Sidebar */}
-            <div className="w-64 bg-gray-200 p-4 fixed top-15 left-0 h-full">
-                <h1 className="text-xl font-bold mb-4">Tableau de bord de l'Enseignant</h1>
-                <ul>
-                    <li>
-                            <Link to={`/DashboardEnseignant/FicheAppel/${idens}`}>
-                            <button className="block w-full text-left py-2 px-4 rounded-lg hover:bg-gray-300">
+            <nav className="fixed top-16 left-0 h-[calc(100%-4rem)] w-64 bg-gradient-to-b from-purple-500 to-purple-800 text-white shadow-lg">
+                <div className="p-4">
+                    <h1 className="text-xl font-bold mb-6 text-center">
+                        Tableau de bord de l'Enseignant
+                    </h1>
+                    <ul className="space-y-4">
+                        <li>
+                            <button
+                                className={`w-full text-left px-4 py-2 rounded-lg transition ${
+                                    activeTab === 'FicheAppel'
+                                        ? 'bg-purple-600 font-semibold'
+                                        : 'hover:bg-purple-700'
+                                }`}
+                                onClick={() => handleTabChange('FicheAppel', `/DashboardEnseignant/FicheAppel/${idens}`)}
+                            >
                                 Fiche de Présence
                             </button>
-                        </Link>
-                    </li>
-                    <li>
-                        <Link to={`/DashboardEnseignant/NoteForm/${idens}`}>
-                            <button className="block w-full text-left py-2 px-4 rounded-lg hover:bg-gray-300">
+                        </li>
+                        <li>
+                            <button
+                                className={`w-full text-left px-4 py-2 rounded-lg transition ${
+                                    activeTab === 'NoteForm'
+                                        ? 'bg-purple-600 font-semibold'
+                                        : 'hover:bg-purple-700'
+                                }`}
+                                onClick={() => handleTabChange('NoteForm', `/DashboardEnseignant/NoteForm/${idens}`)}
+                            >
                                 Remplissage des Notes
                             </button>
-                        </Link>
-                    </li>
-                    <li>
-                        <Link to={`/DashboardEnseignant/NoteEval/${idens}`}>
-                            <button className="block w-full text-left py-2 px-4 rounded-lg hover:bg-gray-300">
+                        </li>
+                        <li>
+                            <button
+                                className={`w-full text-left px-4 py-2 rounded-lg transition ${
+                                    activeTab === 'NoteEval'
+                                        ? 'bg-purple-600 font-semibold'
+                                        : 'hover:bg-purple-700'
+                                }`}
+                                onClick={() => handleTabChange('NoteEval', `/DashboardEnseignant/NoteEval/${idens}`)}
+                            >
                                 Gérer les Notes
                             </button>
-                        </Link>
-                    </li>
-                    <li>
-                        <Link to={`/DashboardEnseignant/EmploisTempsEnseignant`}>
-                            <button className="block w-full text-left py-2 px-4 rounded-lg hover:bg-gray-300">
+                        </li>
+                        <li>
+                            <button
+                                className={`w-full text-left px-4 py-2 rounded-lg transition ${
+                                    activeTab === 'EmploisTemps'
+                                        ? 'bg-purple-600 font-semibold'
+                                        : 'hover:bg-purple-700'
+                                }`}
+                                onClick={() => handleTabChange('EmploisTemps', `/DashboardEnseignant/EmploisTempsEnseignant`)}
+                            >
                                 Mon Emplois de temps
                             </button>
-                        </Link>
-                    </li>
-                    
-                </ul>
-            </div>
+                        </li>
+                    </ul>
+                </div>
+                <footer className="absolute bottom-4 w-full text-center text-sm">
+                    <p>
+                        &copy; {new Date().getFullYear()} Tous droits réservés.{' '}
+                        Gestionnaire d'établissement scolaire
+                    </p>
+                </footer>
+            </nav>
 
             {/* Main Content */}
-            <div className="flex-1 ml-64 p-6 bg-white">
+            <div className="ml-64 mt-16 flex-1 bg-gray-100 p-6 overflow-auto">
                 <Outlet />
             </div>
         </div>

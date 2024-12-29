@@ -99,12 +99,12 @@ function CoursAll() {
   }, [listOfCours, selectedEnseignant, selectedClasse]);
 
   return (
-    <div className="p-6 bg-gray-100 min-h-screen">
-      <h2 className="text-2xl font-semibold mb-4">Liste des Cours</h2>
+    <div className="p-6 bg-gradient-to-r from-gray-100 via-gray-200 to-gray-300 min-h-screen">
+      <h2 className="text-3xl font-bold text-gray-700 mb-6 text-center">Liste des Cours</h2>
 
-      <div className="flex mb-4">
+      <div className="flex justify-center space-x-6 mb-8">
         <select
-          className="mr-4 p-2 border rounded"
+          className="p-3 border rounded bg-white shadow"
           value={selectedEnseignant}
           onChange={(e) => setSelectedEnseignant(e.target.value)}
         >
@@ -117,7 +117,7 @@ function CoursAll() {
         </select>
 
         <select
-          className="p-2 border rounded"
+          className="p-3 border rounded bg-white shadow"
           value={selectedClasse}
           onChange={(e) => setSelectedClasse(e.target.value)}
         >
@@ -130,43 +130,41 @@ function CoursAll() {
         </select>
       </div>
 
-      {filteredCours.map((value, key) => {
-        return (
-          <div key={key} className="bg-white shadow-md rounded-lg p-4 mb-4">
-            <div className="mb-2">
-              <span className="font-bold">Matière :</span> {value.matiere}
-            </div>
-            <div className="mb-2">
-              <span className="font-bold">Coefficient :</span> {value.coefficient}
-            </div>
-            <div className="mb-2">
-              <span className="font-bold">Groupe :</span> {value.groupeCours ? `${value.groupeCours.groupe}` : "N/A"}
-            </div>
-            <div className="mb-2">
-              <span className="font-bold">Classe :</span> {value.classe ? `${value.classe.classe}` : "N/A"}
-            </div>
-            <div className="mb-2">
-              <span className="font-bold">Enseignant :</span> {value.Enseignant ? `${value.Enseignant.nom} (${value.Enseignant.nomUtilisateur})` : "N/A"}
-            </div>
-            <div className="flex space-x-4">
+      <ul className="tilesWrap">
+        {filteredCours.map((value, key) => (
+          <li key={key} className="relative bg-white rounded-lg shadow-lg overflow-hidden">
+            <h2 className="absolute text-8xl text-gray-300 font-bold top-2 right-2">{key + 1}</h2>
+            <h3 className="text-lg font-semibold text-gray-800 mb-2">{value.matiere}</h3>
+            <p className="text-sm text-gray-600 mb-2">
+              <strong>Coefficient :</strong> {value.coefficient}
+            </p>
+            <p className="text-sm text-gray-600 mb-2">
+              <strong>Groupe :</strong> {value.groupeCours ? value.groupeCours.groupe : "N/A"}
+            </p>
+            <p className="text-sm text-gray-600 mb-2">
+              <strong>Classe :</strong> {value.classe ? value.classe.classe : "N/A"}
+            </p>
+            <p className="text-sm text-gray-600 mb-4">
+              <strong>Enseignant :</strong>{" "}
+              {value.Enseignant ? `${value.Enseignant.nom} (${value.Enseignant.nomUtilisateur})` : "N/A"}
+            </p>
+            <div className="flex justify-between">
               <button
-                type="button"
                 onClick={() => navigate(`/DashboardAdmin/CoursUpdate/${value.id}`)}
-                className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-400"
+                className="px-4 py-2 bg-blue-500 text-white text-sm rounded hover:bg-blue-600 focus:ring focus:ring-blue-300"
               >
                 Modifier
               </button>
               <button
-                type="button"
                 onClick={() => navigate(`/DashboardAdmin/CoursDelete/${value.id}`)}
-                className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-400"
+                className="px-4 py-2 bg-red-500 text-white text-sm rounded hover:bg-red-600 focus:ring focus:ring-red-300"
               >
                 Supprimer
               </button>
             </div>
-          </div>
-        );
-      })}
+          </li>
+        ))}
+      </ul>
     </div>
   );
 }

@@ -1,6 +1,6 @@
 const express = require('express')
 const router = express.Router();
-const { Enseignant } = require("../models")
+const { Enseignant,Classe } = require("../models")
 const bcrypt = require('bcrypt'); // bcrypt is a more secure alternative to crypto-js for hashing passwords
 const { validateToken } = require("../middlewares/AuthMiddleware")
 const { sign } = require('jsonwebtoken')
@@ -10,12 +10,23 @@ const { getEnseignantsByMatiere, getEnseignantsByClasse, getEnseignantsByClasseM
 
 
 
-router.get("/", validateToken,async (req, res) => {
+router.get("/", validateToken, async (req, res) => {
+  try {
+    const listOfEnseignant = await Enseignant.findAll({
+      include: [
+        {
+          model: Classe,
+          as: "ResponsableClasse", // Nom défini dans l'association
+          attributes: ["id", "classe", "capacite"], // Champs spécifiques à inclure
+        },
+      ],
+    });
 
-  const listOfEnseignant = await Enseignant.findAll();
-  res.json(listOfEnseignant);
-
-
+    res.json(listOfEnseignant);
+  } catch (error) {
+    console.error("Erreur lors de la récupération des enseignants :", error);
+    res.status(500).json({ error: "Une erreur s'est produite lors de la récupération des enseignants." });
+  }
 });
 
 router.get('/bymatiere/:matiere',validateToken,getEnseignantsByMatiere);
