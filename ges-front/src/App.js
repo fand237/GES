@@ -36,6 +36,8 @@ import CycleDelete from './components/CycleDelete';
 import ClasseUpdate from './components/ClasseUpdate';
 import ClasseDelete from './components/ClasseDelete';
 
+import GroupeForm from './components/GroupeForm';
+import MatiereForm from './components/MatiereForm';
 
 
 import ParentForm from './components/ParentForm'
@@ -202,6 +204,10 @@ function App() {
               <Route path="EmploisTemps" element={<ProtectedRoute requiredRole="Administrateur"> <TimeTable /> </ProtectedRoute>} />
               <Route path="FormAll" element={<ProtectedRoute requiredRole="Administrateur"><FormAll /></ProtectedRoute>} />
               <Route path="PresenceRapport" element={<ProtectedRoute requiredRole="Administrateur"><PresenceRapport /></ProtectedRoute>} />
+
+              <Route path="GroupeForm" element={<ProtectedRoute requiredRole="Administrateur"><GroupeForm /></ProtectedRoute>} />
+              <Route path="MatiereForm" element={<ProtectedRoute requiredRole="Administrateur"><MatiereForm /></ProtectedRoute>} />
+
 
             </Route>
             <Route path="/DashboardEleve" element={<ProtectedRoute requiredRole="Eleve"> <DashboardEleve /> </ProtectedRoute>} />

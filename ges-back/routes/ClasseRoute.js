@@ -77,7 +77,7 @@ router.post('/', validateToken,async (req, res) => {
         return res.status(422).json({ error: "Cette Classe est déjà utilisée." });
       }
   try {
-    const { classe, capacite, cycle } = req.body;
+    const { classe, capacite, cycle, responsable } = req.body;
     const newClasse = await Classe.create({ 
         classe,
         capacite,

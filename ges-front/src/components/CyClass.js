@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import CycleForm from './CycleForm';
 import ClasseForm from './ClasseForm';
+import GroupeForm from './GroupeForm';
+import MatiereForm from './MatiereForm';
 
 
 
@@ -21,6 +23,18 @@ const CyClass = () => {
           Cycles
         </button>
         <button
+          onClick={() => handleTabChange('GroupeForm')}
+          className={`px-4 py-2 font-semibold text-sm rounded-md focus:outline-none ${activeTab === 'GroupeForm' ? 'bg-purple-700 text-white' : 'bg-gray-200 text-gray-700'}`}
+        >
+          Groupes des matieres
+        </button>
+        <button
+          onClick={() => handleTabChange('MatiereForm')}
+          className={`px-4 py-2 font-semibold text-sm rounded-md focus:outline-none ${activeTab === 'MatiereForm' ? 'bg-purple-700 text-white' : 'bg-gray-200 text-gray-700'}`}
+        >
+          Matieres
+        </button>
+        <button
           onClick={() => handleTabChange('ClasseForm')}
           className={`px-4 py-2 font-semibold text-sm rounded-md focus:outline-none ${activeTab === 'ClasseForm' ? 'bg-purple-700 text-white' : 'bg-gray-200 text-gray-700'}`}
         >
@@ -36,6 +50,18 @@ const CyClass = () => {
        {activeTab === 'ClasseForm' && (
         <div className="p-6 bg-white shadow-md rounded-lg">
           <ClasseForm />
+        </div>
+      )}
+
+      {activeTab === 'GroupeForm' && (
+        <div className="p-6 bg-white shadow-md rounded-lg">
+          <GroupeForm />
+        </div>
+      )}
+
+      {activeTab === 'MatiereForm' && (
+        <div className="p-6 bg-white shadow-md rounded-lg">
+          <MatiereForm />
         </div>
       )}
     </div>

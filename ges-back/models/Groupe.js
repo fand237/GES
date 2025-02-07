@@ -17,7 +17,22 @@ module.exports = (sequelize,DataTypes) => {
       },
     }); 
     
-    
+    Groupe.checkOverlapGroupe = async function (groupe) {
+      try {
+        const overlappingGroupe = await this.findAll({
+          where: {
+            groupe: groupe,
+            
+          },
+          
+        });
+  
+        return overlappingGroupe.length > 0;
+      } catch (error) {
+        console.error('Erreur lors de la vérification des chevauchements dans la base de données groupe : ', error);
+        throw error;
+      }
+    };
   
     return Groupe;
   };

@@ -11,6 +11,7 @@ function CoursForm() {
   const [enseignants, setEnseignants] = useState([]);
   const [classes, setClasse] = useState([]);
   const [groupes, setGroupe] = useState([]);
+  const [matieres, setMatieres] = useState([]);
   const coefficients = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
   const matieresSecondaire = ["Mathématiques", "Physique", "Chimie", "Biologie", "Français", "Anglais", "Histoire-Géographie", "Philosophie"];
 
@@ -49,13 +50,33 @@ function CoursForm() {
   useEffect(() => {
     const fetchGroupe = async () => {
       try {
-        const response = await axios.get("http://localhost:3001/Groupe");
+        const response = await axios.get("http://localhost:3001/Groupe",{
+          headers: {
+            accessToken: localStorage.getItem("accessToken"),
+          },
+        });
         setGroupe(response.data);
       } catch (error) {
         console.error("Erreur lors de la récupération des groupes : ", error);
       }
     };
     fetchGroupe();
+  }, []);
+
+  useEffect(() => {
+    const fetchMatieres = async () => {
+      try {
+        const response = await axios.get("http://localhost:3001/Matiere", {
+          headers: {
+            accessToken: localStorage.getItem("accessToken"),
+          },
+        });
+        setMatieres(response.data);
+      } catch (error) {
+        console.error("Erreur lors de la récupération des matières : ", error);
+      }
+    };
+    fetchMatieres();
   }, []);
 
   const initialValues = {
@@ -106,8 +127,8 @@ function CoursForm() {
             <ErrorMessage name="matiere" component="span" className="text-red-500" />
             <Field as="select" id="matiere" name="matiere" className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
               <option value="" disabled>Sélectionnez une matière</option>
-              {matieresSecondaire.map((matiere, index) => (
-                <option key={index} value={matiere}>{matiere}</option>
+              {matieres.map((matiere) => (
+                <option key={matiere.id} value={matiere.nom}>{matiere.nom}</option>
               ))}
             </Field>
           </div>

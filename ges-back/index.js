@@ -87,6 +87,10 @@ app.use("/Note",NoteRoute);
 const GroupeRoute = require("./routes/GroupeRoute");
 app.use("/Groupe",GroupeRoute);
 
+//Routes Matiere
+const MatiereRoute = require("./routes/MatiereRoute");
+app.use("/Matiere",MatiereRoute);
+
 //Routes Annee_Academique
 const Annee_AcademiqueRoute = require("./routes/Annee_AcademiqueRoute");
 app.use("/Annee_Academique",Annee_AcademiqueRoute);
