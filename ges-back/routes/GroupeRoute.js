@@ -6,7 +6,7 @@ const {validateToken} = require("../middlewares/AuthMiddleware")
 
 
 
-router.get("/", async (req, res) => {
+router.get("/", validateToken,async (req, res) => {
 
     const listOfGroupe = await Groupe.findAll();
     res.json(listOfGroupe);

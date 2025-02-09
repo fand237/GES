@@ -6,6 +6,7 @@ const { Cours } = require('../models');
 const createJour_Cours = async (req, res) => {
   try {
     const { coursId, jourId, heureDebut, heureFin, enseignantId, emplois_TempsId } = req.body;
+    console.log("voici le rea body",req.body);
 
     // Vérification de chevauchement
     const isOverlap = await Jour_Cours.checkOverlap(jourId, heureDebut, heureFin, enseignantId);

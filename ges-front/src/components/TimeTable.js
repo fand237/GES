@@ -450,7 +450,11 @@ const TimeTable = () => {
   useEffect(() => {
     const fetchJours = async () => {
       try {
-        const response = await axios.get("http://localhost:3001/Jour");
+        const response = await axios.get("http://localhost:3001/Jour",{
+          headers: {
+            accessToken: localStorage.getItem("accessToken"),
+          },
+        });
         setJours(response.data);
       } catch (error) {
         console.error("Erreur lors de la récupération des jours : ", error);
@@ -485,7 +489,11 @@ const TimeTable = () => {
                 }
               );
               const joursDetails = await axios.get(
-                `http://localhost:3001/Jour/${course.jour}`
+                "http://localhost:3001/Jour/${course.jour}",{
+                  headers: {
+                    accessToken: localStorage.getItem("accessToken"),
+                  },
+                }
               );
               return {
                 ...course,

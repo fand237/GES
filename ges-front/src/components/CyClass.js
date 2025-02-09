@@ -3,6 +3,7 @@ import CycleForm from './CycleForm';
 import ClasseForm from './ClasseForm';
 import GroupeForm from './GroupeForm';
 import MatiereForm from './MatiereForm';
+import JourForm from './JourForm';
 
 
 
@@ -40,6 +41,12 @@ const CyClass = () => {
         >
           Classes
         </button>
+        <button
+          onClick={() => handleTabChange('JourForm')}
+          className={`px-4 py-2 font-semibold text-sm rounded-md focus:outline-none ${activeTab === 'JourForm' ? 'bg-purple-700 text-white' : 'bg-gray-200 text-gray-700'}`}
+        >
+          Jours
+        </button>
       </div>
       
       {activeTab === 'CycleForm' && (
@@ -62,6 +69,12 @@ const CyClass = () => {
       {activeTab === 'MatiereForm' && (
         <div className="p-6 bg-white shadow-md rounded-lg">
           <MatiereForm />
+        </div>
+      )}
+
+      {activeTab === 'JourForm' && (
+        <div className="p-6 bg-white shadow-md rounded-lg">
+          <JourForm />
         </div>
       )}
     </div>
