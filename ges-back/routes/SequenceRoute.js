@@ -1,6 +1,6 @@
 const express = require('express')
 const router = express.Router();
-const {Sequence} = require("../models")
+const {Sequence, Groupe} = require("../models")
 
 
 
@@ -35,6 +35,12 @@ router.get("/:id", async (req, res) => {
 router.post("/", async(req, res) => {
 
     const post=req.body;
+
+    const isOverlap = await Sequence.checkOverlapSequence(post.sequence);
+
+    if (isOverlap) {
+        return res.status(422).json({ error: "Ce Sequence est déjà utilisée." });
+    }
     await Sequence.create(post);
     res.json(post);
 });

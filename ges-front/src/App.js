@@ -39,6 +39,8 @@ import ClasseDelete from './components/ClasseDelete';
 import GroupeForm from './components/GroupeForm';
 import MatiereForm from './components/MatiereForm';
 import JourForm from './components/JourForm';
+import SequenceForm from './components/SequenceForm';
+import TypeEvaluationForm from './components/TypeEvaluationForm';
 
 
 import ParentForm from './components/ParentForm'
@@ -209,6 +211,9 @@ function App() {
               <Route path="GroupeForm" element={<ProtectedRoute requiredRole="Administrateur"><GroupeForm /></ProtectedRoute>} />
               <Route path="MatiereForm" element={<ProtectedRoute requiredRole="Administrateur"><MatiereForm /></ProtectedRoute>} />
               <Route path="JourForm" element={<ProtectedRoute requiredRole="Administrateur"><JourForm /></ProtectedRoute>} />
+              <Route path="SequenceForm" element={<ProtectedRoute requiredRole="Administrateur"><SequenceForm /></ProtectedRoute>} />
+              <Route path="TypeEvaluationForm" element={<ProtectedRoute requiredRole="Administrateur"><TypeEvaluationForm /></ProtectedRoute>} />
+
 
 
 

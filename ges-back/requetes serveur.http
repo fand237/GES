@@ -1,0 +1,8 @@
+POST http://localhost:3001/Administrateur
+Content-Type: application/json
+
+{
+  "nomUtilisateur": "fand237",
+  "motDePasse": "qwerty123",
+  "email": "fand@gmail.com"
+}

@@ -16,8 +16,23 @@ module.exports = (sequelize,DataTypes) => {
         allowNull: false,
       },
     });
-  
-    
+
+    Type_Evaluation.checkOverlapType_Evaluation = async function (type) {
+        try {
+            const overlappingType_Evaluation = await this.findAll({
+                where: {
+                    type: type,
+
+                },
+
+            });
+
+            return overlappingType_Evaluation.length > 0;
+        } catch (error) {
+            console.error('Erreur lors de la vérification des chevauchements dans la base de données Type_Evaluation : ', error);
+            throw error;
+        }
+    };
   
     return Type_Evaluation;
   };

@@ -4,6 +4,8 @@ import ClasseForm from './ClasseForm';
 import GroupeForm from './GroupeForm';
 import MatiereForm from './MatiereForm';
 import JourForm from './JourForm';
+import SequenceForm from './SequenceForm';
+import TypeEvaluationForm from './TypeEvaluationForm';
 
 
 
@@ -47,6 +49,21 @@ const CyClass = () => {
         >
           Jours
         </button>
+
+        <button
+            onClick={() => handleTabChange('SequenceForm')}
+            className={`px-4 py-2 font-semibold text-sm rounded-md focus:outline-none ${activeTab === 'SequenceForm' ? 'bg-purple-700 text-white' : 'bg-gray-200 text-gray-700'}`}
+        >
+          Sequences
+        </button>
+
+        <button
+            onClick={() => handleTabChange('TypeEvaluationForm')}
+            className={`px-4 py-2 font-semibold text-sm rounded-md focus:outline-none ${activeTab === 'TypeEvaluationForm' ? 'bg-purple-700 text-white' : 'bg-gray-200 text-gray-700'}`}
+        >
+          Types d'Evaluation
+        </button>
+
       </div>
       
       {activeTab === 'CycleForm' && (
@@ -77,8 +94,21 @@ const CyClass = () => {
           <JourForm />
         </div>
       )}
+
+      {activeTab === 'SequenceForm' && (
+          <div className="p-6 bg-white shadow-md rounded-lg">
+            <SequenceForm />
+          </div>
+      )}
+
+      {activeTab === 'TypeEvaluationForm' && (
+          <div className="p-6 bg-white shadow-md rounded-lg">
+            <TypeEvaluationForm />
+          </div>
+      )}
     </div>
   );
+
 };
 
 export default CyClass;

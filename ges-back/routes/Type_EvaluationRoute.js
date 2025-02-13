@@ -1,6 +1,6 @@
 const express = require('express')
 const router = express.Router();
-const {Type_Evaluation} = require("../models")
+const {Type_Evaluation, Sequence} = require("../models")
 
 
 
@@ -36,6 +36,11 @@ router.get("/:id", async (req, res) => {
 router.post("/", async(req, res) => {
  
     const post=req.body;
+    const isOverlap = await Type_Evaluation.checkOverlapType_Evaluation(post.type);
+
+    if (isOverlap) {
+        return res.status(422).json({ error: "Ce Type_Evaluation est déjà utilisée." });
+    }
     await Type_Evaluation.create(post);
     res.json(post);
 });

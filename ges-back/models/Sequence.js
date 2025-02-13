@@ -16,8 +16,23 @@ module.exports = (sequelize,DataTypes) => {
         allowNull: false,
       },
     });
-  
-    
+
+    Sequence.checkOverlapSequence = async function (sequence) {
+        try {
+            const overlappingSequence = await this.findAll({
+                where: {
+                    sequence: sequence,
+
+                },
+
+            });
+
+            return overlappingSequence.length > 0;
+        } catch (error) {
+            console.error('Erreur lors de la vérification des chevauchements dans la base de données sequence : ', error);
+            throw error;
+        }
+    };
   
     return Sequence;
   };
