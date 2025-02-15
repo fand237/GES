@@ -3,7 +3,7 @@
 const express = require('express');
 const _ = require('lodash');
 const router = express.Router();
-const { Annee_Academique, Eleve, Note, Cours, Sequence, Type_Evaluation, Classe, Enseignant, Bulletin, Groupe } = require('../models');
+const { Annee_Academique, Eleve, Note, Cours, Sequence, Type_Evaluation, Classe, Enseignant, Bulletin, Groupe , Moyenne} = require('../models');
 
 
 // Route pour créer une nouvelle Bulletin
@@ -19,11 +19,12 @@ router.post("/", async (req, res) => {
 router.get("/byeleve/:idEleve/:idSequence", async (req, res) => {
   const idEleve = req.params.idEleve;
   const idSequence = req.params.idSequence;
-  
+
+
 
   try {
     const distinctElements = await Bulletin.findAll({
-      attributes: ['eleve', 'note', 'annee'],
+      attributes: ['eleve', 'note', 'annee','cours'],
       include: [
         {
           model: Eleve,
@@ -48,7 +49,14 @@ router.get("/byeleve/:idEleve/:idSequence", async (req, res) => {
               ]
             },
             { model: Type_Evaluation, attributes: ['type'], as: 'TypeNote' },
-            { model: Sequence, attributes: ['sequence'], as: 'sequenceNote' }
+            { model: Sequence, attributes: ['sequence'], as: 'sequenceNote' },
+            {
+              model: Moyenne,
+              as: 'moyenneNote',
+              attributes: ['moyenne'],
+              where: { sequence: idSequence ,eleve: idEleve},
+              required: false, // Permet d'inclure même s'il n'y a pas encore de moyenne
+            }
           ]
         },
         { model: Annee_Academique, attributes: ['annee'], as: 'anneeBulletin' }
@@ -60,7 +68,12 @@ router.get("/byeleve/:idEleve/:idSequence", async (req, res) => {
       ]
     });
 
+
+    console.log("la requete est ",distinctElements);
+
+
     if (!distinctElements.length) {
+      console.log("aucune donne trouve");
       return res.status(404).json({ message: 'Aucune donnée trouvée' });
     }
 
@@ -80,6 +93,8 @@ router.get("/byeleve/:idEleve/:idSequence", async (req, res) => {
       return acc;
     }, {});
 
+
+
     // Fusionner les lignes ayant la même matière
     const mergedResults = Object.values(groupedByMatiere).map((group) => {
       // Combine toutes les propriétés sauf pour la liste des éléments
@@ -91,6 +106,9 @@ router.get("/byeleve/:idEleve/:idSequence", async (req, res) => {
         const { noteBulletin: { coursNote: { matiere, ...restCoursNote }, ...restNoteBulletin }, ...restElement } = element;
         return { ...restElement, noteBulletin: { ...restNoteBulletin, coursNote: { ...restCoursNote } } };
       });
+
+
+
       return mergedElement;
     });
 

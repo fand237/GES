@@ -1,6 +1,6 @@
 const express = require('express')
 const router = express.Router();
-const {Annee_Academique} = require("../models")
+const {Annee_Academique, Groupe} = require("../models")
 
 
 
@@ -36,6 +36,14 @@ router.get("/:id", async (req, res) => {
 router.post("/", async(req, res) => {
 
     const post=req.body;
+
+
+    const isOverlap = await Annee_Academique.checkOverlapAnnee_Academique(post.annee);
+
+    if (isOverlap) {
+        return res.status(422).json({ error: "Ce Annee Academique est déjà utilisée." });
+    }
+
     await Annee_Academique.create(post);
     res.json(post);
 });

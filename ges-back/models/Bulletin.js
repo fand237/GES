@@ -19,6 +19,10 @@ module.exports = (sequelize, DataTypes) => {
             type: DataTypes.INTEGER,
             allowNull: false,
         },
+        cours: {
+            type: DataTypes.INTEGER,
+            allowNull: false,
+        },
         annee: {
             type: DataTypes.INTEGER,
             allowNull: false,
@@ -34,6 +38,13 @@ module.exports = (sequelize, DataTypes) => {
             onDelete: 'CASCADE', // Cette ligne active la suppression en cascade
         });
 
+        Bulletin.belongsTo(models.Cours, {
+            foreignKey: 'cours',
+            as: 'coursBulletin',
+            onUpdate: 'CASCADE', // Active la mise à jour en cascade
+            onDelete: 'CASCADE', // Cette ligne active la suppression en cascade
+        });
+
         Bulletin.belongsTo(models.Note, {
             foreignKey: 'note',
             as: 'noteBulletin',
@@ -43,10 +54,28 @@ module.exports = (sequelize, DataTypes) => {
 
         Bulletin.belongsTo(models.Annee_Academique, {
             foreignKey: 'annee',
-            as: 'anneeBulletin',  
+            as: 'anneeBulletin',
             onUpdate: 'CASCADE', // Active la mise à jour en cascade
             onDelete: 'CASCADE', // Cette ligne active la suppression en cascade
         });
+
+
+        Bulletin.belongsTo(models.Moyenne, {
+            foreignKey: 'eleve',
+            targetKey: 'eleve',
+            as: 'moyenneEleve',
+            onUpdate: 'CASCADE',
+            onDelete: 'CASCADE',
+        });
+
+        Bulletin.belongsTo(models.Moyenne, {
+            foreignKey: 'cours',
+            targetKey: 'cours',
+            as: 'moyenneCours',
+            onUpdate: 'CASCADE',
+            onDelete: 'CASCADE',
+        });
+
 
 
 

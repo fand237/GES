@@ -11,6 +11,8 @@ function BulletinSequence() {
   const [error, setError] = useState(null);
 
   useEffect(() => {
+
+
     const fetchSequences = async () => {
       try {
         const response = await axios.get('http://localhost:3001/Sequence');
@@ -29,11 +31,13 @@ function BulletinSequence() {
         try {
           setLoading(true);
           const response = await axios.get(
-            `http://localhost:3001/Bulletin/byeleve/${idEleve}/${selectedSequence}`
+              `http://localhost:3001/Bulletin/byeleve/${idEleve}/${selectedSequence}`
           );
           setBulletin(response.data);
+          console.log("le bulletin est ", response.data);
         } catch (err) {
-          setError('Erreur lors de la récupération du bulletin.');
+          console.error('Erreur lors de la récupération des données du bulletin :', err);
+          setError('Erreur lors de la récupération des données du bulletin.');
         } finally {
           setLoading(false);
         }
@@ -60,7 +64,7 @@ function BulletinSequence() {
             <td className="border px-4 py-2">
               {item.noteBulletin.coursNote.enseignant.nom} {item.noteBulletin.coursNote.enseignant.prenom}
             </td>
-            <td className="border px-4 py-2">{item.noteBulletin.moyenne || 'N/A'}</td>
+            <td className="border px-4 py-2">{item.noteBulletin.moyenneNote.moyenne || 'N/A'}</td>
             <td className="border px-4 py-2">{item.noteBulletin.coursNote.coefficient}</td>
             <td className="border px-4 py-2">{item.noteBulletin.total || 'N/A'}</td>
             <td className="border px-4 py-2">

@@ -478,9 +478,11 @@ const TimeTable = () => {
           if(response.data.error){
             console.log(response.data.error);
           }else{
-          
-          const coursesWithDetails = await Promise.all(
+
+            const coursesWithDetails = await Promise.all(
+
             response.data.map(async (course) => {
+
               const enseignantDetails = await axios.get(
                 `http://localhost:3001/Enseignants/${course.Enseignant}`,{
                   headers:{
@@ -503,7 +505,7 @@ const TimeTable = () => {
             })
           );
 
-          setListOfCours(coursesWithDetails);
+            setListOfCours(coursesWithDetails);
         }
         })
         .catch((error) => {

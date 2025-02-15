@@ -41,6 +41,7 @@ import MatiereForm from './components/MatiereForm';
 import JourForm from './components/JourForm';
 import SequenceForm from './components/SequenceForm';
 import TypeEvaluationForm from './components/TypeEvaluationForm';
+import AnneeAcademiqueForm from './components/AnneeAcademiqueForm';
 
 
 import ParentForm from './components/ParentForm'
@@ -50,6 +51,7 @@ import ParentAll from './components/ParentAll'
 import FicheAppel from './components/FicheAppel'
 import NoteForm from './components/NoteForm'
 import NoteUpdate2 from './components/NoteUpdate2'
+import NoteDelete from './components/NoteDelete'
 import LoginAll from './components/LoginAll'
 import FormAll from './components/FormAll'
 
@@ -174,6 +176,8 @@ function App() {
               <Route path="NoteForm/:idEnseignant" element={<ProtectedRoute requiredRole="Enseignant"> <NoteForm /> </ProtectedRoute>} />
               <Route path="NoteEval/:idEnseignant" element={<ProtectedRoute requiredRole="Enseignant"> <NoteEval /> </ProtectedRoute>} />
               <Route path="NoteUpdate/:idCours/:idClasse/:idSequence/:idType/:date" element={<ProtectedRoute requiredRole="Enseignant"> <NoteUpdate2 /> </ProtectedRoute>} />
+              <Route path="NoteDelete/:idNote" element={<ProtectedRoute requiredRole="Enseignant"> <NoteDelete /> </ProtectedRoute>} />
+
               <Route path="EmploisTempsEnseignant" element={<ProtectedRoute requiredRole="Enseignant"> <TimeTableEnseignant /> </ProtectedRoute>} />
 
             </Route>
@@ -213,6 +217,7 @@ function App() {
               <Route path="JourForm" element={<ProtectedRoute requiredRole="Administrateur"><JourForm /></ProtectedRoute>} />
               <Route path="SequenceForm" element={<ProtectedRoute requiredRole="Administrateur"><SequenceForm /></ProtectedRoute>} />
               <Route path="TypeEvaluationForm" element={<ProtectedRoute requiredRole="Administrateur"><TypeEvaluationForm /></ProtectedRoute>} />
+              <Route path="AnneeAcademiqueForm" element={<ProtectedRoute requiredRole="Administrateur"><AnneeAcademiqueForm /></ProtectedRoute>} />
 
 
 

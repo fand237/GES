@@ -1,3 +1,6 @@
+DELETE http://localhost:3001/Note/1
+
+
 POST http://localhost:3001/Administrateur
 Content-Type: application/json
 

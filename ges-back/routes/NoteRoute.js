@@ -2,7 +2,7 @@
 
 const express = require('express');
 const router = express.Router();
-const { Note, Moyenne, Cours, Sequence, Type_Evaluation, Classe, Bulletin } = require('../models');
+const { Note, Moyenne, Cours, Sequence, Type_Evaluation, Classe, Bulletin, Annee_Academique } = require('../models');
 const {validateToken} = require("../middlewares/AuthMiddleware")
 
 
@@ -32,12 +32,22 @@ router.post('/', validateToken,async (req, res) => {
     } else {
       if (note == '') { note = null }
       // Sinon, créez une nouvelle instance
+      console.log("la note n'exitste pas donc on va creer");
       const newNote = await Note.create({ eleve, cours, note, dateEvaluation, type_Evaluation, sequence });
-      const idannee = 1;
+      // Récupérer l'année académique active
+      const anneeAcademique = await Annee_Academique.findOne({
+        where: { annee: '2024-2025' },
+      });
+      console.log("voici l'annee",anneeAcademique);
+
+      if (!anneeAcademique) {
+        return res.status(400).json({ error: 'Aucune année académique active trouvée' });
+      }
+      const idannee = anneeAcademique.id;
       const idnote = newNote.id
       console.log("l'id de la note cree est ",idnote);
       // Vérifiez si les valeurs requises pour la création du Bulletin sont disponibles
-        const newbuletin = await Bulletin.create({ eleve, note: idnote, annee: idannee });
+        const newbuletin = await Bulletin.create({ eleve, note: idnote, annee: idannee,cours: cours});
 
       if (newbuletin){
         console.log("bulletin cree avec succes");
@@ -82,13 +92,13 @@ router.get("/byeval/:idEnseignant", async (req, res) => {
 
   try {
     const distinctElements = await Note.findAll({
-      attributes: ['cours', 'sequence', 'type_Evaluation', 'dateEvaluation'],
+      attributes: ['cours', 'sequence', 'type_Evaluation', 'dateEvaluation','id'],
       include: [
         { model: Cours, attributes: ['id', 'matiere', 'Enseignant'], as: 'coursNote', include: [{ model: Classe, as: 'classeCours' }], where: { Enseignant: idEnseignant } }, // Utilisez l'alias 'coursNote' correspondant à votre association
         { model: Sequence, attributes: ['sequence'], as: 'sequenceNote' }, // Utilisez l'alias 'sequenceNote' correspondant à votre association
         { model: Type_Evaluation, attributes: ['type'], as: 'TypeNote' }, // Utilisez l'alias 'typeEvaluationNote' correspondant à votre association
       ],
-      group: ['cours', 'sequence', 'type_Evaluation', 'dateEvaluation'],
+      group: ['cours', 'sequence', 'type_Evaluation', 'dateEvaluation','id'],
       raw: true,
       nest: true,
     });
@@ -96,6 +106,27 @@ router.get("/byeval/:idEnseignant", async (req, res) => {
   } catch (error) {
     console.error('Erreur lors de la récupération des éléments distincts :', error);
     res.status(500).json({ error: 'Erreur lors de la récupération des éléments distincts.' });
+  }
+});
+
+router.delete('/:id', validateToken, async (req, res) => {
+  const id = req.params.id; // Récupérer l'ID de la note à supprimer
+
+  try {
+    // Rechercher la note par son ID
+    const note = await Note.findByPk(id);
+
+    if (!note) {
+      return res.status(404).json({ error: 'Note non trouvée' });
+    }
+
+    // Supprimer la note
+    await note.destroy();
+
+    res.status(204).end(); // Réponse 204 No Content pour indiquer une suppression réussie
+  } catch (error) {
+    console.error('Erreur lors de la suppression de la note :', error);
+    res.status(500).json({ error: 'Erreur lors de la suppression de la note' });
   }
 });
 // Autres routes CRUD à ajouter selon les besoins

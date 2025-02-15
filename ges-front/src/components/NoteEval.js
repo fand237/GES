@@ -13,6 +13,7 @@ const NoteEval = () => {
     useEffect(() => {
         axios.get(`http://localhost:3001/Note/byeval/${idens}`)
             .then(response => {
+                console.log(response.data);
                 setEvaluations(response.data);
             })
             .catch(error => {
@@ -42,13 +43,20 @@ const NoteEval = () => {
                             <td className="p-4">{evaluation.sequenceNote.sequence}</td>
                             <td className="p-4">{evaluation.TypeNote.type}</td>
                             <td className="p-4">{evaluation.dateEvaluation}</td>
-                            <td className="p-4">
+                            <td className="p-4 flex gap-2">
                                 <button
                                     type="button"
                                     onClick={() => navigate(`/DashboardEnseignant/NoteUpdate/${evaluation.cours}/${evaluation.coursNote.classeCours.id}/${evaluation.sequence}/${evaluation.type_Evaluation}/${evaluation.dateEvaluation}`)}
                                     className="save-button"
                                 >
                                     Modifier
+                                </button>
+
+                                <button
+                                    onClick={() => navigate(`/DashboardEnseignant/NoteDelete/${evaluation.id}`)}
+                                    className="delete-button"
+                                >
+                                    Supprimer
                                 </button>
                             </td>
                         </tr>

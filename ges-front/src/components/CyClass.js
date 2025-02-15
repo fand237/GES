@@ -6,6 +6,7 @@ import MatiereForm from './MatiereForm';
 import JourForm from './JourForm';
 import SequenceForm from './SequenceForm';
 import TypeEvaluationForm from './TypeEvaluationForm';
+import AnneeAcademiqueForm from "./AnneeAcademiqueForm";
 
 
 
@@ -64,6 +65,13 @@ const CyClass = () => {
           Types d'Evaluation
         </button>
 
+        <button
+            onClick={() => handleTabChange('AnneeAcademiqueForm')}
+            className={`px-4 py-2 font-semibold text-sm rounded-md focus:outline-none ${activeTab === 'AnneeAcademiqueForm' ? 'bg-purple-700 text-white' : 'bg-gray-200 text-gray-700'}`}
+        >
+          Annee Academique
+        </button>
+
       </div>
       
       {activeTab === 'CycleForm' && (
@@ -104,6 +112,12 @@ const CyClass = () => {
       {activeTab === 'TypeEvaluationForm' && (
           <div className="p-6 bg-white shadow-md rounded-lg">
             <TypeEvaluationForm />
+          </div>
+      )}
+
+      {activeTab === 'AnneeAcademiqueForm' && (
+          <div className="p-6 bg-white shadow-md rounded-lg">
+            <AnneeAcademiqueForm />
           </div>
       )}
     </div>

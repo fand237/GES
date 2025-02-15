@@ -35,7 +35,7 @@ router.get('/bymatiereEtclasse', validateToken,getEnseignantsByClasseMatiere);
 
 
 router.get("/auth", validateToken,(req, res) => {
-  console.log("le req user dans auth est ", req.utilisateur);
+  //console.log("le req user dans auth est ", req.utilisateur);
 
   return res.json(req.utilisateur);
 

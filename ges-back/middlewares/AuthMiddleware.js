@@ -9,7 +9,7 @@ const validateToken = (req, res, next) => {
         return res.json({ error: "user non connecte" });
 
     } else {
-        console.log("accessToken existant")
+        //console.log("accessToken existant")
     }
 
         try {
@@ -18,7 +18,7 @@ const validateToken = (req, res, next) => {
             req.utilisateur = validToken;
 
             if (validToken) {
-                console.log("Token valide")
+               // console.log("Token valide")
 
                 return next();
             }

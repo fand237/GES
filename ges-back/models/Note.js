@@ -1,7 +1,6 @@
 // models/Note.js
 
 
-
 module.exports = (sequelize,DataTypes) => {
   const Note = sequelize.define("Note",{
     eleve: {
@@ -48,6 +47,15 @@ module.exports = (sequelize,DataTypes) => {
 
     });
 
+
+    Note.hasOne(models.Moyenne, {
+      foreignKey: 'cours',
+      sourceKey: 'cours',
+
+      as: 'moyenneNote',
+    });
+
+
     // Association avec le modèle Sequence (Many-to-One)
     Note.belongsTo(models.Sequence, {
       foreignKey: 'sequence',
@@ -79,17 +87,71 @@ module.exports = (sequelize,DataTypes) => {
     });
   };
 
-  // models/Note.js
-  const { calculateAndSetMoyenne } = sequelize.models.Moyenne;
+  Note.addHook('afterCreate', async (note, options) => {
+    const { eleve, cours, sequence } = note;
 
+    // Récupérer les deux notes (Contrôle Continu et Évaluation Harmonisée)
+    const notes = await Note.findAll({
+      where: {
+        eleve,
+        cours,
+        sequence,
+      },
+      include: [
+        {
+          model: sequelize.models.Type_Evaluation,
+          as: 'TypeNote',
+        },
+      ],
+    });
 
-Note.addHook('afterCreate', async (note, options) => {
-  // Récupérer l'ID du cours associé à la note
-  const coursId =  note.cours;
+    // Vérifier que les deux notes existent
+    if (notes.length === 2) {
+      const controleContinue = notes.find(n => n.TypeNote.type === 'Controle Continue').note;
+      const evaluationHarmonisee = notes.find(n => n.TypeNote.type === 'Evaluation Harmonisé').note;
 
-  // Appeler la fonction pour calculer et mettre à jour la moyenne
-  await calculateAndSetMoyenne(coursId, sequelize.models);
-});
+      // Calculer la moyenne pondérée
+      const moyenne = (controleContinue * 0.3) + (evaluationHarmonisee * 0.7);
+
+      // Récupérer l'année académique active
+      const anneeAcademique = await sequelize.models.Annee_Academique.findOne({
+        where: { annee: '2024-2025' },
+      });
+
+      if (!anneeAcademique) {
+        throw new Error('Aucune année académique active trouvée');
+      }
+
+      let anneeId = anneeAcademique.id;
+      // Créer ou mettre à jour la moyenne
+      // Vérifier s'il existe déjà une moyenne pour cette combinaison
+      const moyenneExists = await sequelize.models.Moyenne.checkOverlapMoyenne(eleve, cours, sequence, anneeId);
+
+      if (moyenneExists) {
+        // Mettre à jour la moyenne existante
+        await sequelize.models.Moyenne.update(
+            { moyenne },
+            {
+              where: {
+                eleve,
+                cours,
+                sequence,
+                annee: anneeId,
+              },
+            }
+        );
+      } else {
+        // Créer une nouvelle moyenne
+        await sequelize.models.Moyenne.create({
+          eleve,
+          cours,
+          sequence,
+          annee: anneeId,
+          moyenne,
+        });
+      }
+    }
+  });
 
   return Note;
 };  

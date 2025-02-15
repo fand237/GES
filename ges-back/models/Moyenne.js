@@ -1,120 +1,104 @@
-// models/Moyenne.js
+module.exports = (sequelize, DataTypes) => {
+  const Moyenne = sequelize.define("Moyenne", {
+    id: {
+      type: DataTypes.INTEGER,
+      primaryKey: true,
+      autoIncrement: true,
+    },
+    eleve: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+    },
+    cours: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+    },
+    sequence: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+    },
+    annee: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+    },
+    moyenne: {
+      type: DataTypes.FLOAT,
+      allowNull: false,
+    },
+  });
 
- 
-
-module.exports = (sequelize,DataTypes) => {
-    const Moyenne = sequelize.define("Moyenne",{
-      eleve: {
-        type: DataTypes.INTEGER,
-        allowNull: true,
-        
-      },
-      note: {
-        type: DataTypes.INTEGER,
-        allowNull: true,
-      },
-      moyenne: {
-        type: DataTypes.INTEGER,
-        allowNull: true,
-      }, 
-      
-      
+  Moyenne.associate = (models) => {
+    Moyenne.belongsTo(models.Eleve, {
+      foreignKey: 'eleve',
+      as: 'eleveMoyenne',
+      onUpdate: 'CASCADE',
+      onDelete: 'CASCADE',
     });
-  
-  
-  
-    Moyenne.associate = (models) => {
-       
-      // Association avec le modèle Sequence (Many-to-One)
-      Moyenne.belongsTo(models.Eleve, {
-        foreignKey: 'eleve',
-        as: 'eleveMoyenne',
-        onUpdate: 'CASCADE', // Active la mise à jour en cascade
-        onDelete: 'CASCADE', // Définir la clé étrangère à NULL lors de la suppression de l'élève
-  
-  
-      });
-
-      // Association avec le modèle Sequence (Many-to-One)
-      Moyenne.belongsTo(models.Note, {
-        foreignKey: 'note',
-        as: 'noteMoyenne',
-        onUpdate: 'CASCADE', // Active la mise à jour en cascade
-        onDelete: 'CASCADE', // Définir la clé étrangère à NULL lors de la suppression de l'élève
-  
-  
-      });
-
-      
 
 
-    };
+    Moyenne.belongsTo(models.Note, {
+      foreignKey: 'cours',
+      targetKey: 'cours',
+      as: 'noteMoyenne',
+    });
 
-    // models/Moyenne.js
 
-Moyenne.calculateAndSetMoyenne = async function (coursId, models) {
+    Moyenne.hasMany(models.Bulletin, {
+      foreignKey: 'eleve',
+      sourceKey: 'eleve',
+      as: 'bulletinsEleve',
+    });
+
+    Moyenne.hasMany(models.Bulletin, {
+      foreignKey: 'cours',
+      sourceKey: 'cours',
+      as: 'bulletinsCours',
+    });
+
+
+
+
+    Moyenne.belongsTo(models.Cours, {
+      foreignKey: 'cours',
+      as: 'coursMoyenne',
+      onUpdate: 'CASCADE',
+      onDelete: 'CASCADE',
+    });
+
+    Moyenne.belongsTo(models.Sequence, {
+      foreignKey: 'sequence',
+      as: 'sequenceMoyenne',
+      onUpdate: 'CASCADE',
+      onDelete: 'CASCADE',
+    });
+
+    Moyenne.belongsTo(models.Annee_Academique, {
+      foreignKey: 'annee',
+      as: 'anneeMoyenne',
+      onUpdate: 'CASCADE',
+      onDelete: 'CASCADE',
+    });
+  };
+
+  Moyenne.checkOverlapMoyenne = async function (eleve, cours, sequence,annee) {
     try {
-      // Recherche des instances de Moyenne liées au cours spécifié
-      const moyennes = await Moyenne.findAll({
-        include: [
-          {
-            model: models.Note,
-            as: 'noteMoyenne',
-            where: {
-              cours: coursId,
-            },
-          },
-        ],
+      const overlappingMoyenne = await this.findAll({
+        where: {
+          eleve: eleve,
+          cours:cours,
+          sequence:sequence,
+          annee:annee,
+
+        },
+
       });
-  
-      // Si aucune moyenne n'est associée à ce cours, sortir
-      if (moyennes.length === 0) {
-        console.log('Aucune moyenne associée à ce cours.');
-        return;
-      }
-  
-      // Calcul de la moyenne pour chaque instance trouvée
-      moyennes.forEach(async (moyenne) => {
-        const notes = await models.Note.findAll({
-          where: {
-            cours: coursId,
-            eleve: moyenne.eleve, // Assurez-vous de filtrer par élève
-          },
-        });
-  
-        // Si aucune note n'est associée à ce cours pour cet élève, sortir
-        if (notes.length === 0) {
-          console.log('Aucune note associée à ce cours pour cet élève.');
-          return;
-        }
-  
-        // Calcul de la moyenne selon la formule spécifiée
-        const controleContinueNote = notes.find((note) => note.TypeNote.type === 'controle continue');
-        const evaluationHarmoniseeNote = notes.find((note) => note.TypeNote.type === 'evaluation harmonisee');
-  
-        if (!controleContinueNote || !evaluationHarmoniseeNote) {
-          console.log('Notes de contrôle continu ou d\'évaluation harmonisée manquantes.');
-          return;
-        }
-  
-        const moyenneValue = 0.3 * controleContinueNote.note + 0.7 * evaluationHarmoniseeNote.note;
-  
-        // Mise à jour de la moyenne dans l'instance Moyenne
-        await moyenne.update({
-          moyenne: moyenneValue,
-        });
-      });
-  
-      console.log('Moyennes mises à jour avec succès.');
+
+      return overlappingMoyenne.length > 0;
     } catch (error) {
-      console.error('Erreur lors de la mise à jour des moyennes :', error);
+      console.error('Erreur lors de la vérification des chevauchements dans la base de données groupe : ', error);
       throw error;
     }
   };
 
-  
-  
-  
-  
-    return Moyenne;
-  };
+  return Moyenne;
+};

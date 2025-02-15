@@ -12,12 +12,27 @@ module.exports = (sequelize,DataTypes) => {
         autoIncrement: true,
       },
       annee: {
-        type: DataTypes.ENUM('2022-2023','2023-2024','2024-2025','2025-2026'),
+        type: DataTypes.ENUM('2024-2025','2025-2026','2026-2027'),
         allowNull: false,
       },
     });
-  
-    
+
+    Annee_Academique.checkOverlapAnnee_Academique = async function (annee) {
+        try {
+            const overlappingAnnee_Academique = await this.findAll({
+                where: {
+                    annee: annee,
+
+                },
+
+            });
+
+            return overlappingAnnee_Academique.length > 0;
+        } catch (error) {
+            console.error('Erreur lors de la vérification des chevauchements dans la base de données groupe : ', error);
+            throw error;
+        }
+    };
   
     return Annee_Academique;
   };
