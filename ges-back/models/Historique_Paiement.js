@@ -1,17 +1,7 @@
 // models/Historique_paiement.js
 
 
-class HistoriquePaiement  {
 
-    constructor(id, datePaiement, montant, tranche, eleve) {
-        this.id = id;
-        this.datePaiement = datePaiement;
-        this.montant = montant;
-        this.tranche = tranche;
-        this.eleve = eleve;
-      }
-
-}
 
 
 

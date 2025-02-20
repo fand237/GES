@@ -3,7 +3,7 @@
 const express = require('express');
 const _ = require('lodash');
 const router = express.Router();
-const { Annee_Academique, Eleve, Note, Cours, Sequence, Type_Evaluation, Classe, Enseignant, Bulletin, Groupe , Moyenne} = require('../models');
+const { Annee_Academique, Eleve, Note, Cours, Sequence, Type_Evaluation, Classe, Enseignant, Bulletin, Groupe , Moyenne, MoyenneGenerale,MoyenneClasse} = require('../models');
 
 
 // Route pour créer une nouvelle Bulletin
@@ -53,7 +53,7 @@ router.get("/byeleve/:idEleve/:idSequence", async (req, res) => {
             {
               model: Moyenne,
               as: 'moyenneNote',
-              attributes: ['moyenne'],
+              attributes: ['moyenne','moyennePonderee'],
               where: { sequence: idSequence ,eleve: idEleve},
               required: false, // Permet d'inclure même s'il n'y a pas encore de moyenne
             }
@@ -70,6 +70,36 @@ router.get("/byeleve/:idEleve/:idSequence", async (req, res) => {
 
 
     console.log("la requete est ",distinctElements);
+// Récupérer la moyenne générale pour l'élève et la séquence
+    const moyenneGenerale = await MoyenneGenerale.findOne({
+      where: { eleve: idEleve, sequence: idSequence },
+      attributes: ['moyenne','rang'],
+    });
+
+    //Récupérer la classw de l'eleve
+    const classe = await Eleve.findOne({
+      where: { id: idEleve},
+      attributes: ['classe'],
+    });
+    console.log("les donnees de l'eleve",classe);
+    const idClasse = classe.classe;
+
+    // Récupérer l'année académique active (2024-2025)
+    const anneeAcademique = await Annee_Academique.findOne({
+      where: { annee: '2024-2025' },
+    });
+
+    if (!anneeAcademique) {
+      return res.status(400).json({ error: 'Aucune année académique active trouvée' });
+    }
+
+    const idannee = anneeAcademique.id; // ID de l'année académique
+
+    // Récupérer la moyenne de la classe
+    const moyenneClasse = await MoyenneClasse.findOne({
+      where: { classe: idClasse, sequence: idSequence,annee:idannee },
+      attributes: ['moyenneClasse','moyennePremier','moyenneDernier'],
+    });
 
 
     if (!distinctElements.length) {
@@ -112,7 +142,12 @@ router.get("/byeleve/:idEleve/:idSequence", async (req, res) => {
       return mergedElement;
     });
 
-    res.status(200).json(mergedResults);
+    res.status(200).json({
+      moyenneGenerale: moyenneGenerale ? moyenneGenerale : null, // Retourne la moyenne générale
+      moyenneClasse: moyenneClasse ? moyenneClasse : null, // Retourne la moyenne générale
+      bulletin:mergedResults
+    });
+
 
 
   } catch (error) {

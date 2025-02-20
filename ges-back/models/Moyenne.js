@@ -25,6 +25,10 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.FLOAT,
       allowNull: false,
     },
+    moyennePonderee: {
+      type: DataTypes.FLOAT,
+      allowNull: true, // Calculée dynamiquement
+    },
   });
 
   Moyenne.associate = (models) => {
@@ -80,6 +84,14 @@ module.exports = (sequelize, DataTypes) => {
     });
   };
 
+  // Ajoutez un hook avant la sauvegarde pour calculer la moyenne pondérée
+  Moyenne.beforeSave(async (moyenne, options) => {
+    const cours = await sequelize.models.Cours.findByPk(moyenne.cours);
+    if (cours) {
+      moyenne.moyennePonderee = moyenne.moyenne * cours.coefficient;
+    }
+  });
+
   Moyenne.checkOverlapMoyenne = async function (eleve, cours, sequence,annee) {
     try {
       const overlappingMoyenne = await this.findAll({
@@ -99,6 +111,8 @@ module.exports = (sequelize, DataTypes) => {
       throw error;
     }
   };
+
+
 
   return Moyenne;
 };

@@ -31,6 +31,10 @@ module.exports = (sequelize,DataTypes) => {
       allowNull: true,
       
     },
+    annee: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+    },
     
   });
 
@@ -42,6 +46,13 @@ module.exports = (sequelize,DataTypes) => {
     Note.belongsTo(models.Type_Evaluation, {
       foreignKey: 'type_Evaluation',
       as: 'TypeNote', 
+      onUpdate: 'CASCADE', // Active la mise à jour en cascade
+      onDelete: 'CASCADE', // Définir la clé étrangère à NULL lors de la suppression de l'élève
+
+    });
+    Note.belongsTo(models.Annee_Academique, {
+      foreignKey: 'annee',
+      as: 'AnneeNote',
       onUpdate: 'CASCADE', // Active la mise à jour en cascade
       onDelete: 'CASCADE', // Définir la clé étrangère à NULL lors de la suppression de l'élève
 
@@ -153,5 +164,122 @@ module.exports = (sequelize,DataTypes) => {
     }
   });
 
+  Note.addHook('afterCreate', async (note, options) => {
+    await recalculerMoyenneParCours(note.eleve, note.cours, note.sequence);
+    await recalculerMoyenneGenerale(note.eleve, note.sequence);
+    await recalculerMoyennesEtRangs(note.sequence, note.annee);
+
+  });
+
+  Note.addHook('afterUpdate', async (note, options) => {
+    await recalculerMoyenneParCours(note.eleve, note.cours, note.sequence);
+    await recalculerMoyenneGenerale(note.eleve, note.sequence);
+    await recalculerMoyennesEtRangs(note.sequence, note.annee);
+
+  });
+
+
+  async function recalculerMoyenneGenerale(eleve, sequence) {
+    const anneeAcademique = await sequelize.models.Annee_Academique.findOne({ where: { annee: '2024-2025' } });
+    if (!anneeAcademique) return;
+
+    let anneeId = anneeAcademique.id;
+
+    const moyennes = await sequelize.models.Moyenne.findAll({ where: { eleve, sequence, annee: anneeId } });
+
+    if (moyennes.length === 0) return;
+
+    let totalMoyenne = 0;
+    let totalCoef = 0;
+
+    for (const moyenne of moyennes) {
+      const cours = await sequelize.models.Cours.findByPk(moyenne.cours);
+      if (!cours || !cours.coefficient) continue;
+
+      totalMoyenne += moyenne.moyennePonderee;
+      totalCoef += cours.coefficient;
+    }
+
+    const moyenneGenerale = totalCoef ? (totalMoyenne / totalCoef) : 0;
+
+    const [moyenneGenRecord, created] = await sequelize.models.MoyenneGenerale.findOrCreate({
+      where: { eleve, sequence, annee: anneeId },
+      defaults: { moyenne: moyenneGenerale }
+    });
+
+    if (!created) {
+      moyenneGenRecord.moyenne = moyenneGenerale;
+      await moyenneGenRecord.save();
+    }
+  }
+
+  async function recalculerMoyenneParCours(eleve, cours, sequence) {
+    const notes = await Note.findAll({
+      where: { eleve, cours, sequence },
+      include: [{ model: sequelize.models.Type_Evaluation, as: 'TypeNote' }],
+    });
+
+    if (notes.length === 2) {
+      const controleContinue = notes.find(n => n.TypeNote.type === 'Controle Continue')?.note || 0;
+      const evaluationHarmonisee = notes.find(n => n.TypeNote.type === 'Evaluation Harmonisé')?.note || 0;
+
+      const moyenne = (controleContinue * 0.3) + (evaluationHarmonisee * 0.7);
+      const anneeAcademique = await sequelize.models.Annee_Academique.findOne({ where: { annee: '2024-2025' } });
+
+      if (!anneeAcademique) return;
+
+      let anneeId = anneeAcademique.id;
+
+      const [moyenneRecord, created] = await sequelize.models.Moyenne.findOrCreate({
+        where: { eleve, cours, sequence, annee: anneeId },
+        defaults: { moyennePonderee:moyenne }
+      });
+
+      if (!created) {
+        moyenneRecord.moyenne = moyenne;
+        await moyenneRecord.save();
+      }
+    }
+  }
+
+  async function recalculerMoyennesEtRangs(sequence, annee) {
+    // Récupérer les classes concernées
+    const classes = await sequelize.models.Classe.findAll();
+
+    for (const classe of classes) {
+      const moyennes = await sequelize.models.MoyenneGenerale.findAll({
+        where: { annee, sequence },
+        include: [{
+          model: sequelize.models.Eleve,
+          as: 'eleveMoyenneGenerale',
+          where: { classe: classe.id }
+        }],
+        order: [['moyenne', 'DESC']]
+      });
+
+      // Mise à jour des rangs
+      for (let i = 0; i < moyennes.length; i++) {
+        await moyennes[i].update({ rang: i + 1 });
+      }
+
+      // Calcul des statistiques de la classe
+      const nbEleves = moyennes.length;
+      const moyenneClasse = nbEleves > 0 ? moyennes.reduce((acc, m) => acc + m.moyenne, 0) / nbEleves : 0;
+      const moyennePremier = nbEleves > 0 ? moyennes[0].moyenne : 0;
+      const moyenneDernier = nbEleves > 0 ? moyennes[nbEleves - 1].moyenne : 0;
+
+      // Mise à jour de la table MoyenneClasse
+      await sequelize.models.MoyenneClasse.upsert({
+        classe: classe.id,
+        sequence,
+        annee,
+        moyenneClasse,
+        moyennePremier,
+        moyenneDernier
+      }, {
+        where: { classe: classe.id, sequence, annee }
+      });
+    }
+  }
   return Note;
 };  

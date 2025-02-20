@@ -11,6 +11,18 @@ router.post('/', validateToken,async (req, res) => {
 
     let { eleve, cours, note, dateEvaluation, type_Evaluation, sequence } = req.body;
     console.log(req.utilisateur)
+
+    // Récupérer l'année académique active (2024-2025)
+    const anneeAcademique = await Annee_Academique.findOne({
+      where: { annee: '2024-2025' },
+    });
+
+    if (!anneeAcademique) {
+      return res.status(400).json({ error: 'Aucune année académique active trouvée' });
+    }
+
+    const idannee = anneeAcademique.id; // ID de l'année académique
+
     // Recherche d'une instance existante
     const existingInstance = await Note.findOne({
       where: {
@@ -18,6 +30,7 @@ router.post('/', validateToken,async (req, res) => {
         cours,
         type_Evaluation,
         sequence,
+        annee:idannee,
 
       },
     });
@@ -33,18 +46,9 @@ router.post('/', validateToken,async (req, res) => {
       if (note == '') { note = null }
       // Sinon, créez une nouvelle instance
       console.log("la note n'exitste pas donc on va creer");
-      const newNote = await Note.create({ eleve, cours, note, dateEvaluation, type_Evaluation, sequence });
-      // Récupérer l'année académique active
-      const anneeAcademique = await Annee_Academique.findOne({
-        where: { annee: '2024-2025' },
+      const newNote = await Note.create({ eleve, cours, note, dateEvaluation, type_Evaluation, sequence , annee: idannee, // Ajout de l'année académique
       });
-      console.log("voici l'annee",anneeAcademique);
 
-      if (!anneeAcademique) {
-        return res.status(400).json({ error: 'Aucune année académique active trouvée' });
-      }
-      const idannee = anneeAcademique.id;
-      const idnote = newNote.id
       console.log("l'id de la note cree est ",idnote);
       // Vérifiez si les valeurs requises pour la création du Bulletin sont disponibles
         const newbuletin = await Bulletin.create({ eleve, note: idnote, annee: idannee,cours: cours});
