@@ -116,6 +116,19 @@ const DashboardAdmin = () => {
                                 Rapport des présences
                             </button>
                         </li>
+                        <li>
+                            <button
+                                className={`w-full text-left px-4 py-2 rounded-lg transition ${
+                                    activeTab === 'StatistiquesMoyenne'
+                                        ? 'bg-purple-600 font-semibold'
+                                        : 'hover:bg-purple-700'
+                                }`}
+                                onClick={() => handleTabChange('StatistiquesMoyenne', '/DashboardAdmin/StatistiquesMoyenne')}
+                            >
+                                Rapport des Statistiques
+                            </button>
+                        </li>
+
                     </ul>
                 </div>
                 <footer className="absolute bottom-4 w-full text-center text-sm">

@@ -44,6 +44,8 @@ module.exports = (sequelize, DataTypes) => {
       foreignKey: 'cours',
       targetKey: 'cours',
       as: 'noteMoyenne',
+      onUpdate: 'CASCADE', // Active la mise à jour en cascade
+      onDelete: 'CASCADE',
     });
 
 
@@ -51,12 +53,16 @@ module.exports = (sequelize, DataTypes) => {
       foreignKey: 'eleve',
       sourceKey: 'eleve',
       as: 'bulletinsEleve',
+      onUpdate: 'CASCADE', // Active la mise à jour en cascade
+      onDelete: 'CASCADE',
     });
 
     Moyenne.hasMany(models.Bulletin, {
       foreignKey: 'cours',
       sourceKey: 'cours',
       as: 'bulletinsCours',
+      onUpdate: 'CASCADE', // Active la mise à jour en cascade
+      onDelete: 'CASCADE',
     });
 
 
@@ -112,7 +118,47 @@ module.exports = (sequelize, DataTypes) => {
     }
   };
 
+// Méthode pour calculer les statistiques par classe et par matière
+  Moyenne.getStatistiques = async function (classeId, coursId, sequence, annee) {
+    try {
+      const moyennes = await this.findAll({
+        where: { cours: coursId, sequence, annee },
+        include: [
+          { model: sequelize.models.Eleve, as: 'eleveMoyenne', where: { classe: classeId } },
+          { model: sequelize.models.Cours, as: 'coursMoyenne' },
+        ],
+      });
 
+      const totalEleves = moyennes.length;
+      const totalGarcons = moyennes.filter(m => m.eleveMoyenne.civilite === 'Monsieur').length;
+      const totalFilles = totalEleves - totalGarcons;
 
+      const elevesAvecMoyenne = moyennes.filter(m => m.moyenne >= 10).length;
+      const elevesSousMoyenne = totalEleves - elevesAvecMoyenne;
+
+      const garconsAvecMoyenne = moyennes.filter(m => m.eleveMoyenne.civilite === 'M' && m.moyenne >= 10).length;
+      const fillesAvecMoyenne = elevesAvecMoyenne - garconsAvecMoyenne;
+
+      const pourcentageReussiteGarcons = totalGarcons ? (garconsAvecMoyenne / totalGarcons) * 100 : 0;
+      const pourcentageReussiteFilles = totalFilles ? (fillesAvecMoyenne / totalFilles) * 100 : 0;
+      const pourcentageReussiteTotal = totalEleves ? (elevesAvecMoyenne / totalEleves) * 100 : 0;
+
+      return {
+        totalEleves,
+        totalGarcons,
+        totalFilles,
+        elevesAvecMoyenne,
+        elevesSousMoyenne,
+        garconsAvecMoyenne, // Nombre de garçons avec la moyenne
+        fillesAvecMoyenne,  // Nombre de filles avec la moyenne
+        pourcentageReussiteGarcons,
+        pourcentageReussiteFilles,
+        pourcentageReussiteTotal,
+      };
+    } catch (error) {
+      console.error('Erreur lors du calcul des statistiques :', error);
+      throw error;
+    }
+  };
   return Moyenne;
 };

@@ -39,7 +39,7 @@ function BulletinSequence() {
             moyenneClasse: response.data.moyenneClasse.moyenneClasse || 'N/A',
             moyennePremier: response.data.moyenneClasse.moyennePremier || 'N/A',
             moyenneDernier: response.data.moyenneClasse.moyenneDernier || 'N/A',
-            effectif: response.data.effectif || 'N/A',
+            effectif: response.data.effectifClasse || 'N/A',
           });
           console.log("les statistiques",response.data);
         } catch (err) {

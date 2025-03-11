@@ -40,6 +40,18 @@ router.post("/", async(req, res) => {
     res.json(post);
 });
 
+// Route pour récupérer les statistiques par classe et par matière
+router.get('/statistiques/:classeId/:coursId/:sequence/:annee', async (req, res) => {
+    const { classeId, coursId, sequence, annee } = req.params;
+
+    try {
+        const statistiques = await Moyenne.getStatistiques(classeId, coursId, sequence, annee);
+        res.json(statistiques);
+    } catch (error) {
+        console.error('Erreur lors de la récupération des statistiques :', error);
+        res.status(500).json({ error: 'Erreur lors de la récupération des statistiques' });
+    }
+});
 
 
 module.exports = router;

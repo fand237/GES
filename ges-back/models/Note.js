@@ -38,7 +38,26 @@ module.exports = (sequelize,DataTypes) => {
     
   });
 
+  Note.checkOverlapNote = async function (eleve,cours,type,sequence,annee) {
+    try {
+      const overlappingNote = await this.findAll({
+        where: {
+          eleve: eleve,
+          cours:cours,
+          type:type,
+          sequence:sequence,
+          annee:annee
 
+        },
+
+      });
+
+      return overlappingNote.length > 0;
+    } catch (error) {
+      console.error('Erreur lors de la vérification des chevauchements dans la base de données Note : ', error);
+      throw error;
+    }
+  };
 
   Note.associate = (models) => {
      
@@ -98,7 +117,24 @@ module.exports = (sequelize,DataTypes) => {
     });
   };
 
+
+
   Note.addHook('afterCreate', async (note, options) => {
+    await calculmoyenne(note)
+    await recalculerMoyenneParCours(note.eleve, note.cours, note.sequence);
+    await recalculerMoyenneGenerale(note.eleve, note.sequence);
+    await recalculerMoyennesEtRangs(note.sequence, note.annee);
+
+  });
+
+  Note.addHook('afterUpdate', async (note, options) => {
+    await recalculerMoyenneParCours(note.eleve, note.cours, note.sequence);
+    await recalculerMoyenneGenerale(note.eleve, note.sequence);
+    await recalculerMoyennesEtRangs(note.sequence, note.annee);
+
+  });
+
+  async function calculmoyenne(note){
     const { eleve, cours, sequence } = note;
 
     // Récupérer les deux notes (Contrôle Continu et Évaluation Harmonisée)
@@ -162,22 +198,7 @@ module.exports = (sequelize,DataTypes) => {
         });
       }
     }
-  });
-
-  Note.addHook('afterCreate', async (note, options) => {
-    await recalculerMoyenneParCours(note.eleve, note.cours, note.sequence);
-    await recalculerMoyenneGenerale(note.eleve, note.sequence);
-    await recalculerMoyennesEtRangs(note.sequence, note.annee);
-
-  });
-
-  Note.addHook('afterUpdate', async (note, options) => {
-    await recalculerMoyenneParCours(note.eleve, note.cours, note.sequence);
-    await recalculerMoyenneGenerale(note.eleve, note.sequence);
-    await recalculerMoyennesEtRangs(note.sequence, note.annee);
-
-  });
-
+  }
 
   async function recalculerMoyenneGenerale(eleve, sequence) {
     const anneeAcademique = await sequelize.models.Annee_Academique.findOne({ where: { annee: '2024-2025' } });
@@ -268,17 +289,19 @@ module.exports = (sequelize,DataTypes) => {
       const moyennePremier = nbEleves > 0 ? moyennes[0].moyenne : 0;
       const moyenneDernier = nbEleves > 0 ? moyennes[nbEleves - 1].moyenne : 0;
 
-      // Mise à jour de la table MoyenneClasse
-      await sequelize.models.MoyenneClasse.upsert({
-        classe: classe.id,
-        sequence,
-        annee,
-        moyenneClasse,
-        moyennePremier,
-        moyenneDernier
-      }, {
-        where: { classe: classe.id, sequence, annee }
+      const [moyenneClasseRecord, created] = await sequelize.models.MoyenneClasse.findOrCreate({
+        where: { classe: classe.id, sequence, annee },
+        defaults: { moyenneClasse, moyennePremier, moyenneDernier }
       });
+
+      if (!created) {
+        // Si l'enregistrement existe déjà, on le met à jour
+        moyenneClasseRecord.moyenneClasse = moyenneClasse;
+        moyenneClasseRecord.moyennePremier = moyennePremier;
+        moyenneClasseRecord.moyenneDernier = moyenneDernier;
+        await moyenneClasseRecord.save();
+      }
+
     }
   }
   return Note;

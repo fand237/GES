@@ -15,6 +15,7 @@ import TimeTable from './components/TimeTable'
 import TimeTableEnseignant from './components/TimeTableEnseignant'
 import DashboardEnseignant from './components/DashboardEnseignant'
 import PresenceRapport from './components/PresenceRapport'
+import StatistiquesMoyenne from "./components/StatistiquesMoyenne";
 
 import DashboardEleve from './components/DashboardEleve'
 
@@ -211,6 +212,8 @@ function App() {
               <Route path="EmploisTemps" element={<ProtectedRoute requiredRole="Administrateur"> <TimeTable /> </ProtectedRoute>} />
               <Route path="FormAll" element={<ProtectedRoute requiredRole="Administrateur"><FormAll /></ProtectedRoute>} />
               <Route path="PresenceRapport" element={<ProtectedRoute requiredRole="Administrateur"><PresenceRapport /></ProtectedRoute>} />
+              <Route path="StatistiquesMoyenne" element={<ProtectedRoute requiredRole="Administrateur"><StatistiquesMoyenne /></ProtectedRoute>} />
+
 
               <Route path="GroupeForm" element={<ProtectedRoute requiredRole="Administrateur"><GroupeForm /></ProtectedRoute>} />
               <Route path="MatiereForm" element={<ProtectedRoute requiredRole="Administrateur"><MatiereForm /></ProtectedRoute>} />

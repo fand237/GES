@@ -101,6 +101,10 @@ router.get("/byeleve/:idEleve/:idSequence", async (req, res) => {
       attributes: ['moyenneClasse','moyennePremier','moyenneDernier'],
     });
 
+    // Récupérer l'effectif de la classe
+    const effectifClasse = await Eleve.count({
+      where: { classe: idClasse },
+    });
 
     if (!distinctElements.length) {
       console.log("aucune donne trouve");
@@ -145,6 +149,7 @@ router.get("/byeleve/:idEleve/:idSequence", async (req, res) => {
     res.status(200).json({
       moyenneGenerale: moyenneGenerale ? moyenneGenerale : null, // Retourne la moyenne générale
       moyenneClasse: moyenneClasse ? moyenneClasse : null, // Retourne la moyenne générale
+      effectifClasse: effectifClasse, // Ajout de l'effectif de la classe
       bulletin:mergedResults
     });
 

@@ -27,6 +27,24 @@ module.exports = (sequelize, DataTypes) => {
             allowNull: true, // Sera calculé dynamiquement
         }
     });
+    MoyenneGenerale.checkOverlapMoyenneGenerale = async function (eleve, sequence,annee) {
+        try {
+            const overlappingMoyenneGenerale = await this.findAll({
+                where: {
+                    eleve: eleve,
+                    sequence:sequence,
+                    annee:annee,
+
+                },
+
+            });
+
+            return overlappingMoyenneGenerale.length > 0;
+        } catch (error) {
+            console.error('Erreur lors de la vérification des chevauchements dans la base de données Moyenne Generale : ', error);
+            throw error;
+        }
+    };
 
     MoyenneGenerale.associate = (models) => {
         MoyenneGenerale.belongsTo(models.Eleve, {

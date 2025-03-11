@@ -1,12 +1,15 @@
 // NoteRoute.js
-
+const { fn, col } = require('sequelize');
 const express = require('express');
 const router = express.Router();
-const { Note, Moyenne, Cours, Sequence, Type_Evaluation, Classe, Bulletin, Annee_Academique } = require('../models');
+const { Note, Moyenne, Cours, Sequence, Type_Evaluation, Classe, Bulletin, Annee_Academique, Eleve} = require('../models');
 const {validateToken} = require("../middlewares/AuthMiddleware")
 
 
 router.post('/', validateToken,async (req, res) => {
+
+
+
   try {
 
     let { eleve, cours, note, dateEvaluation, type_Evaluation, sequence } = req.body;
@@ -22,6 +25,13 @@ router.post('/', validateToken,async (req, res) => {
     }
 
     const idannee = anneeAcademique.id; // ID de l'année académique
+
+    const isOverlap = await Eleve.checkOverlapEmail(eleve,cours,type_Evaluation,sequence,idannee);
+
+    // Si l'unicité n'est pas respectée, renvoyer une réponse avec le statut 422
+    if (isOverlap) {
+      return res.status(422).json({ error: "Cette adresse Note est déjà utilisée." });
+    }
 
     // Recherche d'une instance existante
     const existingInstance = await Note.findOne({
@@ -48,6 +58,7 @@ router.post('/', validateToken,async (req, res) => {
       console.log("la note n'exitste pas donc on va creer");
       const newNote = await Note.create({ eleve, cours, note, dateEvaluation, type_Evaluation, sequence , annee: idannee, // Ajout de l'année académique
       });
+      const idnote = newNote.id;
 
       console.log("l'id de la note cree est ",idnote);
       // Vérifiez si les valeurs requises pour la création du Bulletin sont disponibles
@@ -96,16 +107,17 @@ router.get("/byeval/:idEnseignant", async (req, res) => {
 
   try {
     const distinctElements = await Note.findAll({
-      attributes: ['cours', 'sequence', 'type_Evaluation', 'dateEvaluation','id'],
+      attributes: [[fn('MIN', col('Note.id')), 'id'], 'cours', 'sequence', 'type_Evaluation', 'dateEvaluation','annee'],
       include: [
         { model: Cours, attributes: ['id', 'matiere', 'Enseignant'], as: 'coursNote', include: [{ model: Classe, as: 'classeCours' }], where: { Enseignant: idEnseignant } }, // Utilisez l'alias 'coursNote' correspondant à votre association
         { model: Sequence, attributes: ['sequence'], as: 'sequenceNote' }, // Utilisez l'alias 'sequenceNote' correspondant à votre association
         { model: Type_Evaluation, attributes: ['type'], as: 'TypeNote' }, // Utilisez l'alias 'typeEvaluationNote' correspondant à votre association
       ],
-      group: ['cours', 'sequence', 'type_Evaluation', 'dateEvaluation','id'],
+      group: ['cours', 'sequence', 'type_Evaluation', 'dateEvaluation','annee'],
       raw: true,
       nest: true,
     });
+    console.log("les elements distincts des eval sont ",distinctElements);
     res.status(200).json(distinctElements);
   } catch (error) {
     console.error('Erreur lors de la récupération des éléments distincts :', error);
@@ -134,5 +146,7 @@ router.delete('/:id', validateToken, async (req, res) => {
   }
 });
 // Autres routes CRUD à ajouter selon les besoins
+
+
 
 module.exports = router;

@@ -33,7 +33,24 @@ module.exports = (sequelize, DataTypes) => {
             defaultValue: 0,
         }
     });
+    MoyenneClasse.checkOverlapMoyenneClasse = async function (classe, sequence,annee) {
+        try {
+            const overlappingMoyenneClasse = await this.findAll({
+                where: {
+                    classe: classe,
+                    sequence:sequence,
+                    annee:annee,
 
+                },
+
+            });
+
+            return overlappingMoyenneClasse.length > 0;
+        } catch (error) {
+            console.error('Erreur lors de la vérification des chevauchements dans la base de données Moyenne Generale : ', error);
+            throw error;
+        }
+    };
     MoyenneClasse.associate = (models) => {
         MoyenneClasse.belongsTo(models.Classe, { foreignKey: 'classe', as: 'classeMoyenne' ,onUpdate: 'CASCADE',
             onDelete: 'CASCADE',});

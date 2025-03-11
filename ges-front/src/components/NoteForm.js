@@ -174,6 +174,22 @@ const NoteForm = () => {
         console.log(`Note de ${note} enregistrée pour l'élève avec l'ID ${eleve.id}`);
       })
       .catch((error) => {
+        if (error.response) {
+          if (error.response.status === 422) {
+            const errorMessage = error.response.data.error;
+            if (errorMessage.includes("note")) {
+              alert("Cette note existe deja.");
+            } else {
+              alert(`Erreur du serveur: ${errorMessage}`);
+            }
+          } else {
+            alert(`Erreur du serveur: ${error.response.data.error}`);
+          }
+        } else if (error.request) {
+          console.error("Aucune réponse reçue du serveur.");
+        } else {
+          console.error("Erreur de configuration de la requête :", error.message);
+        }
         console.error(`Erreur lors de l'enregistrement de la note : `, error);
       });
     });
