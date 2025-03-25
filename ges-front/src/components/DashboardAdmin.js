@@ -129,6 +129,19 @@ const DashboardAdmin = () => {
                             </button>
                         </li>
 
+                        <li>
+                            <button
+                                className={`w-full text-left px-4 py-2 rounded-lg transition ${
+                                    activeTab === 'PlanningExamen'
+                                        ? 'bg-purple-600 font-semibold'
+                                        : 'hover:bg-purple-700'
+                                }`}
+                                onClick={() => handleTabChange('PlanningExamen', '/DashboardAdmin/PlanningExamen')}
+                            >
+                                Plannifier les Examens
+                            </button>
+                        </li>
+
                     </ul>
                 </div>
                 <footer className="absolute bottom-4 w-full text-center text-sm">

@@ -176,6 +176,7 @@ const RapportPresence = () => {
           <thead>
             <tr>
               <th className="border px-4 py-2">Élève</th>
+              <th className="border px-4 py-2">Classe</th>
               <th className="border px-4 py-2">Cours</th>
               <th className="border px-4 py-2">Date</th>
               <th className="border px-4 py-2">Statut</th>
@@ -194,6 +195,7 @@ const RapportPresence = () => {
                   cours.dates.map((dateInfo, dateIndex) => (
                     <tr key={`${eleveIndex}-${coursIndex}-${dateIndex}`}>
                       <td className="border px-4 py-2">{eleve.nom} {eleve.prenom}</td>
+                      <td className="border px-4 py-2">{eleve.classe}</td>
                       <td className="border px-4 py-2">{cours.matiere}</td>
                       <td className="border px-4 py-2">{dateInfo.jour}</td>
                       <td className="border px-4 py-2">{dateInfo.statut}</td>

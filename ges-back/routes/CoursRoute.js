@@ -1,6 +1,6 @@
 const express = require('express')
 const router = express.Router();
-const {Cours, Groupe} = require("../models")
+const {Cours, Groupe,Classe} = require("../models")
 const CoursController = require('../controllers/CoursController');
 
 
@@ -189,6 +189,28 @@ router.put('/MAJ_ET/:id', async (req, res) => {
   } catch (error) {
     console.error('Erreur lors de la mise à jour du cours : ', error);
     return res.status(500).json({ error: 'Erreur serveur lors de la mise à jour du cours' });
+  }
+});
+
+// Nouvelle route pour récupérer les cours par niveau
+router.get('/byNiveau/:niveauId', async (req, res) => {
+  const niveauId = req.params.niveauId;
+
+  try {
+    const courses = await Cours.findAll({
+      include: [{
+        model: Classe,
+        as: 'classeCours',
+        where: { niveauId: niveauId },
+        attributes: [] // On ne veut pas les données de la classe
+      }],
+      attributes: ['id', 'matiere'] // Seulement ces attributs
+    });
+
+    res.json(courses);
+  } catch (error) {
+    console.error("Erreur récupération cours par niveau:", error);
+    res.status(500).json({ error: "Erreur serveur" });
   }
 });
 

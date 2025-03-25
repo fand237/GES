@@ -31,7 +31,9 @@ router.get("/byeleve/:idEleve/:idSequence", async (req, res) => {
           attributes: ['nom', 'prenom', 'dateNaissance'],
           as: 'eleveBulletin',
           where: { id: idEleve },
-          include: [{ model: Classe, attributes: ['classe'], as: 'classeEleve' }]
+          include: [{ model: Classe, attributes: ['classe'], as: 'classeEleve' ,
+          include :[{ model:Enseignant, attributes:['nom','civilite', 'prenom'],  as:'ResponsableClasse'}]}
+          ]
         },
         {
           model: Note,

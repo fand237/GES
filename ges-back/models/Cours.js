@@ -94,7 +94,17 @@ module.exports = (sequelize, DataTypes) => {
       onUpdate: 'CASCADE',
       onDelete: 'CASCADE',
     });
+
+    Cours.hasMany(models.PlanningExamen, {
+      foreignKey: 'matiere',
+      as: 'Plannings',
+      onUpdate: 'CASCADE',
+      onDelete: 'CASCADE',
+    });
   };
+
+
+
 
   
 

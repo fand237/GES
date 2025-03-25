@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const { Classe , Cycle , Enseignant , Eleve} = require('../models');
+const { Classe , Cycle , Enseignant , Eleve, Niveau} = require('../models');
 const {validateToken} = require("../middlewares/AuthMiddleware")
 const sequelize = require('sequelize'); 
 
@@ -14,7 +14,13 @@ router.get('/', validateToken,async (req, res) => {
       attributes: ['id', 'classe','capacite',
         [sequelize.literal('(SELECT COUNT(*) FROM Eleves WHERE Eleves.classe = Classe.id)'), 'nombreEleves'],
       ], // Attributs de la table Classe à afficher
-      include: [{
+      include: [
+          {
+              model: Niveau,
+              as: 'NiveauClasse',
+              attributes: ['id', 'nom']
+          },
+          {
         model: Cycle,
         as: 'CycleClasse', // Utilisez l'alias défini dans votre association
         attributes: ['cycle'], // Attributs du modèle Cycle à afficher
@@ -38,7 +44,9 @@ const formattedClasses = classes.map(cls => ({
   id: cls.id,
   classe: cls.classe,
   capacite: cls.capacite,
-  cycle: cls.CycleClasse ? cls.CycleClasse.cycle : 'nom defini',
+    niveau: cls.NiveauClasse ? cls.NiveauClasse.nom : 'N/A',
+    niveauId: cls.NiveauClasse ? cls.NiveauClasse.id : null,
+    cycle: cls.CycleClasse ? cls.CycleClasse.cycle : 'nom defini',
   nom: cls.ResponsableClasse ? cls.ResponsableClasse.nom : 'N/A',
   prenom: cls.ResponsableClasse ? cls.ResponsableClasse.prenom : 'N/A',
   nombreEleves: cls.dataValues.nombreEleves,
@@ -77,12 +85,18 @@ router.post('/', validateToken,async (req, res) => {
         return res.status(422).json({ error: "Cette Classe est déjà utilisée." });
       }
   try {
-    const { classe, capacite, cycle, responsable } = req.body;
+    const { classe, capacite, cycle, responsable,niveauId } = req.body;
+      // Vérifier que le niveau existe
+      const niveau = await Niveau.findByPk(niveauId);
+      if (!niveau) {
+          return res.status(400).json({ error: "Niveau invalide" });
+      }
     const newClasse = await Classe.create({ 
         classe,
         capacite,
         cycle,
-        responsable });
+        responsable,
+        niveauId});
     res.status(201).json(newClasse);
   } catch (error) {
     res.status(500).json({ error: 'Erreur lors de la création du classe' });
@@ -92,12 +106,13 @@ router.post('/', validateToken,async (req, res) => {
 // Route pour mettre à jour un classe
 router.put('/:id', validateToken,async (req, res) => {
   try {
-    const { classe, capacite, cycle ,responsable} = req.body;
+    const { classe, capacite, cycle ,responsable,niveauId} = req.body;
     const [updated] = await Classe.update({ 
         classe,
         capacite,
         cycle,
         responsable,
+        niveauId
      }, { where: { id: req.params.id } });
     if (updated) {
       const updatedClasse = await Classe.findByPk(req.params.id);
@@ -123,6 +138,23 @@ router.delete('/:id',validateToken, async (req, res) => {
   } catch (error) {
     res.status(500).json({ error: 'Erreur lors de la suppression du classe' });
   }
+});
+
+// Route pour récupérer les classes par niveau
+router.get('/byNiveau/:niveauId', async (req, res) => {
+    const niveauId = req.params.niveauId;
+
+    try {
+        const classes = await Classe.findAll({
+            where: { niveauId: niveauId },
+            attributes: ['id', 'classe']
+        });
+
+        res.json(classes);
+    } catch (error) {
+        console.error("Erreur récupération classes par niveau:", error);
+        res.status(500).json({ error: "Erreur serveur" });
+    }
 });
 
 module.exports = router;

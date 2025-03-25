@@ -33,6 +33,7 @@ function BulletinSequence() {
               `http://localhost:3001/Bulletin/byeleve/${idEleve}/${selectedSequence}`
           );
           setBulletin(response.data.bulletin);
+          console.log("le bulletin est",response.data.bulletin);
           setStats({
             moyenneGenerale: response.data.moyenneGenerale.moyenne || 'N/A',
             rang: response.data.moyenneGenerale.rang || 'N/A',
@@ -110,6 +111,7 @@ function BulletinSequence() {
               <p><strong>Nom de l'élève :</strong> {bulletin[0]?.eleveBulletin.nom} {bulletin[0]?.eleveBulletin.prenom}</p>
               <p><strong>Classe :</strong> {bulletin[0]?.eleveBulletin.classeEleve.classe}</p>
               <p><strong>Année scolaire :</strong> {bulletin[0]?.anneeBulletin.annee}</p>
+              <p><strong>Responsable de la classe :</strong> {bulletin[0]?.eleveBulletin.classeEleve.ResponsableClasse.civilite} {bulletin[0]?.eleveBulletin.classeEleve.ResponsableClasse.nom}  {bulletin[0]?.eleveBulletin.classeEleve.ResponsableClasse.prenom}</p>
             </div>
 
 

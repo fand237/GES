@@ -1,6 +1,6 @@
 const express = require('express')
 const router = express.Router();
-const {Presence, Eleve, Cours} = require("../models")
+const {Presence, Eleve, Cours, Classe} = require("../models")
 const { Op } = require('sequelize');
 const PDFDocument = require('pdfkit');
 
@@ -60,11 +60,15 @@ router.post('/updateOrCreate', async (req, res) => {
       const presences = await Presence.findAll({
         where: whereClause,
         include: [
-          { model: Eleve, as: 'elevePresence' },
+          { model: Eleve, as: 'elevePresence',
+          include:[{
+            model: Classe, as: 'classeEleve',attributes:['classe']
+          }]
+          },
           { model: Cours, as: 'coursPresence' },
         ],
       });
-  
+  console.log("les presences en bac end sont :",presences);
       // Groupement des présences par élève et par cours
       const groupedPresences = presences.reduce((acc, presence) => {
         const eleveId = presence.elevePresence.id;
@@ -74,6 +78,7 @@ router.post('/updateOrCreate', async (req, res) => {
           acc[eleveId] = {
             nom: presence.elevePresence.nom,
             prenom: presence.elevePresence.prenom,
+            classe: presence.elevePresence.classeEleve.classe,
             cours: {}
           };
         }

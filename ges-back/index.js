@@ -107,6 +107,14 @@ app.use("/Moyenne",MoyenneRoute);
 const CycleRoute = require("./routes/CycleRoute");
 app.use("/Cycle",CycleRoute);
 
+//Routes PlanningExamen
+const PlanningExamenRoute = require("./routes/PlanningExamenRoute");
+app.use("/PlanningExamen",PlanningExamenRoute);
+
+//Routes Niveau
+const NiveauRoute = require("./routes/NiveauRoute");
+app.use("/Niveau",NiveauRoute);
+
 
 app.get('/', (req, res) => {
   res.send('Backend de votre application React');
