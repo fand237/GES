@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import { jsPDF } from 'jspdf';
+import { saveAs } from 'file-saver';
 
 const PlanningExamen = () => {
     // États
@@ -66,7 +68,6 @@ const PlanningExamen = () => {
                             headers: { accessToken: localStorage.getItem("accessToken") }
                         })
                     ]);
-                    console.log('les classes sont:',classesRes.data);
                     setMatieres(matieresRes.data);
                     setClasses(classesRes.data);
                     setSelectedMatiere('');
@@ -97,7 +98,6 @@ const PlanningExamen = () => {
                         }
                     );
 
-                    // Tri des données reçues du serveur par date et heure
                     const sortedData = response.data.sort((a, b) => {
                         const dateCompare = new Date(a.date) - new Date(b.date);
                         if (dateCompare !== 0) return dateCompare;
@@ -106,7 +106,6 @@ const PlanningExamen = () => {
 
                     setPlanning(sortedData);
 
-                    // Mettre à jour l'heure de début
                     if (sortedData.length > 0) {
                         setStartTime(sortedData[sortedData.length - 1].heureFin);
                     } else {
@@ -142,7 +141,6 @@ const PlanningExamen = () => {
         return `${String(endHours).padStart(2, '0')}:${String(endMins).padStart(2, '0')}`;
     };
 
-    // Formatage de la date en français (ex: "samedi 1er mars 2025")
     const formatFrenchDate = (dateString) => {
         const date = new Date(dateString);
         const options = {
@@ -152,9 +150,7 @@ const PlanningExamen = () => {
             year: 'numeric'
         };
         return date.toLocaleDateString('fr-FR', options)
-            .replace(/(\d+)/, (match) => {
-                return match === '1' ? '1er' : match;
-            });
+            .replace(/(\d+)/, (match) => match === '1' ? '1er' : match);
     };
 
     // Gestion des tranches
@@ -187,7 +183,6 @@ const PlanningExamen = () => {
             updatedPlanning = [...planning, newItem];
         }
 
-        // Tri du planning par date puis par heure de début
         updatedPlanning.sort((a, b) => {
             const dateCompare = new Date(a.date) - new Date(b.date);
             if (dateCompare !== 0) return dateCompare;
@@ -205,9 +200,7 @@ const PlanningExamen = () => {
         setPlanning(updated);
 
         if (updated.length === 0 || index === planning.length - 1) {
-            setStartTime(updated.length > 0
-                ? updated[updated.length - 1].heureFin
-                : '07:30');
+            setStartTime(updated.length > 0 ? updated[updated.length - 1].heureFin : '07:30');
         }
     };
 
@@ -236,6 +229,169 @@ const PlanningExamen = () => {
             console.error('Erreur sauvegarde:', error);
             alert('Erreur lors de la sauvegarde');
         }
+    };
+
+    // Exportation en PDF avec jsPDF uniquement
+    const exportToPDF = () => {
+        const pdf = new jsPDF('p', 'mm', 'a4');
+        const margin = 10;
+        const pageWidth = pdf.internal.pageSize.getWidth() - 2 * margin;
+        let yPos = 20;
+
+        // En-tête
+        pdf.setFontSize(18);
+        pdf.text(`Planning des évaluations de la ${sequences.find(s => s.id == selectedSequence)?.sequence || ''}`,
+            pdf.internal.pageSize.getWidth() / 2, yPos, { align: 'center' });
+        yPos += 10;
+
+        pdf.setFontSize(14);
+        pdf.text(`Niveau: ${niveaux.find(n => n.id == selectedNiveau)?.nom || ''}`,
+            pdf.internal.pageSize.getWidth() / 2, yPos, { align: 'center' });
+        yPos += 10;
+
+        pdf.text(`Année académique: ${anneesAcademiques.find(a => a.id == selectedAnneeAcademique)?.annee || ''}`,
+            pdf.internal.pageSize.getWidth() / 2, yPos, { align: 'center' });
+        yPos += 20;
+
+        // En-têtes de colonnes
+        pdf.setFontSize(12);
+        pdf.setFont(undefined, 'bold');
+        const headers = ['Date', 'Matière', 'Horaire', 'Durée'];
+        const colWidths = [40, 80, 40, 30];
+        let xPos = margin;
+
+        headers.forEach((header, i) => {
+            pdf.text(header, xPos + colWidths[i] / 2, yPos, { align: 'center' });
+            xPos += colWidths[i];
+        });
+
+        yPos += 10;
+        pdf.setFont(undefined, 'normal');
+        pdf.setDrawColor(200);
+        pdf.line(margin, yPos - 5, margin + pageWidth, yPos - 5);
+
+        // Contenu du tableau
+        Object.entries(groupedPlanning).forEach(([date, items]) => {
+            // Vérifier si on a besoin d'une nouvelle page
+            if (yPos > pdf.internal.pageSize.getHeight() - 20) {
+                pdf.addPage();
+                yPos = 20;
+            }
+
+            // Date groupée
+            pdf.setFont(undefined, 'bold');
+            pdf.text(formatFrenchDate(date), margin, yPos);
+            yPos += 10;
+
+            pdf.setFont(undefined, 'normal');
+            items.forEach(item => {
+                // Vérifier si on a besoin d'une nouvelle page pour l'item
+                if (yPos > pdf.internal.pageSize.getHeight() - 20) {
+                    pdf.addPage();
+                    yPos = 20;
+                }
+
+                xPos = margin;
+                const rowData = [
+                    '', // La date est déjà affichée
+                    item.matiereNom,
+                    `${item.heureDebut} - ${item.heureFin}`,
+                    formatDuration(item.duree)
+                ];
+
+                rowData.forEach((text, i) => {
+                    pdf.text(text, xPos + colWidths[i] / 2, yPos, { align: 'center' });
+                    xPos += colWidths[i];
+                });
+
+                yPos += 10;
+                pdf.line(margin, yPos - 5, margin + pageWidth, yPos - 5);
+            });
+        });
+
+        pdf.save(`planning-${selectedSequence}-${selectedNiveau}.pdf`);
+    };
+
+    // Exportation en Word (inchangé)
+    const exportToWord = async () => {
+        const doc = new Document({
+            sections: [{
+                properties: {},
+                children: [
+                    new Paragraph({
+                        text: `Planning des évaluations de la ${sequences.find(s => s.id == selectedSequence)?.sequence || ''}`,
+                        heading: HeadingLevel.HEADING_1,
+                        alignment: 'center',
+                        spacing: { after: 200 }
+                    }),
+                    new Paragraph({
+                        children: [
+                            new TextRun({
+                                text: `Niveau: ${niveaux.find(n => n.id == selectedNiveau)?.nom || ''}`,
+                                bold: true
+                            })
+                        ],
+                        alignment: 'center',
+                        spacing: { after: 100 }
+                    }),
+                    new Paragraph({
+                        children: [
+                            new TextRun({
+                                text: `Année académique: ${anneesAcademiques.find(a => a.id == selectedAnneeAcademique)?.annee || ''}`,
+                                bold: true
+                            })
+                        ],
+                        alignment: 'center',
+                        spacing: { after: 200 }
+                    }),
+                    new Table({
+                        width: { size: 100, type: WidthType.PERCENTAGE },
+                        borders: {
+                            top: { style: 'single', size: 8, color: 'AAAAAA' },
+                            bottom: { style: 'single', size: 8, color: 'AAAAAA' },
+                            left: { style: 'single', size: 8, color: 'AAAAAA' },
+                            right: { style: 'single', size: 8, color: 'AAAAAA' },
+                            insideHorizontal: { style: 'single', size: 8, color: 'AAAAAA' },
+                            insideVertical: { style: 'single', size: 8, color: 'AAAAAA' }
+                        },
+                        rows: [
+                            new TableRow({
+                                children: [
+                                    new TableCell({ children: [new Paragraph("Date")], width: { size: 25, type: WidthType.PERCENTAGE } }),
+                                    new TableCell({ children: [new Paragraph("Matière")], width: { size: 35, type: WidthType.PERCENTAGE } }),
+                                    new TableCell({ children: [new Paragraph("Horaire")], width: { size: 20, type: WidthType.PERCENTAGE } }),
+                                    new TableCell({ children: [new Paragraph("Durée")], width: { size: 20, type: WidthType.PERCENTAGE } })
+                                ]
+                            }),
+                            ...Object.entries(groupedPlanning).flatMap(([date, items]) => [
+                                new TableRow({
+                                    children: [
+                                        new TableCell({
+                                            children: [new Paragraph(formatFrenchDate(date))],
+                                            rowSpan: items.length,
+                                            verticalAlign: VerticalAlign.CENTER
+                                        }),
+                                        new TableCell({ children: [new Paragraph(items[0].matiereNom)] }),
+                                        new TableCell({ children: [new Paragraph(`${items[0].heureDebut} - ${items[0].heureFin}`)] }),
+                                        new TableCell({ children: [new Paragraph(formatDuration(items[0].duree))] })
+                                    ]
+                                }),
+                                ...items.slice(1).map(item => new TableRow({
+                                    children: [
+                                        new TableCell({ children: [new Paragraph(item.matiereNom)] }),
+                                        new TableCell({ children: [new Paragraph(`${item.heureDebut} - ${item.heureFin}`)] }),
+                                        new TableCell({ children: [new Paragraph(formatDuration(item.duree))] })
+                                    ]
+                                }))
+                            ])
+                        ]
+                    })
+                ]
+            }]
+        });
+
+        const buffer = await Packer.toBlob(doc);
+        saveAs(buffer, `planning-${selectedSequence}-${selectedNiveau}.docx`);
     };
 
     // Grouper par date
@@ -298,7 +454,6 @@ const PlanningExamen = () => {
                     </div>
                 </div>
 
-                {/* Afficher les classes du niveau sélectionné */}
                 {selectedNiveau && (
                     <div className="mt-4">
                         <h3 className="font-medium mb-2">Classes du niveau:</h3>
@@ -397,10 +552,26 @@ const PlanningExamen = () => {
 
                         <button
                             onClick={handleSave}
-                            className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600 ml-auto"
+                            className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600"
                             disabled={isLoading || planning.length === 0}
                         >
-                            Sauvegarder Planning
+                            Sauvegarder
+                        </button>
+
+                        <button
+                            onClick={exportToPDF}
+                            className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600"
+                            disabled={isLoading || planning.length === 0}
+                        >
+                            Exporter PDF
+                        </button>
+
+                        <button
+                            onClick={exportToWord}
+                            className="px-4 py-2 bg-indigo-500 text-white rounded hover:bg-indigo-600"
+                            disabled={isLoading || planning.length === 0}
+                        >
+                            Exporter Word
                         </button>
                     </div>
                 </div>
