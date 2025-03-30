@@ -44,6 +44,7 @@ import JourForm from './components/JourForm';
 import SequenceForm from './components/SequenceForm';
 import TypeEvaluationForm from './components/TypeEvaluationForm';
 import AnneeAcademiqueForm from './components/AnneeAcademiqueForm';
+import ChatInterface  from "./components/ChatInterface";
 
 
 import ParentForm from './components/ParentForm'
@@ -229,10 +230,13 @@ function App() {
 
 
             </Route>
-            <Route path="/DashboardEleve" element={<ProtectedRoute requiredRole="Eleve"> <DashboardEleve /> </ProtectedRoute>} />
+            <Route path="/DashboardEleve" element={<ProtectedRoute requiredRole="Eleve"> <DashboardEleve /></ProtectedRoute>}>
+              <Route path="BulletinSequence" element={<ProtectedRoute requiredRole="Eleve"> <BulletinSequence /> </ProtectedRoute>} />
+              <Route path="ChatInterface" element={<ProtectedRoute requiredRole="Eleve"> <ChatInterface /> </ProtectedRoute>} />
+
+            </Route>
 
 
-            <Route path="/BulletinSequence/:idEleve/:idSequence" element={<ProtectedRoute requiredRole="Eleve"> <BulletinSequence /> </ProtectedRoute>} />
 
 
           </Routes>

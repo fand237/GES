@@ -1,9 +1,11 @@
 const express = require('express')
 const router = express.Router();
-const { Eleve, Classe, Parent } = require("../models")
+const { Eleve, Classe, Parent,Conversation } = require("../models")
 const bcrypt = require('bcrypt');
 const {validateToken} = require("../middlewares/AuthMiddleware")
 const { sign } = require('jsonwebtoken')
+const { Op } = require('sequelize');
+
 
 
 
@@ -220,6 +222,43 @@ router.post("/login", async (req, res) => {
     console.error(error);
     return res.status(500).json({ error: 'Erreur serveur' });
   }
+});
+
+// Nouvelle route pour obtenir les camarades de classe
+router.get('/classmates/:eleveId', validateToken, async (req, res) => {
+    try {
+        // 1. Récupérer l'élève pour obtenir sa classe
+        const eleve = await Eleve.findByPk(req.params.eleveId);
+        if (!eleve) {
+            return res.status(404).json({ error: "Élève non trouvé" });
+        }
+
+        // 2. Récupérer tous les élèves de la même classe (sauf l'élève actuel)
+        const classmates = await Eleve.findAll({
+            where: {
+                classe: eleve.classe,
+                id: { [Op.ne]: eleve.id } // Exclure l'élève actuel
+            },
+            attributes: ['id', 'nom', 'prenom', 'nomUtilisateur'],
+            include: [{
+                model: Conversation,
+                as: 'conversations',
+                attributes: ['id'],
+                through: { attributes: [] }
+            }],
+            order: [['nom', 'ASC']]
+        });
+
+        // 3. Filtrer pour n'avoir que les élèves sans conversation existante
+        const availableClassmates = classmates.filter(classmate =>
+            classmate.conversations.length === 0
+        );
+
+        res.json(availableClassmates);
+    } catch (error) {
+        console.error("Erreur:", error);
+        res.status(500).json({ error: "Erreur serveur" });
+    }
 });
 
 

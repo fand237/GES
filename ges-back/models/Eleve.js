@@ -75,6 +75,12 @@
     });
 
     Eleve.associate = (models) => {
+
+      Eleve.belongsToMany(models.Conversation, {
+        through: 'ConversationEleves',
+        as: 'conversations',
+        foreignKey: 'eleveId'
+      });
      
       // Association avec le modèle Classe (Many-to-One)
       Eleve.belongsTo(models.Classe, {
