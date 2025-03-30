@@ -47,8 +47,16 @@ module.exports = (server) => {
         // Gestion des messages
         socket.on('sendMessage', async (messageData) => {
             // Juste retransmettre, la création est gérée par la route API
+// Vérification basique
+            if (!messageData.conversationId || !messageData.envoyeurId) {
+                return socket.emit('error', 'Données manquantes');
+            }
+
+            // Diffusion à la conversation
             io.to(`conv_${messageData.conversationId}`).emit('newMessage', messageData);
-        });
+
+            // Notification individuelle (optionnelle)
+            io.to(`user_${messageData.envoyeurId}`).emit('messageSent', messageData);        });
 
         // Gestion déconnexion
         socket.on('disconnect', () => {

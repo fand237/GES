@@ -51,37 +51,37 @@ const ChatInterface = ({ classeId }) => {
 
         fetchData();
 
-        // Configuration Socket.io
-        socketRef.current = io('http://localhost:3001', { query: { eleveId: idEleve } });
-        socketRef.current.on('newMessage', handleNewMessage);
-
-        return () => {
-            socketRef.current.off('newMessage', handleNewMessage);
-            socketRef.current.disconnect();
-        };
-    }, [idEleve, classeId]);
-
-    useEffect(() => {
+        // 1. Création de la connexion Socket.io
         const socket = io('http://localhost:3001', {
             auth: {
-                token: localStorage.getItem("accessToken")
+                token: localStorage.getItem("accessToken") // Authentification
             },
-            query: { eleveId: idEleve }
+            query: { eleveId: idEleve } // Paramètres supplémentaires
         });
 
+        // 2. Stocker la référence du socket
+        socketRef.current = socket;
+
+        // 3. Écoute des événements
         socket.on('newMessage', (message) => {
             if (selectedConversation?.id === message.conversationId) {
                 setMessages(prev => [...prev, message]);
             }
-            // Ajoutez une notification si la conversation n'est pas active
-            else {
-                // Implémentez un système de notifications
-                console.log("Nouveau message dans une autre conversation", message);
-            }
         });
 
-        return () => socket.disconnect();
-    }, [idEleve, selectedConversation]);
+        // 4. Rejoindre la room de la conversation actuelle SI une conversation est sélectionnée
+        if (selectedConversation) {
+            socket.emit('joinConversation', selectedConversation.id);
+        }
+
+        // 5. Nettoyage
+        return () => {
+            socket.disconnect();
+        };
+
+
+    }, [idEleve, classeId, selectedConversation]);
+
 
     const handleNewMessage = (message) => {
         if (selectedConversation?.id === message.conversationId) {
@@ -91,12 +91,18 @@ const ChatInterface = ({ classeId }) => {
 
     const loadMessages = async (conversation) => {
         try {
+            setSelectedConversation(conversation);
+
             const response = await axios.get(
                 `http://localhost:3001/Conversation/${conversation.id}/messages`,
                 { headers: { accessToken: localStorage.getItem("accessToken") } }
             );
-            setSelectedConversation(conversation);
             setMessages(response.data);
+
+            if (socketRef.current) {
+                socketRef.current.emit('joinConversation', conversation.id);
+            }
+
         } catch (error) {
             console.error("Erreur de chargement des messages:", error);
         }
@@ -137,7 +143,6 @@ const ChatInterface = ({ classeId }) => {
                 { headers: { accessToken: localStorage.getItem("accessToken") } }
             );
 
-            setMessages(prev => [...prev, response.data]);
             setNewMessage('');
 
         } catch (error) {
