@@ -17,20 +17,63 @@ module.exports = (server) => {
     });
 
     const activeUsers = new Map();
+    const userNotifications = new Map();
+
+    // Fonction pour envoyer des notifications
+    const sendNotification = (userId, userType, notification) => {
+        const socketId = activeUsers.get(`${userType}_${userId}`);
+        if (socketId) {
+            io.to(socketId).emit('newNotification', {
+                id: Date.now(),
+                ...notification,
+                date: new Date(),
+                read: false
+            });
+        } else {
+            if (!userNotifications.has(userId)) {
+                userNotifications.set(userId, []);
+            }
+            userNotifications.get(userId).push({
+                id: Date.now(),
+                ...notification,
+                date: new Date(),
+                read: false
+            });
+        }
+    };
 
     io.on('connection', (socket) => {
         console.log('Nouvelle connexion:', socket.id);
 
-        // Authentification
+
+
+        // Authentification via token
         socket.on('authenticate', (token) => {
             try {
                 const decoded = jwt.verify(token, process.env.JWT_SECRET);
-                activeUsers.set(decoded.id, socket.id);
-                console.log(`Utilisateur ${decoded.id} authentifié`);
-                socket.join(`user_${decoded.id}`);
+                const userId = decoded.id;
+
+                // Vérification du type d'utilisateur
+                if (decoded.typeUtilisateur === 'Eleve') {
+                    activeUsers.set(`eleve_${userId}`, socket.id);
+                    socket.join(`user_eleve_${userId}`);
+                } else if (decoded.typeUtilisateur === 'Enseignant') {
+                    activeUsers.set(`enseignant_${userId}`, socket.id);
+                    socket.join(`user_enseignant_${userId}`);
+                }
+
+                console.log(`Utilisateur ${userId} (${decoded.typeUtilisateur}) authentifié`);
+
+                // Envoyer les notifications en attente
+                if (userNotifications.has(userId)) {
+                    const pendingNotifications = userNotifications.get(userId);
+                    pendingNotifications.forEach(notification => {
+                        socket.emit('newNotification', notification);
+                    });
+                    userNotifications.delete(userId);
+                }
             } catch (error) {
                 console.error('Authentification échouée:', error);
-                socket.disconnect();
             }
         });
 
@@ -55,8 +98,33 @@ module.exports = (server) => {
             // Diffusion à la conversation
             io.to(`conv_${messageData.conversationId}`).emit('newMessage', messageData);
 
-            // Notification individuelle (optionnelle)
-            io.to(`user_${messageData.envoyeurId}`).emit('messageSent', messageData);        });
+            // Envoyer une notification aux autres participants
+            Conversation.findByPk(messageData.conversationId, {
+                include: [{
+                    model: Eleve,
+                    as: 'participants',
+                    attributes: ['id'],
+                    through: { attributes: [] }
+                }]
+            }).then(conversation => {
+                conversation.participants.forEach(participant => {
+                    if (participant.id !== messageData.envoyeurId) {
+                        sendNotification(participant.id, {
+                            title: 'Nouveau message',
+                            message: `Vous avez reçu un nouveau message dans une conversation`,
+                            type: 'message',
+                            conversationId: messageData.conversationId
+                        });
+                    }
+                });
+            });
+        });
+
+        // Marquer une notification comme lue
+        socket.on('markNotificationAsRead', (notificationId) => {
+            // Implémentez la logique de marquage comme lu dans votre base de données si nécessaire
+            socket.emit('notificationRead', notificationId);
+        });
 
         // Gestion déconnexion
         socket.on('disconnect', () => {
@@ -70,5 +138,5 @@ module.exports = (server) => {
         });
     });
 
-    return io;
+    return {io, sendNotification};
 };

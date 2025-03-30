@@ -4,7 +4,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { jwtDecode } from 'jwt-decode'; // Assurez-vous d'importer jwt-decode correctement
 import svgUser from "../assets/images/user.svg";
 import svgDisconnect from "../assets/images/disconnect svg.svg";
-
+import NotificationSystem from './NotificationSystem';
 
 
 const Navbar = ({ authState, logout }) => {
@@ -67,6 +67,7 @@ const Navbar = ({ authState, logout }) => {
       Accueil
     </button>
     <div className="flex items-center space-x-4">
+      <NotificationSystem />
       <button onClick={logout} className="hover:text-gray-300">
         <img
           src={svgDisconnect}

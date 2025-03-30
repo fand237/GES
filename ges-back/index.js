@@ -12,7 +12,7 @@ const port = 3001;
 const server = http.createServer(app);
 
 // Configuration Socket.io via le middleware
-const io = setupSocket(server);
+const { io, sendNotification } = setupSocket(server);
 
 // Initialisation de la base de données
 const db = require("./models");
@@ -50,7 +50,7 @@ const routes = [
   { path: "/Cycle", router: require("./routes/CycleRoute") },
   { path: "/PlanningExamen", router: require("./routes/PlanningExamenRoute") },
   { path: "/Niveau", router: require("./routes/NiveauRoute") },
-  { path: "/Conversation", router: require("./routes/ConversationRoute")(io) } // On passe io à la route Conversation
+  { path: "/Conversation", router: require("./routes/ConversationRoute")(io, sendNotification ) } // On passe io à la route Conversation
 ];
 
 // Chargement des routes

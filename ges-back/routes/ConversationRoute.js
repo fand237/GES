@@ -1,7 +1,8 @@
 const { Sequelize } = require('sequelize');
 const {Conversation, Eleve} = require("../models");
+const {sendNotification} = require("../middlewares/socketMiddleware");
 
-module.exports = (io) => {
+module.exports = (io, sendNotification) => {
     const router = require('express').Router();
     const { Conversation, Message, Eleve,ConversationEleve } = require("../models");
     const { validateToken } = require("../middlewares/AuthMiddleware");
@@ -249,11 +250,33 @@ module.exports = (io) => {
                 }]
             });
 
-            conversations.participants.forEach(participant => {
+
+            // Envoyer des notifications à tous les participants (sauf l'envoyeur)
+            conversation.participants.forEach(participant => {
                 if (participant.id !== envoyeurId) {
-                    io.to(`user_${participant.id}`).emit('messageNotification', {
+                    // Déterminer le type d'utilisateur (élève ou enseignant)
+                    const userType = participant.typeUtilisateur === 'Eleve' ? 'eleve' : 'enseignant';
+
+                    sendNotification(
+                        participant.id,
+                        userType, // Type d'utilisateur
+                        {
+                            id: Date.now(),
+                            title: 'Nouveau message',
+                            message: `Nouveau message de ${envoyeur.prenom} ${envoyeur.nom}`,
+                            type: 'message',
+                            conversationId: conversationId,
+                            senderId: envoyeurId,
+                            date: new Date().toISOString(),
+                            read: false
+                        }
+                    );
+
+                    // Notification alternative via socket.io
+                    io.to(`user_${userType}_${participant.id}`).emit('messageNotification', {
                         conversationId,
-                        message: messageWithSender
+                        message: messageWithSender,
+                        isNew: true
                     });
                 }
             });
