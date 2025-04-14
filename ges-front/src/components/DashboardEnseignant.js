@@ -69,6 +69,19 @@ const DashboardEnseignant = () => {
                                 Mon Emplois de temps
                             </button>
                         </li>
+
+                        <li>
+                            <button
+                                className={`w-full text-left px-4 py-2 rounded-lg transition ${
+                                    activeTab === 'ChatEnseignantAll'
+                                        ? 'bg-purple-600 font-semibold'
+                                        : 'hover:bg-purple-700'
+                                }`}
+                                onClick={() => handleTabChange('ChatEnseignantAll', `/DashboardEnseignant/ChatEnseignantAll`)}
+                            >
+                                Chat et Annonce
+                            </button>
+                        </li>
                     </ul>
                 </div>
                 <footer className="absolute bottom-4 w-full text-center text-sm">

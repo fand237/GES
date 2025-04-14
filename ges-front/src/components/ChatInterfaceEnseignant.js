@@ -3,43 +3,48 @@ import axios from 'axios';
 import { io } from 'socket.io-client';
 import UseAuthEleve from './UseAuthEleve';
 
-
-const ChatInterface = ({ classeId }) => {
+const ChatInterfaceEnseignant = ({ classeId }) => {
     const { idEleve } = UseAuthEleve();
     const [conversations, setConversations] = useState([]);
     const [selectedConversation, setSelectedConversation] = useState(null);
     const [messages, setMessages] = useState([]);
     const [newMessage, setNewMessage] = useState('');
-    const [classmates, setClassmates] = useState([]); // Renommé pour plus de clarté
+    const [enseignants, setEnseignants] = useState([]);
     const [loading, setLoading] = useState(true);
     const socketRef = useRef();
 
     useEffect(() => {
         const fetchData = async () => {
             try {
-                // Charger les conversations ET les camarades de classe en parallèle
-                const [conversationsRes, classmatesRes] = await Promise.all([
-                    axios.get(`http://localhost:3001/Conversation/${idEleve}`, {
+                // Charger les conversations ET les enseignants en parallèle
+                const [conversationsRes, enseignantsRes] = await Promise.all([
+                    axios.get(`http://localhost:3001/Conversation/Enseignant/${idEleve}`, {
                         headers: { accessToken: localStorage.getItem("accessToken") }
                     }),
-                    axios.get(`http://localhost:3001/Eleve/classmates/${idEleve}`, {
+                    axios.get(`http://localhost:3001/Enseignants/enseignantsParEleve/${idEleve}`, {
                         headers: { accessToken: localStorage.getItem("accessToken") }
+                    }).catch(err => {
+                        console.error("Détails de l'erreur enseignantsParEleve:", {
+                            status: err.response?.status,
+                            data: err.response?.data,
+                            headers: err.response?.headers
+                        });
+                        throw err;
                     })
                 ]);
 
                 setConversations(conversationsRes.data);
-                console.log("les conversations sont ", conversationsRes.data)
 
-                // Filtrer l'élève actuel et ceux avec qui il a déjà une conversation
+                // Filtrer les enseignants avec qui l'élève a déjà une conversation
                 const existingParticipants = new Set(
                     conversationsRes.data.flatMap(conv =>
-                        conv.participants.map(p => p.id)
+                        conv.participantsEnseignants.map(p => p.id)
                     )
                 );
 
-                setClassmates(
-                    classmatesRes.data.filter(e =>
-                        e.id !== idEleve && !existingParticipants.has(e.id)
+                setEnseignants(
+                    enseignantsRes.data.filter(e =>
+                        !existingParticipants.has(e.id)
                     )
                 );
 
@@ -52,9 +57,9 @@ const ChatInterface = ({ classeId }) => {
 
         fetchData();
 
-        // 1. Création de la connexion Socket.io
+        // Configuration Socket.io
         const socket = io('http://localhost:3001', {
-            transports: ['websocket'], // Force WebSocket
+            transports: ['websocket'],
             auth: {
                 token: localStorage.getItem("accessToken")
             },
@@ -64,21 +69,17 @@ const ChatInterface = ({ classeId }) => {
             }
         });
 
-        // Après la connexion, envoyer le token
         socket.on('connect', () => {
             const token = localStorage.getItem("accessToken");
             if (token) {
-                socket.emit('authenticate', token); // Envoyer juste le token directement
+                socket.emit('authenticate', token);
             } else {
                 console.error('Aucun token trouvé dans le localStorage');
-                // Gérer le cas où l'utilisateur n'est pas connecté
             }
         });
 
-        // 2. Stocker la référence du socket
         socketRef.current = socket;
 
-        // 3. Écoute des événements
         socket.on('newMessage', (message) => {
             if (selectedConversation?.id === message.conversationId) {
                 setMessages(prev => [...prev, message]);
@@ -93,32 +94,22 @@ const ChatInterface = ({ classeId }) => {
             console.log('Disconnected:', reason);
         });
 
-        // 4. Rejoindre la room de la conversation actuelle SI une conversation est sélectionnée
         if (selectedConversation) {
             socket.emit('joinConversation', selectedConversation.id);
         }
 
-        // 5. Nettoyage
         return () => {
             socket.disconnect();
         };
 
-
     }, [idEleve, classeId, selectedConversation]);
-
-
-    const handleNewMessage = (message) => {
-        if (selectedConversation?.id === message.conversationId) {
-            setMessages(prev => [...prev, message]);
-        }
-    };
 
     const loadMessages = async (conversation) => {
         try {
             setSelectedConversation(conversation);
 
             const response = await axios.get(
-                `http://localhost:3001/Conversation/${conversation.id}/messages`,
+                `http://localhost:3001/Conversation/Enseignant/${conversation.id}/messages`,
                 { headers: { accessToken: localStorage.getItem("accessToken") } }
             );
             setMessages(response.data);
@@ -132,50 +123,47 @@ const ChatInterface = ({ classeId }) => {
         }
     };
 
-    const startNewConversation = async (classmateId) => {
+    const startNewConversation = async (enseignantId) => {
         try {
-            console.log("Tentative de création avec:", idEleve, classmateId);
-
             const response = await axios.post(
-                'http://localhost:3001/Conversation', // Notez le /api/ ajouté
+                'http://localhost:3001/Conversation/Enseignant',
                 {
-                    eleveId: idEleve,
-                    participantId: classmateId
+                    enseignantId,
+                    eleveId: idEleve
                 },
                 {
                     headers: {
                         accessToken: localStorage.getItem("accessToken"),
                     },
                 }
-
             );
-            console.log("resuktat du post de nouveau conversation",response.data);
+
             setConversations(prev => [...prev, response.data]);
-            setClassmates(prev => prev.filter(e => e.id !== classmateId));
+            setEnseignants(prev => prev.filter(e => e.id !== enseignantId));
             loadMessages(response.data);
         } catch (error) {
             console.error("Détails de l'erreur:", error.response?.data || error.message);
         }
     };
+
     const sendMessage = async () => {
         if (!newMessage.trim() || !selectedConversation) return;
 
         try {
-            const response = await axios.post(
-                `http://localhost:3001/Conversation/${selectedConversation.id}/messages`,
+            await axios.post(
+                `http://localhost:3001/Conversation/Enseignant/${selectedConversation.id}/messages`,
                 { contenu: newMessage, envoyeurId: idEleve },
                 { headers: { accessToken: localStorage.getItem("accessToken") } }
             );
 
             setNewMessage('');
-
         } catch (error) {
             console.error("Erreur d'envoi de message:", error);
         }
     };
 
     const getInterlocutor = (conversation) => {
-        return conversation.participants.find(p => p.id !== idEleve);
+        return conversation.participantsEnseignants[0];
     };
 
     if (loading) return <div className="flex justify-center p-8">Chargement...</div>;
@@ -185,7 +173,7 @@ const ChatInterface = ({ classeId }) => {
             {/* Sidebar */}
             <div className="w-1/3 bg-white border-r">
                 <div className="p-4 border-b">
-                    <h2 className="text-xl font-bold">Messagerie</h2>
+                    <h2 className="text-xl font-bold">Messagerie Enseignants</h2>
                     <button
                         onClick={() => document.getElementById('new-chat-modal').showModal()}
                         className="mt-2 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
@@ -200,7 +188,7 @@ const ChatInterface = ({ classeId }) => {
                         <div
                             key={conv.id}
                             className={`p-4 border-b cursor-pointer hover:bg-gray-50 ${
-                                selectedConversation?.id == conv.id ? 'bg-blue-50' : ''
+                                selectedConversation?.id === conv.id ? 'bg-blue-50' : ''
                             }`}
                             onClick={() => loadMessages(conv)}
                         >
@@ -248,11 +236,11 @@ const ChatInterface = ({ classeId }) => {
                                 <div
                                     key={msg.id}
                                     className={`mb-4 flex ${
-                                        msg.envoyeur.id === idEleve ? 'justify-end' : 'justify-start'
+                                        msg.envoyeurType === 'eleve' ? 'justify-end' : 'justify-start'
                                     }`}
                                 >
                                     <div className={`max-w-xs px-4 py-2 rounded-lg ${
-                                        msg.envoyeur.id === idEleve
+                                        msg.envoyeurType === 'eleve'
                                             ? 'bg-blue-500 text-white'
                                             : 'bg-white border border-gray-200'
                                     }`}>
@@ -303,7 +291,7 @@ const ChatInterface = ({ classeId }) => {
             <dialog id="new-chat-modal" className="modal">
                 <div className="modal-box max-w-md">
                     <div className="flex justify-between items-center mb-4">
-                        <h3 className="text-lg font-bold">Nouvelle conversation</h3>
+                        <h3 className="text-lg font-bold">Nouvelle conversation avec un enseignant</h3>
                         <button
                             onClick={() => document.getElementById('new-chat-modal').close()}
                             className="text-gray-500 hover:text-gray-700"
@@ -313,30 +301,30 @@ const ChatInterface = ({ classeId }) => {
                     </div>
 
                     <div className="space-y-2 max-h-96 overflow-y-auto">
-                        {classmates.length > 0 ? (
-                            classmates.map(classmate => (
+                        {enseignants.length > 0 ? (
+                            enseignants.map(enseignant => (
                                 <div
-                                    key={classmate.id}
+                                    key={enseignant.id}
                                     className="p-3 hover:bg-gray-50 rounded-lg cursor-pointer flex items-center"
                                     onClick={() => {
-                                        startNewConversation(classmate.id);
+                                        startNewConversation(enseignant.id);
                                         document.getElementById('new-chat-modal').close();
                                     }}
                                 >
                                     <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center mr-3">
                                         <span className="text-blue-600 font-medium">
-                                            {classmate.prenom.charAt(0)}{classmate.nom.charAt(0)}
+                                            {enseignant.prenom.charAt(0)}{enseignant.nom.charAt(0)}
                                         </span>
                                     </div>
                                     <div>
-                                        <p className="font-medium">{classmate.prenom} {classmate.nom}</p>
-                                        <p className="text-sm text-gray-500">{classmate.nomUtilisateur}</p>
+                                        <p className="font-medium">Prof. {enseignant.nom}</p>
+                                        <p className="text-sm text-gray-500">{enseignant.matiere}</p>
                                     </div>
                                 </div>
                             ))
                         ) : (
                             <p className="text-gray-500 text-center py-4">
-                                Aucun nouveau camarade de classe disponible
+                                Aucun enseignant disponible pour une nouvelle conversation
                             </p>
                         )}
                     </div>
@@ -346,4 +334,4 @@ const ChatInterface = ({ classeId }) => {
     );
 };
 
-export default ChatInterface;
+export default ChatInterfaceEnseignant;

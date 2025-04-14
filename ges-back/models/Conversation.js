@@ -13,6 +13,28 @@ module.exports = (sequelize, DataTypes) => {
         classeId: {
             type: DataTypes.INTEGER,
             allowNull: false,
+        },
+        type: {
+            type: DataTypes.ENUM('eleve_eleve', 'eleve-enseignant', 'annonce', 'groupe'),
+            defaultValue: 'eleve_eleve',
+            allowNull: false
+        },
+        createurId: {
+            type: DataTypes.INTEGER,
+            allowNull: true
+        },
+        createurType: {
+            type: DataTypes.ENUM('eleve', 'enseignant', 'system'),
+            allowNull: true
+        },
+        isActive: {
+            type: DataTypes.BOOLEAN,
+            defaultValue: true,
+            allowNull: false
+        },
+        estAnnonce: {
+            type: DataTypes.BOOLEAN,
+            defaultValue: false
         }
     });
 
@@ -31,6 +53,19 @@ module.exports = (sequelize, DataTypes) => {
         Conversation.hasMany(models.Message, {
             foreignKey: 'conversationId',
             as: 'messages'
+        });
+
+        // Participants enseignants
+        Conversation.belongsToMany(models.Enseignant, {
+            through: 'ConversationEnseignants',
+            as: 'participantsEnseignants',
+            foreignKey: 'conversationId'
+        });
+
+        Conversation.belongsTo(models.Eleve, {
+            foreignKey: 'createurId',
+            constraints: false,
+            as: 'createurEleve'
         });
     };
 

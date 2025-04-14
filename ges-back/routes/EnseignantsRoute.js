@@ -1,6 +1,6 @@
 const express = require('express')
 const router = express.Router();
-const { Enseignant,Classe } = require("../models")
+const { Enseignant,Classe,Eleve,Cours } = require("../models")
 const bcrypt = require('bcrypt'); // bcrypt is a more secure alternative to crypto-js for hashing passwords
 const { validateToken } = require("../middlewares/AuthMiddleware")
 const { sign } = require('jsonwebtoken')
@@ -32,6 +32,38 @@ router.get("/", validateToken, async (req, res) => {
 router.get('/bymatiere/:matiere',validateToken,getEnseignantsByMatiere);
 router.get('/byClasse/:classe', validateToken,getEnseignantsByClasse);
 router.get('/bymatiereEtclasse', validateToken,getEnseignantsByClasseMatiere);
+
+// Récupérer les enseignants à partir de l'ID d'un élève
+router.get('/enseignantsParEleve/:idEleve', validateToken, async (req, res) => {
+    const { idEleve } = req.params;
+    
+    try {
+        const eleve = await Eleve.findByPk(idEleve);
+
+        if (!eleve) return res.status(404).json({ message: "Élève introuvable" });
+
+        const cours = await Cours.findAll({
+            where: { classe: eleve.classe },
+            include: [
+                {
+                    model: Enseignant,
+                    as: 'enseignant'
+                }
+            ]
+        });
+
+        const enseignantsUniques = Array.from(
+            new Map(
+                cours.map(c => [c.Enseignant, c.enseignant])
+            ).values()
+        );
+
+        res.json(enseignantsUniques);
+    } catch (error) {
+        console.error("Erreur complète:", error);
+        res.status(500).json({ message: "Erreur serveur" });
+    }
+});
 
 
 router.get("/auth", validateToken,(req, res) => {

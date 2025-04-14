@@ -1,7 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { io } from 'socket.io-client';
 import UseAuthEleve from './UseAuthEleve';
-
 
 const BellIcon = () => (
     <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -13,108 +12,95 @@ const NotificationSystem = () => {
     const { idEleve } = UseAuthEleve();
     const [notifications, setNotifications] = useState([]);
     const [isOpen, setIsOpen] = useState(false);
-    const [unreadCount, setUnreadCount] = useState(0);
-    const socketRef = React.useRef();
+    const socketRef = useRef();
 
     useEffect(() => {
         if (!idEleve) return;
 
-        const token = localStorage.getItem('accessToken');
-        if (!token) return;
-
-        // Configuration de la connexion avec gestion des erreurs
-        const socketOptions = {
-            path: '/socket.io',
+        const socket = io('http://localhost:3001', {
             transports: ['websocket'],
-            auth: { token },
-            query: { userId: idEleve },
-            reconnectionAttempts: 5,
-            reconnectionDelay: 1000,
-            timeout: 20000
-        };
-
-        socketRef.current = io('http://localhost:3001', socketOptions);
-
-        // Gestion des événements
-        socketRef.current.on('connect', () => {
-            console.log('Connecté au serveur Socket.IO');
-            socketRef.current.emit('authenticate', token);
-        });
-
-        socketRef.current.on('newNotification', (notification) => {
-            setNotifications(prev => [notification, ...prev]);
-            setUnreadCount(prev => prev + 1);
-        });
-
-        socketRef.current.on('disconnect', (reason) => {
-            console.log('Déconnecté:', reason);
-            if (reason === 'io server disconnect') {
-                socketRef.current.connect();
+            auth: {
+                token: localStorage.getItem('accessToken')
             }
         });
 
-        socketRef.current.on('connect_error', (err) => {
-            console.error('Erreur de connexion:', err.message);
-            setTimeout(() => socketRef.current.connect(), 1000);
+        socketRef.current = socket;
+
+        socket.on('connect', () => {
+            console.log('Connecté aux notifications');
+        });
+
+        socket.on('newNotification', (notification) => {
+            setNotifications(prev => [{
+                ...notification,
+                id: Date.now(), // Génère un ID unique basé sur le timestamp
+                date: new Date()
+            }, ...prev]);
         });
 
         return () => {
-            if (socketRef.current) {
-                socketRef.current.off('newNotification');
-                socketRef.current.disconnect();
-            }
+            socket.disconnect();
         };
     }, [idEleve]);
 
-    const markAsRead = (id) => {
+    const clearAllNotifications = () => {
+        setNotifications([]);
+    };
+
+    const handleNotificationClick = (id) => {
         setNotifications(prev =>
             prev.map(notif =>
                 notif.id === id ? { ...notif, read: true } : notif
             )
         );
-        setUnreadCount(prev => Math.max(0, prev - 1));
-        socketRef.current?.emit('markNotificationAsRead', id);
     };
 
     return (
         <div className="relative">
             <button
                 onClick={() => setIsOpen(!isOpen)}
-                className="p-1 rounded-full text-gray-400 hover:text-white focus:outline-none"
+                className="p-2 relative focus:outline-none"
             >
                 <BellIcon />
-                {unreadCount > 0 && (
-                    <span className="absolute top-0 right-0 inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-white transform translate-x-1/2 -translate-y-1/2 bg-red-500 rounded-full">
-            {unreadCount}
-          </span>
+                {notifications.length > 0 && (
+                    <span className="absolute top-0 right-0 inline-flex items-center justify-center w-5 h-5 text-xs font-bold text-white bg-red-500 rounded-full">
+                        {notifications.filter(n => !n.read).length}
+                    </span>
                 )}
             </button>
 
             {isOpen && (
-                <div className="absolute right-0 mt-2 w-72 bg-white rounded-md shadow-lg overflow-hidden z-50">
-                    <div className="py-1 max-h-96 overflow-y-auto">
-                        <div className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100">
-                            Notifications
-                        </div>
+                <div className="absolute right-0 mt-2 w-72 bg-white rounded-md shadow-lg z-50">
+                    <div className="flex justify-between items-center px-4 py-2 border-b">
+                        <span className="font-medium">Notifications</span>
+                        <button
+                            onClick={clearAllNotifications}
+                            className="text-sm text-blue-500 hover:text-blue-700"
+                        >
+                            Tout effacer
+                        </button>
+                    </div>
+
+                    <div className="max-h-96 overflow-y-auto">
                         {notifications.length === 0 ? (
-                            <div className="px-4 py-2 text-sm text-gray-500">
+                            <div className="px-4 py-4 text-center text-gray-500">
                                 Aucune notification
                             </div>
                         ) : (
                             notifications.map(notification => (
                                 <div
                                     key={notification.id}
-                                    className={`px-4 py-2 text-sm cursor-pointer ${!notification.read ? 'bg-blue-50' : 'bg-white'} hover:bg-gray-50`}
-                                    onClick={() => markAsRead(notification.id)}
+                                    className={`px-4 py-3 border-b cursor-pointer ${!notification.read ? 'bg-blue-50' : 'bg-white'} hover:bg-gray-50`}
+                                    onClick={() => handleNotificationClick(notification.id)}
                                 >
                                     <div className="font-medium text-gray-900">
                                         {notification.title}
                                     </div>
-                                    <div className="text-gray-500">
+                                    <div className="text-sm text-gray-600 mt-1">
                                         {notification.message}
                                     </div>
                                     <div className="text-xs text-gray-400 mt-1">
-                                        {new Date(notification.date).toLocaleString()}
+                                        {notification.date.toLocaleTimeString()}
                                     </div>
                                 </div>
                             ))

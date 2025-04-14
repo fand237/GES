@@ -21,20 +21,41 @@ module.exports = (sequelize, DataTypes) => {
         lu: {
             type: DataTypes.BOOLEAN,
             defaultValue: false,
+        },
+        envoyeurType: {
+            type: DataTypes.ENUM('eleve', 'enseignant'),
+            allowNull: false
+        },
+        estAnnonce: {
+            type: DataTypes.BOOLEAN,
+            defaultValue: false,
+        },
+        pinned: {
+            type: DataTypes.BOOLEAN,
+            defaultValue: false,
         }
     });
 
     Message.associate = (models) => {
         Message.belongsTo(models.Eleve, {
             foreignKey: 'envoyeurId',
-            as: 'envoyeur'
+            as: 'envoyeur',
+            constraints: false
         });
 
         Message.belongsTo(models.Conversation, {
             foreignKey: 'conversationId',
             as: 'conversation'
         });
+
+        Message.belongsTo(models.Enseignant, {
+            foreignKey: 'envoyeurId',
+            constraints: false,
+            as: 'envoyeurEnseignant'
+        });
     };
+
+
 
     return Message;
 };

@@ -157,4 +157,30 @@ router.get('/byNiveau/:niveauId', async (req, res) => {
     }
 });
 
+// Récupérer les classes dont l'enseignant est responsable
+router.get('/responsable/:enseignantId', validateToken, async (req, res) => {
+    try {
+        const { enseignantId } = req.params;
+
+        // Vérifier que l'enseignant existe
+        const enseignant = await Enseignant.findByPk(enseignantId);
+        if (!enseignant) {
+            return res.status(404).json({ error: "Enseignant non trouvé" });
+        }
+
+        // Récupérer les classes dont l'enseignant est responsable
+        const classes = await Classe.findAll({
+            where: {
+                responsable: enseignantId
+            },
+            attributes: ['id', 'classe', 'cycle', 'niveauId'],
+            order: [['classe', 'ASC']]
+        });
+
+        res.json(classes);
+    } catch (error) {
+        console.error('Erreur:', error);
+        res.status(500).json({ error: 'Erreur serveur' });
+    }
+});
 module.exports = router;

@@ -53,6 +53,13 @@ module.exports = (sequelize, DataTypes) => {
       foreignKey: 'classe',
       as: 'Plannings',
     });
+
+    Classe.hasMany(models.Cours, {
+      foreignKey: 'classe',
+      as: 'coursDeLaClasse',
+      onUpdate: 'CASCADE',
+      onDelete: 'CASCADE'
+    });
   };
 
 

@@ -50,7 +50,9 @@ const routes = [
   { path: "/Cycle", router: require("./routes/CycleRoute") },
   { path: "/PlanningExamen", router: require("./routes/PlanningExamenRoute") },
   { path: "/Niveau", router: require("./routes/NiveauRoute") },
-  { path: "/Conversation", router: require("./routes/ConversationRoute")(io, sendNotification ) } // On passe io à la route Conversation
+  { path: "/Conversation", router: require("./routes/ConversationRoute")(io, sendNotification ) }, // On passe io à la route Conversation
+  { path: "/Annonce", router: require("./routes/AnnonceRoute")(io) }
+
 ];
 
 // Chargement des routes

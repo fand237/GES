@@ -38,7 +38,7 @@ const DashboardEleve = () => {
                                         ? 'bg-purple-600 font-semibold'
                                         : 'hover:bg-purple-700'
                                 }`}
-                                onClick={() => handleTabChange('ChatInterface', '/DashboardEleve/ChatInterface')}
+                                onClick={() => handleTabChange('ChatInterfaceAll', '/DashboardEleve/ChatInterfaceAll')}
                             >
                                 Chat
                             </button>

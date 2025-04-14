@@ -1,6 +1,6 @@
 const express = require('express')
 const router = express.Router();
-const { Eleve, Classe, Parent,Conversation } = require("../models")
+const { Eleve, Classe, Parent,Conversation, Cours } = require("../models")
 const bcrypt = require('bcrypt');
 const {validateToken} = require("../middlewares/AuthMiddleware")
 const { sign } = require('jsonwebtoken')
@@ -29,7 +29,11 @@ router.get("/auth", validateToken,(req, res) => {
 router.get("/:id", validateToken,async (req, res) => {
 
   const id = req.params.id;
-  const post = await Eleve.findByPk(id);
+  const post = await Eleve.findByPk(id,{
+      include: [
+          {model:Classe,as:'classeEleve'}
+      ]
+  });
   res.json(post);
 
 
@@ -79,7 +83,6 @@ router.get('/nopass/:id', async (req, res) => {
     res.status(500).json({ error: 'Erreur serveur' });
   }
 });
-
 
 
 // Route pour la mise à jour d'un Eleve
@@ -261,5 +264,55 @@ router.get('/classmates/:eleveId', validateToken, async (req, res) => {
     }
 });
 
+router.get('/elevesParEnseignant/:enseignantId', validateToken, async (req, res) => {
+    try {
+        const { enseignantId } = req.params;
 
+        // 1. D'abord trouver les classes où l'enseignant donne cours
+        const classesAvecCours = await Cours.findAll({
+            where: { Enseignant: enseignantId },
+            attributes: ['classe'],
+            group: ['classe']
+        });
+
+        if (!classesAvecCours.length) {
+            return res.json([]);
+        }
+
+        const classesIds = classesAvecCours.map(c => c.classe);
+
+        // 2. Ensuite trouver les élèves de ces classes
+        const eleves = await Eleve.findAll({
+            include: [{
+                model: Classe,
+                as: 'classeEleve',
+                attributes: ['id', 'classe'],
+                where: {
+                    id: classesIds
+                }
+            }],
+            attributes: ['id', 'nom', 'prenom', 'email'],
+            order: [
+                [{ model: Classe, as: 'classeEleve' }, 'classe', 'ASC'],
+                ['nom', 'ASC'],
+                ['prenom', 'ASC']
+            ]
+        });
+
+        // Formater la réponse pour inclure le nom de la classe directement
+        const result = eleves.map(eleve => ({
+            id: eleve.id,
+            nom: eleve.nom,
+            prenom: eleve.prenom,
+            email: eleve.email,
+            classeId: eleve.classeEleve?.id,
+            classeNom: eleve.classeEleve?.classe || 'Non assigné'
+        }));
+
+        res.json(result);
+    } catch (error) {
+        console.error('Erreur:', error);
+        res.status(500).json({ message: 'Erreur serveur' });
+    }
+});
 module.exports = router;

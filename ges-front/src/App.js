@@ -28,6 +28,7 @@ import CycleAll from './components/CycleAll'
 import EleveAll from './components/EleveAll'
 import EleveUpdate from './components/EleveUpdate'
 import EleveDelete from './components/EleveDelete'
+import AnnonceEleve from "./components/AnnonceEleve";
 
 import EnseignantUpdate from './components/EnseignantUpdate';
 import EnseignantDelete from './components/EnseignantDelete';
@@ -44,7 +45,9 @@ import JourForm from './components/JourForm';
 import SequenceForm from './components/SequenceForm';
 import TypeEvaluationForm from './components/TypeEvaluationForm';
 import AnneeAcademiqueForm from './components/AnneeAcademiqueForm';
-import ChatInterface  from "./components/ChatInterface";
+import ChatInterfaceEnseignant  from "./components/ChatInterfaceEnseignant";
+import ChatEnseignantAll from "./components/ChatEnseignantAll"
+import ChatInterfaceAll  from "./components/ChatInterfaceAll";
 
 
 import ParentForm from './components/ParentForm'
@@ -180,6 +183,7 @@ function App() {
               <Route path="NoteEval/:idEnseignant" element={<ProtectedRoute requiredRole="Enseignant"> <NoteEval /> </ProtectedRoute>} />
               <Route path="NoteUpdate/:idCours/:idClasse/:idSequence/:idType/:date" element={<ProtectedRoute requiredRole="Enseignant"> <NoteUpdate2 /> </ProtectedRoute>} />
               <Route path="NoteDelete/:idNote" element={<ProtectedRoute requiredRole="Enseignant"> <NoteDelete /> </ProtectedRoute>} />
+              <Route path="ChatEnseignantAll" element={<ProtectedRoute requiredRole="Enseignant"> <ChatEnseignantAll /> </ProtectedRoute>} />
 
               <Route path="EmploisTempsEnseignant" element={<ProtectedRoute requiredRole="Enseignant"> <TimeTableEnseignant /> </ProtectedRoute>} />
 
@@ -232,7 +236,7 @@ function App() {
             </Route>
             <Route path="/DashboardEleve" element={<ProtectedRoute requiredRole="Eleve"> <DashboardEleve /></ProtectedRoute>}>
               <Route path="BulletinSequence" element={<ProtectedRoute requiredRole="Eleve"> <BulletinSequence /> </ProtectedRoute>} />
-              <Route path="ChatInterface" element={<ProtectedRoute requiredRole="Eleve"> <ChatInterface /> </ProtectedRoute>} />
+              <Route path="ChatInterfaceAll" element={<ProtectedRoute requiredRole="Eleve"> <ChatInterfaceAll /> </ProtectedRoute>} />
 
             </Route>
 

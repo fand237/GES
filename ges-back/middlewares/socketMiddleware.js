@@ -1,7 +1,7 @@
 // middleware/socketMiddleware.js
 const { Server } = require('socket.io');
-const jwt = require('jsonwebtoken');
-const { Conversation, Eleve, Message } = require("../models");
+const { verify } = require("jsonwebtoken")
+const { Conversation, Eleve, Enseignant,Message } = require("../models");
 
 module.exports = (server) => {
     const io = new Server(server, {
@@ -45,12 +45,25 @@ module.exports = (server) => {
     io.on('connection', (socket) => {
         console.log('Nouvelle connexion:', socket.id);
 
+        // Rejoindre la room de la classe si l'utilisateur est un élève
+        socket.on('join_classe', (classeId) => {
+            socket.join(`classe_${classeId}`);
+        });
 
+        socket.on('join_classe', (classeRoom) => {
+            socket.join(classeRoom);
+            console.log(`Utilisateur a rejoint la room ${classeRoom}`);
+        });
 
         // Authentification via token
         socket.on('authenticate', (token) => {
+
             try {
-                const decoded = jwt.verify(token, process.env.JWT_SECRET);
+                if (!token) {
+                    throw new Error('Aucun token fourni');
+                }
+                const decoded = verify(token, "importantsecret");
+
                 const userId = decoded.id;
 
                 // Vérification du type d'utilisateur
@@ -89,9 +102,7 @@ module.exports = (server) => {
 
         // Gestion des messages
         socket.on('sendMessage', async (messageData) => {
-            // Juste retransmettre, la création est gérée par la route API
-// Vérification basique
-            if (!messageData.conversationId || !messageData.envoyeurId) {
+            if (!messageData.conversationId || !messageData.envoyeurId || !messageData.envoyeurType) {
                 return socket.emit('error', 'Données manquantes');
             }
 
@@ -99,26 +110,142 @@ module.exports = (server) => {
             io.to(`conv_${messageData.conversationId}`).emit('newMessage', messageData);
 
             // Envoyer une notification aux autres participants
-            Conversation.findByPk(messageData.conversationId, {
-                include: [{
-                    model: Eleve,
-                    as: 'participants',
-                    attributes: ['id'],
-                    through: { attributes: [] }
-                }]
-            }).then(conversation => {
-                conversation.participants.forEach(participant => {
+            try {
+                const conversation = await Conversation.findByPk(messageData.conversationId, {
+                    include: [{
+                        model: Eleve,
+                        as: 'participants',
+                        attributes: ['id', 'typeUtilisateur'],
+                        through: { attributes: [] }
+                    }]
+                });
+
+                const conversationEns = await Conversation.findByPk(messageData.conversationId, {
+                    include: [{
+                        model: Enseignant,
+                        as: 'participantsEnseignants',
+                        attributes: ['id', 'typeUtilisateur'],
+                        through: { attributes: [] }
+                    }]
+                });
+
+                if (!conversation) throw new Error('Conversation non trouvée');
+
+                // Bloquer les réponses dans les annonces si l'envoyeur est un élève
+                if (conversation.type === 'annonce' && messageData.envoyeurType === 'eleve') {
+                    throw new Error('Les élèves ne peuvent pas répondre aux annonces');
+                }
+
+                const envoyeur = await Eleve.findByPk(messageData.envoyeurId);
+                if (!envoyeur) return;
+
+                conversationEns.participantsEnseignants.forEach(participant => {
                     if (participant.id !== messageData.envoyeurId) {
-                        sendNotification(participant.id, {
-                            title: 'Nouveau message',
-                            message: `Vous avez reçu un nouveau message dans une conversation`,
-                            type: 'message',
-                            conversationId: messageData.conversationId
-                        });
+                        sendNotification(
+                            participant.id,
+                            participant.typeUtilisateur, // 'eleve' ou 'enseignant'
+                            {
+                                title: conversation.type === 'annonce' ? 'Nouvelle annonce' : 'Nouveau message',
+                                message: conversation.type === 'annonce'
+                                    ? `Nouvelle annonce de ${envoyeur.prenom}`
+                                    : `Message de ${envoyeur.prenom}`,
+                                type: conversation.type,
+                                conversationId: messageData.conversationId,
+                                senderId: messageData.envoyeurId
+                            }
+                        );
                     }
                 });
-            });
+
+                conversation.participants.forEach(participant => {
+                    if (participant.id !== messageData.envoyeurId) {
+                        sendNotification(
+                            participant.id,
+                            participant.typeUtilisateur, // 'eleve' ou 'enseignant'
+                            {
+                                title: conversation.type === 'annonce' ? 'Nouvelle annonce' : 'Nouveau message',
+                                message: conversation.type === 'annonce'
+                                    ? `Nouvelle annonce de ${envoyeur.prenom}`
+                                    : `Message de ${envoyeur.prenom}`,
+                                type: conversation.type,
+                                conversationId: messageData.conversationId,
+                                senderId: messageData.envoyeurId
+                            }
+                        );
+                    }
+                }
+
+
+
+                );
+            } catch (error) {
+                console.error('Erreur lors de l\'envoi des notifications:', error);
+            }
         });
+
+
+        // Gestion des annonces
+        socket.on('createAnnonce', async ({ enseignantId, classeId, titre, contenu }) => {
+            try {
+                // Vérifier que l'enseignant donne cours dans cette classe
+                const enseignant = await Enseignant.findByPk(enseignantId, {
+                    include: [{
+                        model: Cours,
+                        as: 'cours',
+                        where: { classe: classeId }
+                    }]
+                });
+
+                if (!enseignant) {
+                    throw new Error("Vous n'enseignez pas dans cette classe");
+                }
+
+                // Créer la conversation d'annonce
+                const conversation = await Conversation.create({
+                    titre: titre || `Annonces de ${enseignant.nom}`,
+                    classeId,
+                    type: 'annonce',
+                    createurId: enseignantId,
+                    createurType: 'enseignant'
+                });
+
+                // Créer le message d'annonce
+                const message = await Message.create({
+                    contenu,
+                    envoyeurId: enseignantId,
+                    envoyeurType: 'enseignant',
+                    conversationId: conversation.id,
+                    estAnnonce: true
+                });
+
+                // Ajouter tous les élèves de la classe
+                const eleves = await Eleve.findAll({ where: { classe: classeId } });
+                await conversation.addParticipants(eleves);
+
+                // Diffuser l'annonce
+                io.to(`conv_${conversation.id}`).emit('newMessage', message);
+
+                // Envoyer des notifications
+                eleves.forEach(eleve => {
+                    sendNotification(
+                        eleve.id,
+                        'eleve',
+                        {
+                            title: 'Nouvelle annonce',
+                            message: `Nouvelle annonce dans ${conversation.titre}`,
+                            type: 'annonce',
+                            conversationId: conversation.id
+                        }
+                    );
+                });
+
+                socket.emit('annonce_created', { conversation, message });
+            } catch (error) {
+                console.error('Erreur createAnnonce:', error);
+                socket.emit('annonce_error', { message: error.message });
+            }
+        });
+
 
         // Marquer une notification comme lue
         socket.on('markNotificationAsRead', (notificationId) => {
