@@ -40,13 +40,13 @@ const PlanningExamen = () => {
             setIsLoading(true);
             try {
                 const [niveauxRes, sequencesRes, anneesRes] = await Promise.all([
-                    axios.get('http://localhost:3001/Niveau', {
+                    axios.get(`${config.api.baseUrl}/Niveau`, {
                         headers: { accessToken: localStorage.getItem("accessToken") }
                     }),
-                    axios.get('http://localhost:3001/Sequence', {
+                    axios.get(`${config.api.baseUrl}/Sequence`, {
                         headers: { accessToken: localStorage.getItem("accessToken") }
                     }),
-                    axios.get('http://localhost:3001/Annee_Academique', {
+                    axios.get(`${config.api.baseUrl}/Annee_Academique`, {
                         headers: { accessToken: localStorage.getItem("accessToken") }
                     })
                 ]);
@@ -71,10 +71,10 @@ const PlanningExamen = () => {
             if (selectedNiveau) {
                 try {
                     const [matieresRes, classesRes] = await Promise.all([
-                        axios.get(`http://localhost:3001/Cours/byNiveau/${selectedNiveau}`, {
+                        axios.get(`${config.api.baseUrl}/Cours/byNiveau/${selectedNiveau}`, {
                             headers: { accessToken: localStorage.getItem("accessToken") }
                         }),
-                        axios.get(`http://localhost:3001/Classe/byNiveau/${selectedNiveau}`, {
+                        axios.get(`${config.api.baseUrl}/Classe/byNiveau/${selectedNiveau}`, {
                             headers: { accessToken: localStorage.getItem("accessToken") }
                         })
                     ]);
@@ -97,7 +97,7 @@ const PlanningExamen = () => {
                 setIsLoading(true);
                 try {
                     const response = await axios.get(
-                        'http://localhost:3001/PlanningExamen',
+                        `${config.api.baseUrl}/PlanningExamen`,
                         {
                             params: {
                                 sequenceId: selectedSequence,
@@ -226,7 +226,7 @@ const PlanningExamen = () => {
 
         try {
             await axios.post(
-                'http://localhost:3001/PlanningExamen',
+                `${config.api.baseUrl}/PlanningExamen`,
                 {
                     planning: planning.map(item => ({
                         ...item,

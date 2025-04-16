@@ -32,7 +32,7 @@ function StatistiquesMoyenne() {
         const fetchData = async () => {
             try {
                 // Récupérer les classes
-                const classesResponse = await axios.get('http://localhost:3001/Classe',{
+                const classesResponse = await axios.get(`${config.api.baseUrl}/Classe`,{
                     headers: {
                         accessToken: localStorage.getItem("accessToken"),
                     },
@@ -40,15 +40,15 @@ function StatistiquesMoyenne() {
                 setClasses(classesResponse.data);
 
                 // Récupérer les matières
-                const matieresResponse = await axios.get('http://localhost:3001/Cours');
+                const matieresResponse = await axios.get(`${config.api.baseUrl}/Cours`);
                 setMatieres(matieresResponse.data);
 
                 // Récupérer les séquences
-                const sequencesResponse = await axios.get('http://localhost:3001/Sequence');
+                const sequencesResponse = await axios.get(`${config.api.baseUrl}/Sequence`);
                 setSequences(sequencesResponse.data);
 
                 // Récupérer les années académiques
-                const anneesResponse = await axios.get('http://localhost:3001/Annee_Academique');
+                const anneesResponse = await axios.get(`${config.api.baseUrl}/Annee_Academique`);
                 setAnnees(anneesResponse.data);
             } catch (error) {
                 console.error('Erreur lors de la récupération des données :', error);
@@ -64,7 +64,7 @@ function StatistiquesMoyenne() {
             if (selectedClasse && selectedMatiere && selectedSequence && selectedAnnee) {
                 try {
                     const response = await axios.get(
-                        `http://localhost:3001/Moyenne/statistiques/${selectedClasse}/${selectedMatiere}/${selectedSequence}/${selectedAnnee}`
+                        `${config.api.baseUrl}/Moyenne/statistiques/${selectedClasse}/${selectedMatiere}/${selectedSequence}/${selectedAnnee}`
                     );
                     setStatistiques(response.data);
                 } catch (error) {

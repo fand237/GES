@@ -17,7 +17,7 @@ const TypeEvaluationForm = () => {
 
     const handleSubmit = async (values, { resetForm }) => {
         try {
-            await axios.post('http://localhost:3001/Type_Evaluation', values, {
+            await axios.post(`${config.api.baseUrl}/Type_Evaluation`, values, {
                 headers: {
                     accessToken: localStorage.getItem("accessToken"),
                 },

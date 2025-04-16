@@ -72,7 +72,7 @@ function EnseignantForm() {
   const onSubmit = async (data, { resetForm }) => {
     try {
 
-      const response = await axios.post("http://localhost:3001/Enseignants"
+      const response = await axios.post(`${config.api.baseUrl}/Enseignants`
       ,data,
       {
         headers:{

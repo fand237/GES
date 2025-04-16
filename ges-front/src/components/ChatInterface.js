@@ -20,10 +20,10 @@ const ChatInterface = ({ classeId }) => {
             try {
                 // Charger les conversations ET les camarades de classe en parallèle
                 const [conversationsRes, classmatesRes] = await Promise.all([
-                    axios.get(`http://localhost:3001/Conversation/${idEleve}`, {
+                    axios.get(`${config.api.baseUrl}/Conversation/${idEleve}`, {
                         headers: { accessToken: localStorage.getItem("accessToken") }
                     }),
-                    axios.get(`http://localhost:3001/Eleve/classmates/${idEleve}`, {
+                    axios.get(`${config.api.baseUrl}/Eleve/classmates/${idEleve}`, {
                         headers: { accessToken: localStorage.getItem("accessToken") }
                     })
                 ]);
@@ -54,7 +54,7 @@ const ChatInterface = ({ classeId }) => {
         fetchData();
 
         // 1. Création de la connexion Socket.io
-        const socket = io('http://localhost:3001', {
+        const socket = io(`${config.api.baseUrl}`, {
             transports: ['websocket'], // Force WebSocket
             auth: {
                 token: localStorage.getItem("accessToken")
@@ -119,7 +119,7 @@ const ChatInterface = ({ classeId }) => {
             setSelectedConversation(conversation);
 
             const response = await axios.get(
-                `http://localhost:3001/Conversation/${conversation.id}/messages`,
+                `${config.api.baseUrl}/Conversation/${conversation.id}/messages`,
                 { headers: { accessToken: localStorage.getItem("accessToken") } }
             );
             setMessages(response.data);
@@ -138,7 +138,7 @@ const ChatInterface = ({ classeId }) => {
             console.log("Tentative de création avec:", idEleve, classmateId);
 
             const response = await axios.post(
-                'http://localhost:3001/Conversation', // Notez le /api/ ajouté
+                `${config.api.baseUrl}/Conversation`, // Notez le /api/ ajouté
                 {
                     eleveId: idEleve,
                     participantId: classmateId
@@ -163,7 +163,7 @@ const ChatInterface = ({ classeId }) => {
 
         try {
             const response = await axios.post(
-                `http://localhost:3001/Conversation/${selectedConversation.id}/messages`,
+                `${config.api.baseUrl}/Conversation/${selectedConversation.id}/messages`,
                 { contenu: newMessage, envoyeurId: idEleve },
                 { headers: { accessToken: localStorage.getItem("accessToken") } }
             );

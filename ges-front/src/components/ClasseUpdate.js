@@ -24,7 +24,7 @@ const ClasseUpdate = () => {
   useEffect(() => {
     const fetchCycles = async () => {
       try {
-        const response = await axios.get('http://localhost:3001/Cycle', {
+        const response = await axios.get(`${config.api.baseUrl}/Cycle`, {
           headers: {
             accessToken: localStorage.getItem("accessToken"),
           },
@@ -37,7 +37,7 @@ const ClasseUpdate = () => {
 
     const fetchNiveaux = async () => {
       try {
-        const response = await axios.get('http://localhost:3001/Niveau', {
+        const response = await axios.get(`${config.api.baseUrl}/Niveau`, {
           headers: {
             accessToken: localStorage.getItem("accessToken"),
           },
@@ -50,7 +50,7 @@ const ClasseUpdate = () => {
 
     const fetchEnseignants = async () => {
       try {
-        const response = await axios.get('http://localhost:3001/Enseignants', {
+        const response = await axios.get(`${config.api.baseUrl}/Enseignants`, {
           headers: {
             accessToken: localStorage.getItem("accessToken"),
           },
@@ -69,7 +69,7 @@ const ClasseUpdate = () => {
   useEffect(() => {
     const fetchClasse = async () => {
       try {
-        const response = await axios.get(`http://localhost:3001/Classe/${id}`, {
+        const response = await axios.get(`${config.api.baseUrl}/Classe/${id}`, {
           headers: {
             accessToken: localStorage.getItem("accessToken"),
           },
@@ -99,7 +99,7 @@ const ClasseUpdate = () => {
   const handleSubmit = async (values) => {
     try {
 
-      await axios.put(`http://localhost:3001/Classe/${id}`, values, {
+      await axios.put(`${config.api.baseUrl}/Classe/${id}`, values, {
         headers: {
           accessToken: localStorage.getItem("accessToken"),
         },

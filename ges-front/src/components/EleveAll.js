@@ -17,7 +17,7 @@ function EleveAll() {
   useEffect(() => {
     const fetchClasses = async () => {
       try {
-        const response = await axios.get("http://localhost:3001/Classe", {
+        const response = await axios.get(`${config.api.baseUrl}/Classe`, {
           headers: {
             "accessToken": localStorage.getItem("accessToken"),
           },
@@ -47,7 +47,7 @@ function EleveAll() {
     const fetchElevesByClass = async () => {
       if (selectedClass) {
         try {
-          const response = await axios.get(`http://localhost:3001/Eleve/byclasse/${selectedClass}`, {
+          const response = await axios.get(`${config.api.baseUrl}/Eleve/byclasse/${selectedClass}`, {
             headers: {
               "accessToken": localStorage.getItem("accessToken"),
             },

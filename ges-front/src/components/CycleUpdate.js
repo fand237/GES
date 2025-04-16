@@ -15,7 +15,7 @@ const CycleUpdate = () => {
   useEffect(() => { 
     const fetchCycle = async () => {
       try {
-        const response = await axios.get(`http://localhost:3001/Cycle/${id}`,{
+        const response = await axios.get(`${config.api.baseUrl}/Cycle/${id}`,{
             headers:{
               accessToken: localStorage.getItem("accessToken"),
             },
@@ -38,7 +38,7 @@ const CycleUpdate = () => {
 
   const handleSubmit = async (values) => {
     try {
-      await axios.put(`http://localhost:3001/Cycle/${id}`, values,{
+      await axios.put(`${config.api.baseUrl}/Cycle/${id}`, values,{
         headers:{
           accessToken: localStorage.getItem("accessToken"),
         },

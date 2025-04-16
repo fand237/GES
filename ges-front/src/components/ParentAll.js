@@ -15,7 +15,7 @@ function ParentAll() {
   useEffect(() => {
     const fetchClasses = async () => {
       try {
-        const response = await axios.get("http://localhost:3001/Classe", {
+        const response = await axios.get(`${config.api.baseUrl}/Classe`, {
           headers: {
             accessToken: localStorage.getItem("accessToken"),
           },
@@ -31,7 +31,7 @@ function ParentAll() {
 
   const fetchParents = async () => {
     try {
-      const response = await axios.get("http://localhost:3001/Parent", {
+      const response = await axios.get(`${config.api.baseUrl}/Parent`, {
         headers: {
           accessToken: localStorage.getItem("accessToken"),
         },
@@ -51,7 +51,7 @@ function ParentAll() {
   useEffect(() => {
     const fetchFilteredParents = async () => {
       try {
-        let url = "http://localhost:3001/Parent";
+        let url = `${config.api.baseUrl}/Parent`;
         if (selectedClasse) {
           url += `/byClasse/${selectedClasse}`;
         }

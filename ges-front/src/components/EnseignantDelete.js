@@ -7,7 +7,7 @@ function EnseignantDelete() {
   const navigate = useNavigate();
 
   const handleDelete = () => {
-    axios.delete(`http://localhost:3001/Enseignants/${id}`,{
+    axios.delete(`${config.api.baseUrl}/Enseignants/${id}`,{
         headers:{
           accessToken: localStorage.getItem("accessToken"),
         },

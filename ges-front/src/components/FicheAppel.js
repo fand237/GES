@@ -18,7 +18,7 @@ function FicheAppel() {
   useEffect(() => {
     const fetchCoursList = async () => {
       try {
-        const response = await axios.get(`http://localhost:3001/Cours/byens/${idens}`, {
+        const response = await axios.get(`${config.api.baseUrl}/Cours/byens/${idens}`, {
           headers: {
             accessToken: localStorage.getItem("accessToken"),
           },
@@ -26,7 +26,7 @@ function FicheAppel() {
 
         const coursesWithDetails = await Promise.all(
           response.data.map(async (course) => {
-            const classeDetails = await axios.get(`http://localhost:3001/Classe/${course.classe}`, {
+            const classeDetails = await axios.get(`${config.api.baseUrl}/Classe/${course.classe}`, {
               headers: {
                 accessToken: localStorage.getItem("accessToken"),
               },
@@ -51,7 +51,7 @@ function FicheAppel() {
     const fetchElevesByCours = async () => {
       if (selectedCours) {
         try {
-          const response = await axios.get(`http://localhost:3001/Eleve/byclasse/${selectedCours.classe.id}`, {
+          const response = await axios.get(`${config.api.baseUrl}/Eleve/byclasse/${selectedCours.classe.id}`, {
             headers: {
               accessToken: localStorage.getItem("accessToken"),
             },
@@ -79,7 +79,7 @@ function FicheAppel() {
   const handlePresenceChange = async (eleve, statut) => {
     const dateDuJour = format(new Date(), 'yyyy-MM-dd');
     try {
-      await axios.post('http://localhost:3001/Presence/updateOrCreate', {
+      await axios.post(`${config.api.baseUrl}/Presence/updateOrCreate`, {
         eleve: eleve.id,
         cours: selectedCours.id,
         jour: dateDuJour,
@@ -101,7 +101,7 @@ function FicheAppel() {
       if (statut === 'Absent(e)') {
         const MessageParent = `Bonjour M./Mme ${eleve.parentEleve.nom} ${eleve.parentEleve.prenom}, votre enfant ${eleve.nom} ${eleve.prenom} de la ${selectedCours.classe.classe} a été absent(e) au cours ${selectedCours.matiere}. Veuillez nous contacter pour plus d'informations.`;
 
-        await axios.post('http://localhost:3001/Notification/absence', {
+        await axios.post(`${config.api.baseUrl}/Notification/absence`, {
           numeroTelephone: eleve.parentEleve.indicatif.concat(eleve.parentEleve.numeroTelephone),
           message: MessageParent,
         });
@@ -137,7 +137,7 @@ function FicheAppel() {
 
     elevesAvecRetard.forEach((eleve) => {
       const retard = retardMinutes[eleve.id];
-      axios.post('http://localhost:3001/Presence/updateOrCreate', {
+      axios.post(`${config.api.baseUrl}/Presence/updateOrCreate`, {
         eleve: eleve.id,
         cours: selectedCours.id,
         jour: dateDuJour,

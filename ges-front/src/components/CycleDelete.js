@@ -7,7 +7,7 @@ function CycleDelete() {
   const navigate = useNavigate();
 
   const handleDelete = () => {
-    axios.delete(`http://localhost:3001/Cycle/${id}`,{
+    axios.delete(`${config.api.baseUrl}/Cycle/${id}`,{
         headers:{
           accessToken: localStorage.getItem("accessToken"),
         },

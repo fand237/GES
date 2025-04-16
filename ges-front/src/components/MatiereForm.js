@@ -23,7 +23,7 @@ const MatiereForm = () => {
     try {
       
       // Ajouter la nouvelle matière
-      await axios.post('http://localhost:3001/matiere', values, {
+      await axios.post(`${config.api.baseUrl}/matiere`, values, {
         headers: {
           accessToken: localStorage.getItem("accessToken"),
         },

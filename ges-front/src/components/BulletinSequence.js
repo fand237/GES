@@ -15,7 +15,7 @@ function BulletinSequence() {
   useEffect(() => {
     const fetchSequences = async () => {
       try {
-        const response = await axios.get('http://localhost:3001/Sequence');
+        const response = await axios.get(`${config.api.baseUrl}/Sequence`);
         setSequences(response.data);
         setSelectedSequence(response.data[0]?.id || '');
       } catch (err) {
@@ -31,7 +31,7 @@ function BulletinSequence() {
         try {
           setLoading(true);
           const response = await axios.get(
-              `http://localhost:3001/Bulletin/byeleve/${idEleve}/${selectedSequence}`
+              `${config.api.baseUrl}/Bulletin/byeleve/${idEleve}/${selectedSequence}`
           );
           setBulletin(response.data.bulletin);
           console.log("le bulletin est",response.data.bulletin);

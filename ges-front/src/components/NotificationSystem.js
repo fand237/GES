@@ -18,7 +18,7 @@ const NotificationSystem = () => {
     useEffect(() => {
         if (!idEleve) return;
 
-        const socket = io('http://localhost:3001', {
+        const socket = io(`${config.api.baseUrl}`, {
             transports: ['websocket'],
             auth: {
                 token: localStorage.getItem('accessToken')

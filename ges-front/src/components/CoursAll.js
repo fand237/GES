@@ -16,21 +16,21 @@ function CoursAll() {
   useEffect(() => {
     const fetchCours = async () => {
       try {
-        const response = await axios.get("http://localhost:3001/Cours");
+        const response = await axios.get(`${config.api.baseUrl}/Cours`);
         const coursesWithDetails = await Promise.all(
           response.data.map(async (course) => {
-            const enseignantDetails = course.Enseignant ? await axios.get(`http://localhost:3001/Enseignants/${course.Enseignant}`, {
+            const enseignantDetails = course.Enseignant ? await axios.get(`${config.api.baseUrl}Enseignants/${course.Enseignant}`, {
               headers: {
                 accessToken: localStorage.getItem("accessToken"),
               },
             }) : null;
 
-            const joursDetails = course.jour ? await axios.get(`http://localhost:3001/Jour/${course.jour},{
+            const joursDetails = course.jour ? await axios.get(`${config.api.baseUrl}/Jour/${course.jour},{
           headers: {
             accessToken: localStorage.getItem("accessToken"),
           },
         }`) : null;
-            const classesDetails = course.classe ? await axios.get(`http://localhost:3001/Classe/${course.classe}`,{
+            const classesDetails = course.classe ? await axios.get(`${config.api.baseUrl}/Classe/${course.classe}`,{
               headers: {
                 accessToken: localStorage.getItem("accessToken"),
               },
@@ -53,7 +53,7 @@ function CoursAll() {
 
     const fetchEnseignants = async () => {
       try {
-        const response = await axios.get("http://localhost:3001/Enseignants",{
+        const response = await axios.get(`${config.api.baseUrl}/Enseignants`,{
           headers:{
             accessToken: localStorage.getItem("accessToken"),
           },
@@ -66,7 +66,7 @@ function CoursAll() {
 
     const fetchClasses = async () => {
       try {
-        const response = await axios.get("http://localhost:3001/Classe",
+        const response = await axios.get(`${config.api.baseUrl}/Classe`,
           {
             headers: {
               accessToken: localStorage.getItem("accessToken"),

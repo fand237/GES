@@ -27,7 +27,7 @@ function EnseignantUpdate() {
   });
 
   useEffect(() => {
-    axios.get(`http://localhost:3001/Enseignants/forupdate/${id}`,{
+    axios.get(`${config.api.baseUrl}/Enseignants/forupdate/${id}`,{
         headers:{
           accessToken: localStorage.getItem("accessToken"),
         },
@@ -60,7 +60,7 @@ function EnseignantUpdate() {
 
   const onSubmit = async (data, { resetForm }) => {
     try {
-      await axios.put(`http://localhost:3001/Enseignants/${id}`,data,{
+      await axios.put(`${config.api.baseUrl}/Enseignants/${id}`,data,{
         headers:{
           accessToken: localStorage.getItem("accessToken"),
         },

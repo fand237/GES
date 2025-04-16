@@ -20,7 +20,7 @@ const GroupeForm = () => {
   // Fonction pour gérer la soumission du formulaire
   const handleSubmit = async (values, { resetForm }) => {
     try {
-      await axios.post('http://localhost:3001/Groupe', values, {
+      await axios.post(`${config.api.baseUrl}/Groupe`, values, {
         headers: {
           accessToken: localStorage.getItem("accessToken"),
         },

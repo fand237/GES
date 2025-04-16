@@ -7,7 +7,7 @@ function ClasseDelete() {
   const navigate = useNavigate();
 
   const handleDelete = () => {
-    axios.delete(`http://localhost:3001/Classe/${id}`,{
+    axios.delete(`${config.api.baseUrl}/Classe/${id}`,{
         headers:{
           accessToken: localStorage.getItem("accessToken"),
         },

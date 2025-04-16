@@ -20,7 +20,7 @@ const AnnonceEnseignant = () => {
         const fetchClasses = async () => {
             try {
                 const response = await axios.get(
-                    `http://localhost:3001/Classe/responsable/${idens}`,
+                    `${config.api.baseUrl}/Classe/responsable/${idens}`,
                     {
                         headers: { accessToken: localStorage.getItem("accessToken") }
                     }
@@ -37,7 +37,7 @@ const AnnonceEnseignant = () => {
         fetchClasses();
 
         // Configurer Socket.IO
-        const newSocket = io('http://localhost:3001', {
+        const newSocket = io(`${config.api.baseUrl}`, {
             auth: { token: localStorage.getItem("accessToken") }
         });
         setSocket(newSocket);
@@ -54,7 +54,7 @@ const AnnonceEnseignant = () => {
     const loadHistorique = async (classeId) => {
         try {
             const response = await axios.get(
-                `http://localhost:3001/Conversation/annonceClasse/${classeId}`,
+                `${config.api.baseUrl}/Conversation/annonceClasse/${classeId}`,
                 {
                     headers: { accessToken: localStorage.getItem("accessToken") }
                 }
@@ -72,7 +72,7 @@ const AnnonceEnseignant = () => {
         setLoading(true);
         try {
             const response = await axios.post(
-                'http://localhost:3001/Conversation/annonceInst',
+                `${config.api.baseUrl}/Conversation/annonceInst`,
                 { contenu: annonce, classeId: selectedClasse },
                 { headers: { accessToken: localStorage.getItem("accessToken") } }
             );

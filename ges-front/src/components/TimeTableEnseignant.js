@@ -30,24 +30,24 @@ const TimetableDropArea = ({ classes, jours, ensId, enseignantNom }) => {
   const fetchPreFilledCourses = useCallback(async () => {
     if (ensId) {
       try {
-        const response = await axios.get(`http://localhost:3001/Jour_Cours/byens/${ensId}`,{
+        const response = await axios.get(`${config.api.baseUrl}/Jour_Cours/byens/${ensId}`,{
           headers: {
             accessToken: localStorage.getItem("accessToken"),
           },
         });
         const coursesWithDetails = await Promise.all(
           response.data.map(async (course) => {
-            const coursDetails = await axios.get(`http://localhost:3001/Cours/${course.cours}`, {
+            const coursDetails = await axios.get(`${config.api.baseUrl}/Cours/${course.cours}`, {
               headers: {
                 accessToken: localStorage.getItem("accessToken"),
               },
             });
-            const enseignantDetails = await axios.get(`http://localhost:3001/Enseignants/${coursDetails.data.Enseignant}`, {
+            const enseignantDetails = await axios.get(`${config.api.baseUrl}/Enseignants/${coursDetails.data.Enseignant}`, {
               headers: {
                 accessToken: localStorage.getItem("accessToken"),
               },
             });
-            const classeDetails = await axios.get(`http://localhost:3001/Classe/${coursDetails.data.classe}`, {
+            const classeDetails = await axios.get(`${config.api.baseUrl}/Classe/${coursDetails.data.classe}`, {
               headers: {
                 accessToken: localStorage.getItem("accessToken"),
               },
@@ -185,21 +185,21 @@ const TimeTableEnseignant = () => {
   const { idens } = UseAuth();
 
   const fetchData = async () => {
-    const coursResponse = await axios.get('http://localhost:3001/Cours', {
+    const coursResponse = await axios.get(`${config.api.baseUrl}/Cours`, {
       headers: {
         accessToken: localStorage.getItem("accessToken"),
       },
     });
     setListOfCours(coursResponse.data);
 
-    const classeResponse = await axios.get('http://localhost:3001/Classe', {
+    const classeResponse = await axios.get(`${config.api.baseUrl}/Classe`, {
       headers: {
         accessToken: localStorage.getItem("accessToken"),
       },
     });
     setClasse(classeResponse.data);
 
-    const joursResponse = await axios.get('http://localhost:3001/Jour', {
+    const joursResponse = await axios.get(`${config.api.baseUrl}/Jour`, {
       headers: {
         accessToken: localStorage.getItem("accessToken"),
       },
@@ -210,7 +210,7 @@ const TimeTableEnseignant = () => {
   const fetchEnseignantNom = async () => {
     if (ensId) {
       try {
-        const response = await axios.get(`http://localhost:3001/Enseignants/${ensId}`, {
+        const response = await axios.get(`${config.api.baseUrl}/Enseignants/${ensId}`, {
           headers: {
             accessToken: localStorage.getItem("accessToken"),
           },

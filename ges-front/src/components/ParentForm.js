@@ -81,7 +81,7 @@ function ParentForm() {
 
   const onSubmit = async (data, { resetForm }) => {
     try {
-      const response = await axios.post("http://localhost:3001/Parent", {
+      const response = await axios.post(`${config.api.baseUrl}/Parent`, {
         ...data,
         motDePasse,
       }, {

@@ -12,7 +12,7 @@ const NoteEval = () => {
     const [evaluations, setEvaluations] = useState([]);
 
     useEffect(() => {
-        axios.get(`http://localhost:3001/Note/byeval/${idens}`)
+        axios.get(`${config.api.baseUrl}/Note/byeval/${idens}`)
             .then(response => {
                 console.log(response.data);
                 setEvaluations(response.data);

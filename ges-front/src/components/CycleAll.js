@@ -13,7 +13,7 @@ const CycleAll = () => {
   useEffect(() => {
     const fetchCycles = async () => {
       try {
-        const response = await axios.get('http://localhost:3001/Cycle',{
+        const response = await axios.get(`${config.api.baseUrl}/Cycle`,{
             headers:{
               accessToken: localStorage.getItem("accessToken"),
             },

@@ -7,7 +7,7 @@ function EleveDelete() {
   const navigate = useNavigate();
 
   const handleDelete = () => {
-    axios.delete(`http://localhost:3001/Eleve/${id}`)
+    axios.delete(`${config.api.baseUrl}/Eleve/${id}`)
       .then(() => {
         console.log("Élève supprimé avec succès");
         navigate(`/DashboardAdmin`);

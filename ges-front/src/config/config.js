@@ -1,7 +1,6 @@
 const config = {
     api: {
-        baseUrl: process.env.REACT_APP_BACKEND_URL
-            || 'http://localhost:3001',
+        baseUrl: process.env.REACT_APP_API_URL,
     }
 };
 

@@ -21,7 +21,7 @@ const SequenceForm = () => {
     // Fonction pour gérer la soumission du formulaire
     const handleSubmit = async (values, { resetForm }) => {
         try {
-            await axios.post('http://localhost:3001/Sequence', values, {
+            await axios.post(`${config.api.baseUrl}/Sequence`, values, {
                 headers: {
                     accessToken: localStorage.getItem("accessToken"),
                 },

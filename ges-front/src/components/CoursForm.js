@@ -19,7 +19,7 @@ function CoursForm() {
   useEffect(() => {
     const fetchEnseignants = async () => {
       try {
-        const response = await axios.get("http://localhost:3001/Enseignants",{
+        const response = await axios.get(`${config.api.baseUrl}/Enseignants`,{
           headers:{
             accessToken: localStorage.getItem("accessToken"),
           },
@@ -35,7 +35,7 @@ function CoursForm() {
   useEffect(() => {
     const fetchClasse = async () => {
       try {
-        const response = await axios.get("http://localhost:3001/Classe",{
+        const response = await axios.get(`${config.api.baseUrl}/Classe`,{
           headers: {
             accessToken: localStorage.getItem("accessToken"),
           },
@@ -51,7 +51,7 @@ function CoursForm() {
   useEffect(() => {
     const fetchGroupe = async () => {
       try {
-        const response = await axios.get("http://localhost:3001/Groupe",{
+        const response = await axios.get(`${config.api.baseUrl}/Group`,{
           headers: {
             accessToken: localStorage.getItem("accessToken"),
           },
@@ -67,7 +67,7 @@ function CoursForm() {
   useEffect(() => {
     const fetchMatieres = async () => {
       try {
-        const response = await axios.get("http://localhost:3001/Matiere", {
+        const response = await axios.get(`${config.api.baseUrl}/Matiere`, {
           headers: {
             accessToken: localStorage.getItem("accessToken"),
           },
@@ -98,7 +98,7 @@ function CoursForm() {
 
   const onSubmit = async (data , { resetForm }) => {
     try {
-      await axios.post("http://localhost:3001/Cours", data);
+      await axios.post(`${config.api.baseUrl}/Cours`, data);
       console.log("Cours créé avec succès");
       setShowSuccessMessage(true); // Affichage du message de succès
       setTimeout(() => {

@@ -28,7 +28,7 @@ const NoteUpdate = () => {
   useEffect(() => {
     const fetchSequenceList = async () => {
       try {
-        const response = await axios.get('http://localhost:3001/Sequence');
+        const response = await axios.get(`${config.api.baseUrl}/Sequence`);
         setSequences(response.data);
       } catch (error) {
         console.error('Erreur lors de la récupération de la liste des séquences :', error);
@@ -41,7 +41,7 @@ const NoteUpdate = () => {
   useEffect(() => {
     const fetchTypeEvaluationList = async () => {
       try {
-        const response = await axios.get('http://localhost:3001/Type_Evaluation');
+        const response = await axios.get(`${config.api.baseUrl}/Type_Evaluation`);
 
         setTypeEvaluation(response.data);
       } catch (error) {
@@ -57,10 +57,10 @@ const NoteUpdate = () => {
     const fetchCoursList = async () => {
       try {
         // Appeler l'API pour récupérer la liste des cours de l'enseignant
-        const response = await axios.get(`http://localhost:3001/Cours/byens/${idEnseignant}`);
+        const response = await axios.get(`${config.api.baseUrl}/Cours/byens/${idEnseignant}`);
         const coursesWithDetails = await Promise.all(
           response.data.map(async (course) => {
-            const classeDetails = await axios.get(`http://localhost:3001/Classe/${course.classe}`);
+            const classeDetails = await axios.get(`${config.api.baseUrl}/Classe/${course.classe}`);
 
 
             return {
@@ -84,7 +84,7 @@ const NoteUpdate = () => {
   const fetchElevesForCours = async (classeId) => {
     try {
       // Appeler l'API pour récupérer la liste des élèves pour le cours spécifié
-      const response = await axios.get(`http://localhost:3001/Eleve/byclasse/${classeId}`);
+      const response = await axios.get(`${config.api.baseUrl}/Eleve/byclasse/${classeId}`);
       // Retourner la liste des élèves
       return response.data;
     } catch (error) {
@@ -235,7 +235,7 @@ const NoteUpdate = () => {
       console.log("le type d'evaluation est ", selectedTypeEvaluation)
       console.log("les notes ", notes)
 
-      axios.post('http://localhost:3001/Note', {
+      axios.post(`${config.api.baseUrl}/Note`, {
         eleve: eleve.id,
         cours: selectedCours.id,
         note: note,
@@ -261,7 +261,7 @@ const NoteUpdate = () => {
 
   const fetchExistingNotes = async (coursId, sequenceId, typeEvaluationId, date) => {
     try {
-      const response = await axios.get(`http://localhost:3001/Note/forupdate/${coursId}/${sequenceId}/${typeEvaluationId}/${date}`);
+      const response = await axios.get(`${config.api.baseUrl}/Note/forupdate/${coursId}/${sequenceId}/${typeEvaluationId}/${date}`);
       const existingNotes = {};
       response.data.forEach((note) => {
         existingNotes[note.eleve] = note.note;

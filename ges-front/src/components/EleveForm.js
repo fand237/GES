@@ -15,7 +15,7 @@ function EleveForm() {
   useEffect(() => {
     const fetchClasses = async () => {
       try {
-        const response = await axios.get("http://localhost:3001/Classe",{
+        const response = await axios.get(`${config.api.baseUrl}/Classe`,{
           headers:{
             accessToken: localStorage.getItem("accessToken"),
           },
@@ -32,7 +32,7 @@ function EleveForm() {
   useEffect(() => {
     const fetchParents = async () => {
       try {
-        const response = await axios.get("http://localhost:3001/Parent");
+        const response = await axios.get(`${config.api.baseUrl}/Parent`);
         setParents(response.data);
       } catch (error) {
         console.error("Erreur lors de la récupération des parents : ", error);
@@ -69,7 +69,7 @@ function EleveForm() {
   const onSubmit = async (data, { resetForm }) => {
     try {
 
-      const response = await axios.post("http://localhost:3001/Eleve", {
+      const response = await axios.post(`${config.api.baseUrl}/Eleve`, {
         ...data,
       },{
         headers:{

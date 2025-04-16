@@ -7,7 +7,7 @@ function ParentDelete() {
   let navigate = useNavigate();
 
   const handleDelete = () => {
-    axios.delete(`http://localhost:3001/Parent/${id}`)
+    axios.delete(`${config.api.baseUrl}/Parent/${id}`)
       .then(() => {
         console.log("Parent supprimé avec succès");
         navigate(`/ParentAll`); // Utilisation de navigate pour la navigation

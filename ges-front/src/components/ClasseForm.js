@@ -17,7 +17,7 @@ const ClasseForm = () => {
   useEffect(() => {
     const fetchCycles = async () => {
       try {
-        const response = await axios.get('http://localhost:3001/Cycle', {
+        const response = await axios.get(`${config.api.baseUrl}/Cycle`, {
           headers: {
             accessToken: localStorage.getItem("accessToken"),
           },
@@ -30,7 +30,7 @@ const ClasseForm = () => {
 
     const fetchNiveau = async () => {
       try {
-        const response = await axios.get('http://localhost:3001/Niveau', {
+        const response = await axios.get(`${config.api.baseUrl}/Niveau`, {
           headers: {
             accessToken: localStorage.getItem("accessToken"),
           },
@@ -43,7 +43,7 @@ const ClasseForm = () => {
 
     const fetchEnseignants = async () => {
       try {
-        const response = await axios.get('http://localhost:3001/Enseignants', {
+        const response = await axios.get(`${config.api.baseUrl}/Enseignants`, {
           headers: {
             accessToken: localStorage.getItem("accessToken"),
           },
@@ -74,7 +74,7 @@ const ClasseForm = () => {
 
   const handleSubmit = async (values, { resetForm }) => {
     try {
-      await axios.post('http://localhost:3001/Classe', values, {
+      await axios.post(`${config.api.baseUrl}/Classe`, values, {
         headers: {
           accessToken: localStorage.getItem("accessToken"),
         },

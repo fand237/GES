@@ -18,7 +18,7 @@ const AnneeAcademiqueForm = () => {
     // Fonction pour gérer la soumission du formulaire
     const handleSubmit = async (values, { resetForm }) => {
         try {
-            await axios.post('http://localhost:3001/Annee_Academique', values, {
+            await axios.post(`${config.api.baseUrl}/Annee_Academique`, values, {
                 headers: {
                     accessToken: localStorage.getItem("accessToken"),
                 },

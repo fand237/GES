@@ -15,7 +15,7 @@ const JourForm = () => {
 
   const handleSubmit = async (values, { resetForm }) => {
     try {
-      await axios.post('http://localhost:3001/Jour', values, {
+      await axios.post(`${config.api.baseUrl}/Jour`, values, {
         headers: {
           accessToken: localStorage.getItem("accessToken"),
         },

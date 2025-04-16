@@ -58,7 +58,7 @@ const TimetableDropArea = ({ classes, jours, selectedClass, handleClassChange, t
   const fetchPreFilledCourses = useCallback(async () => {
     if (timetableId) {
       try {
-        const response = await axios.get(`http://localhost:3001/Jour_Cours/byemplois/${timetableId}`,{
+        const response = await axios.get(`${config.api.baseUrl}/Jour_Cours/byemplois/${timetableId}`,{
           headers: {
             accessToken: localStorage.getItem("accessToken"),
           },
@@ -66,7 +66,7 @@ const TimetableDropArea = ({ classes, jours, selectedClass, handleClassChange, t
 
         const coursesWithDetails = await Promise.all(
           response.data.map(async (course) => {
-            const coursDetails = await axios.get(`http://localhost:3001/Cours/${course.cours}`,{
+            const coursDetails = await axios.get(`${config.api.baseUrl}/Cours/${course.cours}`,{
               headers: {
                 accessToken: localStorage.getItem("accessToken"),
               },

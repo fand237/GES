@@ -36,7 +36,7 @@ const NoteUpdate2 = () => {
 
   const fetchElevesForCours = async (classeId) => {
     try {
-      const response = await axios.get(`http://localhost:3001/Eleve/byclasse/${classeId}`);
+      const response = await axios.get(`${config.api.baseUrl}/Eleve/byclasse/${classeId}`);
       return response.data;
     } catch (error) {
       console.error('Erreur lors de la récupération des élèves pour le cours :', error);
@@ -46,7 +46,7 @@ const NoteUpdate2 = () => {
 
   const fetchExistingNotes = async (coursId, sequenceId, typeEvaluationId, date) => {
     try {
-      const response = await axios.get(`http://localhost:3001/Note/forupdate/${coursId}/${sequenceId}/${typeEvaluationId}/${date}`);
+      const response = await axios.get(`${config.api.baseUrl}/Note/forupdate/${coursId}/${sequenceId}/${typeEvaluationId}/${date}`);
       const existingNotes = {};
       response.data.forEach((note) => {
         existingNotes[note.eleve] = note.note;
@@ -76,7 +76,7 @@ const NoteUpdate2 = () => {
     eleves.forEach((eleve) => {
       const note = notes[eleve.id];
 
-      axios.post('http://localhost:3001/Note', {
+      axios.post(`${config.api.baseUrl}/Note`, {
         eleve: eleve.id,
         cours: idCours,
         note: note,

@@ -27,7 +27,7 @@ const NoteForm = () => {
   useEffect(() => {
     const fetchSequenceList = async () => {
       try {
-        const response = await axios.get('http://localhost:3001/Sequence',{
+        const response = await axios.get(`${config.api.baseUrl}/Sequence`,{
           headers: {
             accessToken: localStorage.getItem("accessToken"),
           },
@@ -44,7 +44,7 @@ const NoteForm = () => {
   useEffect(() => {
     const fetchTypeEvaluationList = async () => {
       try {
-        const response = await axios.get('http://localhost:3001/Type_Evaluation',{
+        const response = await axios.get(`${config.api.baseUrl}/Type_Evaluation`,{
           headers: {
             accessToken: localStorage.getItem("accessToken"),
           },
@@ -61,14 +61,14 @@ const NoteForm = () => {
   useEffect(() => {
     const fetchCoursList = async () => {
       try {
-        const response = await axios.get(`http://localhost:3001/Cours/byens/${idens}`,{
+        const response = await axios.get(`${config.api.baseUrl}/Cours/byens/${idens}`,{
           headers: {
             accessToken: localStorage.getItem("accessToken"),
           },
         });
         const coursesWithDetails = await Promise.all(
           response.data.map(async (course) => {
-            const classeDetails = await axios.get(`http://localhost:3001/Classe/${course.classe}`,{
+            const classeDetails = await axios.get(`${config.api.baseUrl}/Classe/${course.classe}`,{
               headers: {
                 accessToken: localStorage.getItem("accessToken"),
               },
@@ -91,7 +91,7 @@ const NoteForm = () => {
 
   const fetchElevesForCours = async (classeId) => {
     try {
-      const response = await axios.get(`http://localhost:3001/Eleve/byclasse/${classeId}`);
+      const response = await axios.get(`${config.api.baseUrl}/Eleve/byclasse/${classeId}`);
       return response.data;
     } catch (error) {
       console.error('Erreur lors de la récupération des élèves pour le cours :', error);
@@ -159,7 +159,7 @@ const NoteForm = () => {
 
     eleves.forEach(eleve => {
       const note = notes[eleve.id];
-      axios.post('http://localhost:3001/Note', {
+      axios.post(`${config.api.baseUrl}/Note`, {
         eleve: eleve.id,
         cours: selectedCours.id,
         note: note,

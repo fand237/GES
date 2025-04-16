@@ -21,7 +21,7 @@ const validationSchema = Yup.object().shape({
 });
 
 const onSubmit=(data) => {
-  axios.post("http://localhost:3001/Administrateur", data).then((response) => {
+  axios.post(`${config.api.baseUrl}/Administrateur`, data).then((response) => {
           console.log("IT WORKED");
         });
 };

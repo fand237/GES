@@ -18,7 +18,7 @@ const CycleForm = () => {
 
   const handleSubmit = async (values, { resetForm }) => {
     try {
-      await axios.post('http://localhost:3001/Cycle', values,{
+      await axios.post(`${config.api.baseUrl}/Cycle`, values,{
         headers:{
           accessToken: localStorage.getItem("accessToken"),
         },

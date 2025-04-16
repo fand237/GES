@@ -32,7 +32,7 @@ function EleveUpdate() {
   useEffect(() => {
     const fetchClasses = async () => {
       try {
-        const response = await axios.get("http://localhost:3001/Classe",{
+        const response = await axios.get(`${config.api.baseUrl}/Classe`,{
           headers:{
             accessToken: localStorage.getItem("accessToken"),
           },
@@ -49,7 +49,7 @@ function EleveUpdate() {
   useEffect(() => {
     const fetchParents = async () => {
       try {
-        const response = await axios.get("http://localhost:3001/Parent",{
+        const response = await axios.get(`${config.api.baseUrl}/Parent`,{
           headers:{
             accessToken: localStorage.getItem("accessToken"),
           },
@@ -64,7 +64,7 @@ function EleveUpdate() {
   }, []);
 
   useEffect(() => {
-    axios.get(`http://localhost:3001/Eleve/nopass/${id}`,{
+    axios.get(`${config.api.baseUrl}/Eleve/nopass/${id}`,{
       headers:{
         accessToken: localStorage.getItem("accessToken"),
       },
@@ -94,7 +94,7 @@ function EleveUpdate() {
 
   const onSubmit = async (data) => {
     try {
-      await axios.put(`http://localhost:3001/Eleve/${id}`,data, {
+      await axios.put(`${config.api.baseUrl}/Eleve/${id}`,data, {
         headers:{
           accessToken: localStorage.getItem("accessToken"),
         },

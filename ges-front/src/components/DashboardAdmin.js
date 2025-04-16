@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { Outlet, useNavigate } from 'react-router-dom';
 import config from "../config/config";
-import config from "../config/config";
 
 const DashboardAdmin = () => {
     const [activeTab, setActiveTab] = useState('');

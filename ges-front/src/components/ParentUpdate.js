@@ -25,7 +25,7 @@ function ParentUpdate() {
   });
 
   useEffect(() => {
-    axios.get(`http://localhost:3001/Parent/nopass/${id}`,{
+    axios.get(`${config.api.baseUrl}/Parent/nopass/${id}`,{
       headers:{
         accessToken: localStorage.getItem("accessToken"),
       },
@@ -55,7 +55,7 @@ function ParentUpdate() {
 
   const onSubmit = async (data) => {
     try {
-      await axios.put(`http://localhost:3001/Parent/${id}`, data,{
+      await axios.put(`${config.api.baseUrl}/Parent/${id}`, data,{
         headers:{
           accessToken: localStorage.getItem("accessToken"),
         },

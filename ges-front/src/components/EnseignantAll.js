@@ -17,7 +17,7 @@ function EnseignantAll() {
   useEffect(() => {
     const fetchMatieres = async () => {
       try {
-        const response = await axios.get("http://localhost:3001/Cours/bymatiere", {
+        const response = await axios.get(`${config.api.baseUrl}/Cours/bymatiere`, {
           headers: {
             accessToken: localStorage.getItem("accessToken"),
           },
@@ -35,7 +35,7 @@ function EnseignantAll() {
   useEffect(() => {
     const fetchClasses = async () => {
       try {
-        const response = await axios.get("http://localhost:3001/Classe", {
+        const response = await axios.get(`${config.api.baseUrl}/Classe`, {
           headers: {
             accessToken: localStorage.getItem("accessToken"),
           },
@@ -51,7 +51,7 @@ function EnseignantAll() {
 
   const fetchEnseignants = async () => {
     try {
-      const response = await axios.get("http://localhost:3001/Enseignants", {
+      const response = await axios.get(`${config.api.baseUrl}/Enseignants`, {
         headers: {
           accessToken: localStorage.getItem("accessToken"),
         },
@@ -71,7 +71,7 @@ console.log(response.data);
   useEffect(() => {
     const fetchFilteredEnseignants = async () => {
       try {
-        let url = "http://localhost:3001/Enseignants";
+        let url = `${config.api.baseUrl}/Enseignants`;
         if (selectedMatiere && selectedClasse) {
           url += `/bymatiereEtclasse?matiere=${selectedMatiere}&classe=${selectedClasse}`;
         } else if (selectedMatiere) {

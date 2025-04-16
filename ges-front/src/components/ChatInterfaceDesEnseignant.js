@@ -19,10 +19,10 @@ const ChatInterfaceDesEnseignant = ({ classeId }) => {
             try {
                 // Charger les conversations et les élèves de la classe
                 const [conversationsRes, elevesRes] = await Promise.all([
-                    axios.get(`http://localhost:3001/Conversation/Enseignant/${idens}`, {
+                    axios.get(`${config.api.baseUrl}/Conversation/Enseignant/${idens}`, {
                         headers: { accessToken: localStorage.getItem("accessToken") }
                     }),
-                    axios.get(`http://localhost:3001/Eleve/elevesParEnseignant/${idens}`, {
+                    axios.get(`${config.api.baseUrl}/Eleve/elevesParEnseignant/${idens}`, {
                         headers: { accessToken: localStorage.getItem("accessToken") }
                     })
                 ]);
@@ -53,7 +53,7 @@ console.log("les elevs sont ",elevesRes.data)
         fetchData();
 
         // Configuration Socket.io
-        const socket = io('http://localhost:3001', {
+        const socket = io(`${config.api.baseUrl}`, {
             transports: ['websocket'],
             auth: {
                 token: localStorage.getItem("accessToken")
@@ -104,7 +104,7 @@ console.log("les elevs sont ",elevesRes.data)
             setSelectedConversation(conversation);
 
             const response = await axios.get(
-                `http://localhost:3001/Conversation/Enseignant/${conversation.id}/messages`,
+                `${config.api.baseUrl}/Conversation/Enseignant/${conversation.id}/messages`,
                 { headers: { accessToken: localStorage.getItem("accessToken") } }
             );
             setMessages(response.data);
@@ -121,7 +121,7 @@ console.log("les elevs sont ",elevesRes.data)
     const startNewConversation = async (eleveId) => {
         try {
             const response = await axios.post(
-                'http://localhost:3001/Conversation/Enseignant',
+                `${config.api.baseUrl}/Conversation/Enseignant`,
                 {
                     enseignantId: idens,
                     eleveId
@@ -146,7 +146,7 @@ console.log("les elevs sont ",elevesRes.data)
 
         try {
             await axios.post(
-                `http://localhost:3001/Conversation/Enseignant/${selectedConversation.id}/messages`,
+                `${config.api.baseUrl}/Conversation/Enseignant/${selectedConversation.id}/messages`,
                 { contenu: newMessage, envoyeurId: idens },
                 { headers: { accessToken: localStorage.getItem("accessToken") } }
             );

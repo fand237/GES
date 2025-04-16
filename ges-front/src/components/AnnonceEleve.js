@@ -21,7 +21,7 @@ const AnnonceEleve = () => {
             try {
                 // 1. Récupérer les infos de la classe
                 const classeResponse = await axios.get(
-                    `http://localhost:3001/Eleve/${idEleve}`,
+                    `${config.api.baseUrl}/Eleve/${idEleve}`,
                     { headers: { accessToken: localStorage.getItem("accessToken") } }
                 );
 
@@ -32,7 +32,7 @@ const AnnonceEleve = () => {
 
                 // 2. Récupérer les annonces existantes
                 const annoncesResponse = await axios.get(
-                    `http://localhost:3001/Conversation/annonceClasseEleve/${classeData.id}`,
+                    `${config.api.baseUrl}/Conversation/annonceClasseEleve/${classeData.id}`,
                     { headers: { accessToken: localStorage.getItem("accessToken") } }
                 );
 
@@ -47,7 +47,7 @@ const AnnonceEleve = () => {
                 }
 
                 // 3. Configurer Socket.IO
-                socket = io('http://localhost:3001', {
+                socket = io('${config.api.baseUrl}', {
                     auth: { token: localStorage.getItem("accessToken") },
                     reconnectionAttempts: 5,
                     reconnectionDelay: 1000

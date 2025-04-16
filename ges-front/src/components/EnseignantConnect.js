@@ -23,7 +23,7 @@ const EnseignantConnect = () => {
     const onSubmit = async (data) => {
         try {
             await axios
-                .post("http://localhost:3001/Enseignants/login", data)
+                .post(`${config.api.baseUrl}/Enseignants/login`, data)
                 .then((response) => {
                     if (response.data.error) {
                         alert(response.data.error);

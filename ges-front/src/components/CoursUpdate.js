@@ -27,7 +27,7 @@ function CoursUpdate() {
   });
 
   useEffect(() => {
-    axios.get(`http://localhost:3001/Cours/${id}`)
+    axios.get(`${config.api.baseUrl}/Cours/${id}`)
       .then((response) => {
         console.log("Response from API:", response.data);
         setInitialValues(response.data);
@@ -36,7 +36,7 @@ function CoursUpdate() {
         console.error("Erreur lors de la récupération des informations du cours : ", error);
       });
 
-    axios.get("http://localhost:3001/Enseignants",{
+    axios.get(`${config.api.baseUrl}/Enseignants`,{
       headers:{
         accessToken: localStorage.getItem("accessToken"),
       },
@@ -50,7 +50,7 @@ function CoursUpdate() {
 
     const fetchJour = async () => {
       try {
-        const response = await axios.get("http://localhost:3001/Jour");
+        const response = await axios.get(`${config.api.baseUrl}/Jour`);
         setJour(response.data);
       } catch (error) {
         console.error("Erreur lors de la récupération des jours : ", error);
@@ -61,7 +61,7 @@ function CoursUpdate() {
 
     const fetchClasse = async () => {
       try {
-        const response = await axios.get("http://localhost:3001/Classe",{
+        const response = await axios.get(`${config.api.baseUrl}/Classe`,{
           headers:{
             accessToken: localStorage.getItem("accessToken"),
           },
@@ -79,7 +79,7 @@ function CoursUpdate() {
   useEffect(() => {
     const fetchGroupe = async () => {
       try {
-        const response = await axios.get("http://localhost:3001/Groupe");
+        const response = await axios.get(`${config.api.baseUrl}/Groupe`);
         setGroupe(response.data);
       } catch (error) {
         console.error("Erreur lors de la récupération des groupes : ", error);
@@ -101,7 +101,7 @@ function CoursUpdate() {
 
   const onSubmit = async (data) => {
     try {
-      await axios.put(`http://localhost:3001/Cours/${id}`, data);
+      await axios.put(`${config.api.baseUrl}/Cours/${id}`, data);
       console.log("Cours mis à jour avec succès");
       setShowSuccessMessage(true); // Affichage du message de succès
       setTimeout(() => {

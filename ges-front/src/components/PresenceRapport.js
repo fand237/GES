@@ -18,7 +18,7 @@ const RapportPresence = () => {
   useEffect(() => {
     const fetchClasses = async () => {
       try {
-        const response = await axios.get('http://localhost:3001/Classe', {
+        const response = await axios.get(`${config.api.baseUrl}/Classe`, {
           headers: {
             accessToken: localStorage.getItem("accessToken"),
           },
@@ -36,7 +36,7 @@ const RapportPresence = () => {
     if (filter.classeId) {
       const fetchEleves = async () => {
         try {
-          const response = await axios.get(`http://localhost:3001/Eleve/byclasse/${filter.classeId}`, {
+          const response = await axios.get(`${config.api.baseUrl}/Eleve/byclasse/${filter.classeId}`, {
             headers: {
               accessToken: localStorage.getItem("accessToken"),
             },
@@ -56,7 +56,7 @@ const RapportPresence = () => {
   useEffect(() => {
     const fetchPresences = async () => {
       try {
-        const response = await axios.get('http://localhost:3001/Presence/rapport', { 
+        const response = await axios.get(`${config.api.baseUrl}/Presence/rapport`, {
           params: filter,
           headers: {
             accessToken: localStorage.getItem("accessToken"),
@@ -74,7 +74,7 @@ const RapportPresence = () => {
 
   const handleDownload = async () => {
     try {
-      const response = await axios.get('http://localhost:3001/Presence/rapport/download', { 
+      const response = await axios.get(`${config.api.baseUrl}/Presence/rapport/download`, {
         params: filter,
         responseType: 'blob',
         headers: {

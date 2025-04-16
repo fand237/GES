@@ -68,7 +68,7 @@ import Logout from './components/Logout'
 
 import NoteEval from './components/NoteEval'
 import BulletinSequence from './components/BulletinSequence'
-// eslint-disable-next-line 
+import config from './config/config'// eslint-disable-next-line
 import ProtectedRoute from './components/ProtectedRoute'
 import { AuthContext } from './helpers/AuthContext'
 import { useState, useEffect, Fragment } from 'react';
@@ -119,7 +119,7 @@ function App() {
     const setSatate = async () => {
       try {
         await axios
-          .get(`http://localhost:3001/Enseignants/auth`, {
+          .get(`${config.api.baseUrl}/Enseignants/auth`, {
             headers: {
               "accessToken": localStorage.getItem("accessToken"),
             },

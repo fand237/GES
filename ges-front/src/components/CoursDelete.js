@@ -7,7 +7,7 @@ function CoursDelete() {
   let navigate = useNavigate();
 
   const handleDelete = () => {
-    axios.delete(`http://localhost:3001/Cours/${id}`)
+    axios.delete(`${config.api.baseUrl}/Cours/${id}`)
       .then(() => {
         console.log("Cours supprimé avec succès");
         navigate(`/DashboardAdmin/CoursAll`); // Utilisation de navigate pour la navigation

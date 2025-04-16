@@ -7,7 +7,7 @@ function NoteDelete() {
     const navigate = useNavigate();
 
     const handleDelete = () => {
-        axios.delete(`http://localhost:3001/Note/${idNote}`, {
+        axios.delete(`${config.api.baseUrl}/Note/${idNote}`, {
                 headers: {
                     accessToken: localStorage.getItem("accessToken"),
                 },
