@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+import config from "../config/config";
 
 function EnseignantAll() {
   let navigate = useNavigate();

@@ -1,5 +1,6 @@
 import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import config from "../config/config";
 
 function CycleDelete() {
   const { id } = useParams();

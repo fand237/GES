@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
 import { usePDF } from 'react-to-pdf';
+import config from "../config/config";
 
 const PlanningExamen = () => {
     // États

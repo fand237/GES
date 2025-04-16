@@ -3,6 +3,7 @@ import axios from 'axios';
 import html2canvas from 'html2canvas';
 import jsPDF from 'jspdf';
 import UseAuth from './UseAuth';
+import config from "../config/config";
 
 const TimetableDropArea = ({ classes, jours, ensId, enseignantNom }) => {
   const timeSlots = [

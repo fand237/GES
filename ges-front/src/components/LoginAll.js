@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import EleveConnect from './EleveConnect';
 import EnseignantConnect from './EnseignantConnect';
 import AdminConnect from './AdminConnect';
+import config from "../config/config";
 
 const LoginAll = () => {
   const [activeTab, setActiveTab] = useState('enseignant');

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Outlet, Link, useNavigate } from 'react-router-dom';
 import UseAuth from './UseAuth';
+import config from "../config/config";
 
 const DashboardEnseignant = () => {
     const { idens } = UseAuth();

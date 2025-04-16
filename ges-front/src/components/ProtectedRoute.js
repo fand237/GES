@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react';
 import { Route, Navigate, useNavigate } from 'react-router-dom';
 import { jwtDecode } from 'jwt-decode'; // Assurez-vous d'importer correctement jwt-decode
+import config from "../config/config";
 
 const useAuth = () => {
   const token = localStorage.getItem('accessToken');

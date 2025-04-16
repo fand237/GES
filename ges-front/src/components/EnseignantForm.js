@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
 import axios from 'axios';
+import config from "../config/config";
 
 function EnseignantForm() {
   const [showSuccessMessage, setShowSuccessMessage] = useState(false); // Ajout de l'état pour le message de succès

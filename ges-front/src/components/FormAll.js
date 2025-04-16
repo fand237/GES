@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import EleveForm from './EleveForm';
 import EnseignantForm from './EnseignantForm';
 import ParentForm from './ParentForm';
+import config from "../config/config";
 
 const FormAll = () => {
   const [activeTab, setActiveTab] = useState('enseignant');

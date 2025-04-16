@@ -3,6 +3,7 @@ import { useParams } from 'react-router-dom';
 import { format } from 'date-fns';
 import axios from 'axios';
 import UseAuth from './UseAuth';
+import config from "../config/config";
 
 function FicheAppel() {
   const { idens } = UseAuth();

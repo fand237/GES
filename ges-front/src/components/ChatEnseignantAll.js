@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import ChatInterfaceDesEnseignant from './ChatInterfaceDesEnseignant';
 import AnnonceEnseignant from "./AnnonceEnseignant";
+import config from "../config/config";
 
 const ChatEnseignantAll = () => {
     const [activeTab, setActiveTab] = useState('ChatInterfaceDesEnseignant');

@@ -4,6 +4,7 @@ import { useParams } from 'react-router-dom';
 import * as Yup from 'yup';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+import config from "../config/config";
 
 function CoursUpdate() {
   let histotique = useNavigate();

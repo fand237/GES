@@ -1,10 +1,10 @@
-// Navbar.js
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { jwtDecode } from 'jwt-decode'; // Assurez-vous d'importer jwt-decode correctement
 import svgUser from "../assets/images/user.svg";
 import svgDisconnect from "../assets/images/disconnect svg.svg";
 import NotificationSystem from './NotificationSystem';
+import config from "../config/config";
 
 
 const Navbar = ({ authState, logout }) => {

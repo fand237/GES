@@ -7,6 +7,7 @@ import JourForm from './JourForm';
 import SequenceForm from './SequenceForm';
 import TypeEvaluationForm from './TypeEvaluationForm';
 import AnneeAcademiqueForm from "./AnneeAcademiqueForm";
+import config from "../config/config";
 
 
 

@@ -3,6 +3,7 @@ import { Formik, Form, Field, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
 import axios from 'axios';
 import { useParams, useNavigate } from 'react-router-dom';
+import config from "../config/config";
 
 
 function EnseignantUpdate() {

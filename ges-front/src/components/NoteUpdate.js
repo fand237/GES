@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import axios from 'axios';
+import config from "../config/config";
 
 const NoteUpdate = () => {
   // Récupérer l'ID de l'enseignant depuis les paramètres d'URL

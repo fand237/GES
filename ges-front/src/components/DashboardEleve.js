@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Outlet, useNavigate } from 'react-router-dom';
+import config from "../config/config";
 
 const DashboardEleve = () => {
     const [activeTab, setActiveTab] = useState('');

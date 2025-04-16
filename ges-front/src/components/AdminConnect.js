@@ -4,6 +4,7 @@ import * as Yup from "yup";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { AuthContext } from "../helpers/AuthContext";
+import config from "../config/config";
 
 const AdminLogin = () => {
     const { setAuthState } = useContext(AuthContext);
@@ -21,7 +22,7 @@ const AdminLogin = () => {
 
     const onSubmit = async (data) => {
         try {
-            await axios.post("http://localhost:3001/Administrateur/login", data).then((response) => {
+            await axios.post(`${config.api.baseUrl}/Administrateur/login`, data).then((response) => {
                 if (response.data.error) {
                     alert(response.data.error);
                 } else {

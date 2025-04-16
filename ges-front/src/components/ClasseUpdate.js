@@ -3,6 +3,7 @@ import axios from 'axios';
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
 import { useParams, useNavigate } from 'react-router-dom';
+import config from "../config/config";
 
 const ClasseUpdate = () => {
   const { id } = useParams();

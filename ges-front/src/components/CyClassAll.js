@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import CycleAll from './CycleAll';
 import ClasseAll from './ClasseAll';
+import config from "../config/config";
 
 const CyClassAll = () => {
   const [activeTab, setActiveTab] = useState('CycleAll');

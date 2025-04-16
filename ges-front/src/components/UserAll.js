@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import EleveAll from './EleveAll';
 import EnseignantAll from './EnseignantAll';
 import ParentAll from './ParentAll';
+import config from "../config/config";
 
 const UserAll = () => {
   const [activeTab, setActiveTab] = useState('enseignant');

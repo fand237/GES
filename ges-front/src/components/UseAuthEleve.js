@@ -1,4 +1,6 @@
-import { jwtDecode } from 'jwt-decode'; 
+import { jwtDecode } from 'jwt-decode';
+import config from "../config/config";
+
 const UseAuth = () => {
   const token = localStorage.getItem('accessToken');
   let idEleve = null;

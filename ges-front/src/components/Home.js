@@ -1,6 +1,7 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import imgPresentation from "../assets/images/img-presentation.png";
+import config from "../config/config";
 
 
 
