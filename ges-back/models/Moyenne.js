@@ -12,6 +12,8 @@ module.exports = (sequelize, DataTypes) => {
     cours: {
       type: DataTypes.INTEGER,
       allowNull: false,
+      unique: true ,
+
     },
     sequence: {
       type: DataTypes.INTEGER,
