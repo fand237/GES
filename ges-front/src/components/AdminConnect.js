@@ -22,6 +22,8 @@ const AdminLogin = () => {
 
     const onSubmit = async (data) => {
         try {
+            console.log('URL appelée:', `${config.api.baseUrl}/Administrateur/login`);
+
             await axios.post(`${config.api.baseUrl}/Administrateur/login`, data).then((response) => {
                 if (response.data.error) {
                     alert(response.data.error);
