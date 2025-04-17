@@ -5,13 +5,16 @@ module.exports = (sequelize,DataTypes) => {
   const Note = sequelize.define("Note",{
     eleve: {
       type: DataTypes.INTEGER,
+      primaryKey: true,
+
       allowNull: true,
       
     },
     cours: {
       type: DataTypes.INTEGER,
+      primaryKey: true,
+
       allowNull: true,
-      unique: true ,
 
 
     },
