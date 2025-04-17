@@ -163,6 +163,23 @@ function App() {
     });
   }
 
+  const AutoRedirect = () => {
+    if (!authState.status) {
+      return <Navigate to="/Home" replace />;
+    }
+
+    switch(authState.typeUtilisateur) {
+      case "Eleve":
+        return <Navigate to="/DashboardEleve" replace />;
+      case "Enseignant":
+        return <Navigate to="/DashboardEnseignant" replace />;
+      case "Administrateur":
+        return <Navigate to="/DashboardAdmin" replace />;
+      default:
+        return <Navigate to="/Home" replace />;
+    }
+  };
+
   return (
     <div className="App">
       <AuthContext.Provider value={{ authState, setAuthState }}>
@@ -172,6 +189,7 @@ function App() {
 
 
           <Routes>
+            <Route path="/" element={<AutoRedirect/>} />
             <Route path="/Home" element={<Home />} />
 
 
