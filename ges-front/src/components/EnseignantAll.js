@@ -206,13 +206,13 @@ console.log(response.data);
                   <td className="p-4 flex gap-2">
                     <button
                       onClick={() => navigate(`/DashboardAdmin/EnseignantDelete/${enseignant.id}`)}
-                      className="text-red-600 hover:text-red-800 font-medium"
+                      className="delete-button"
                     >
                       Supprimer
                     </button>
                     <button
                       onClick={() => navigate(`/DashboardAdmin/EnseignantUpdate/${enseignant.id}`)}
-                      className="text-blue-600 hover:text-blue-800 font-medium"
+                      className="modify-button"
                     >
                       Modifier
                     </button>

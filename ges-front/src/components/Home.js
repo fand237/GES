@@ -49,7 +49,7 @@ const Home = () => {
       <div id="Fonctionnalités" className="services bg-white py-16">
         <div className="container mx-auto">
           <h2 className="text-3xl font-bold mb-6 text-center">
-            Principales <em className="text-purple-500">Fonctionnalités</em> de <em>SISOKO</em>
+            Principales <em className="text-purple-500">Fonctionnalités</em> de <em>SoukouGES</em>
           </h2>
           <p className="text-center mb-12">
             Explorez une multitude de fonctionnalités avancées avec notre application de gestion d'établissement.
@@ -58,7 +58,7 @@ const Home = () => {
             <div className="service-item text-center p-6 bg-gray-100 rounded-lg shadow-md">
               <h3 className="text-xl font-bold mb-2">Gestion des Élèves</h3>
               <p>
-                SISOKO permet une gestion efficace des données des élèves, y compris les inscriptions, les transferts et les résultats académiques.
+                SoukouGES permet une gestion efficace des données des élèves, y compris les inscriptions, les transferts et les résultats académiques.
               </p>
             </div>
             <div className="service-item text-center p-6 bg-gray-100 rounded-lg shadow-md">
@@ -82,7 +82,7 @@ const Home = () => {
             <div className="service-item text-center p-6 bg-gray-100 rounded-lg shadow-md">
               <h3 className="text-xl font-bold mb-2">Sécurité et Confidentialité</h3>
               <p>
-                SISOKO garantit la sécurité des données avec des normes de confidentialité rigoureuses.
+                SoukouGES garantit la sécurité des données avec des normes de confidentialité rigoureuses.
               </p>
             </div>
             <div className="service-item text-center p-6 bg-gray-100 rounded-lg shadow-md">
@@ -99,7 +99,7 @@ const Home = () => {
       <div id="Avantages" className="about-us bg-gray-50 py-16">
         <div className="container mx-auto">
           <h2 className="text-3xl font-bold mb-6 text-center">
-            Pourquoi <em className="text-purple-500">avoir SISOKO</em> dans votre établissement ?
+            Pourquoi <em className="text-purple-500">avoir SoukouGES</em> dans votre établissement ?
           </h2>
           <p className="text-center mb-12">
             Découvrez les avantages exceptionnels de notre application de gestion scolaire.

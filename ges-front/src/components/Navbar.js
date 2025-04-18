@@ -42,7 +42,7 @@ const Navbar = ({ authState, logout }) => {
           <div className="navbar flex justify-between items-center p-0 bg-purple-700 text-white">
             <div className="container mx-auto flex justify-between items-center py-4 px-6">
               <Link to="/Home" className="text-2xl font-bold">
-                G.E.S  <span className="text-blue-500">.</span>
+                SoukouGES  <span className="text-blue-500">.</span>
               </Link>
               <div className="flex space-x-6">
 

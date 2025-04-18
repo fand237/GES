@@ -16,20 +16,22 @@ function CoursAll() {
   useEffect(() => {
     const fetchCours = async () => {
       try {
+        console.log('URL appelée:', `${config.api.baseUrl}/Cours`);
+
         const response = await axios.get(`${config.api.baseUrl}/Cours`);
         const coursesWithDetails = await Promise.all(
           response.data.map(async (course) => {
-            const enseignantDetails = course.Enseignant ? await axios.get(`${config.api.baseUrl}Enseignants/${course.Enseignant}`, {
+            const enseignantDetails = course.Enseignant ? await axios.get(`${config.api.baseUrl}/Enseignants/${course.Enseignant}`, {
               headers: {
                 accessToken: localStorage.getItem("accessToken"),
               },
             }) : null;
 
-            const joursDetails = course.jour ? await axios.get(`${config.api.baseUrl}/Jour/${course.jour},{
+            const joursDetails = course.jour ? await axios.get(`${config.api.baseUrl}/Jour/${course.jour}`,{
           headers: {
             accessToken: localStorage.getItem("accessToken"),
           },
-        }`) : null;
+        }) : null;
             const classesDetails = course.classe ? await axios.get(`${config.api.baseUrl}/Classe/${course.classe}`,{
               headers: {
                 accessToken: localStorage.getItem("accessToken"),
@@ -152,13 +154,13 @@ function CoursAll() {
             <div className="flex justify-between">
               <button
                 onClick={() => navigate(`/DashboardAdmin/CoursUpdate/${value.id}`)}
-                className="px-4 py-2 bg-blue-500 text-white text-sm rounded hover:bg-blue-600 focus:ring focus:ring-blue-300"
+                className="modify-button"
               >
                 Modifier
               </button>
               <button
                 onClick={() => navigate(`/DashboardAdmin/CoursDelete/${value.id}`)}
-                className="px-4 py-2 bg-red-500 text-white text-sm rounded hover:bg-red-600 focus:ring focus:ring-red-300"
+                className="delete-button"
               >
                 Supprimer
               </button>

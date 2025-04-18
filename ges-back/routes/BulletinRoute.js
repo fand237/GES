@@ -20,6 +20,7 @@ router.get("/byeleve/:idEleve/:idSequence", async (req, res) => {
   const idEleve = req.params.idEleve;
   const idSequence = req.params.idSequence;
 
+  console.log("Requête reçue sur /byeleve avec idEleve:", idEleve, "et idSequence:", idSequence);
 
 
   try {
@@ -32,7 +33,7 @@ router.get("/byeleve/:idEleve/:idSequence", async (req, res) => {
           as: 'eleveBulletin',
           where: { id: idEleve },
           include: [{ model: Classe, attributes: ['classe'], as: 'classeEleve' ,
-          include :[{ model:Enseignant, attributes:['nom','civilite', 'prenom'],  as:'ResponsableClasse'}]}
+            include :[{ model:Enseignant, attributes:['nom','civilite', 'prenom'],  as:'ResponsableClasse'}]}
           ]
         },
         {
@@ -83,7 +84,6 @@ router.get("/byeleve/:idEleve/:idSequence", async (req, res) => {
       where: { id: idEleve},
       attributes: ['classe'],
     });
-    console.log("les donnees de l'eleve",classe);
     const idClasse = classe.classe;
 
     // Récupérer l'année académique active (2024-2025)
@@ -110,7 +110,7 @@ router.get("/byeleve/:idEleve/:idSequence", async (req, res) => {
 
     if (!distinctElements.length) {
       console.log("aucune donne trouve");
-      return res.status(404).json({ message: 'Aucune donnée trouvée' });
+      return res.status(502).json({ message: 'Aucune donnée trouvée' });
     }
 
     // Convertir les instances Sequelize en objets JSON

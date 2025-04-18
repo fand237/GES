@@ -3,17 +3,19 @@
 
 module.exports = (sequelize,DataTypes) => {
   const Note = sequelize.define("Note",{
-    eleve: {
+    id: {
       type: DataTypes.INTEGER,
       primaryKey: true,
+      autoIncrement: true,
+    },
 
+    eleve: {
+      type: DataTypes.INTEGER,
       allowNull: true,
       
     },
     cours: {
       type: DataTypes.INTEGER,
-      primaryKey: true,
-
       allowNull: true,
 
 

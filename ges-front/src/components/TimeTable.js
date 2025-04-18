@@ -73,7 +73,7 @@ const TimetableDropArea = ({ classes, jours, selectedClass, handleClassChange, t
             });
 
             const enseignantDetails = await axios.get(
-              `http://localhost:3001/Enseignants/${coursDetails.data.Enseignant}`, {
+              `${config.api.baseUrl}/Enseignants/${coursDetails.data.Enseignant}`, {
                 headers: {
                   accessToken: localStorage.getItem("accessToken"),
                 },
@@ -124,7 +124,7 @@ const TimetableDropArea = ({ classes, jours, selectedClass, handleClassChange, t
   const deleteJour_Cours = async (jourCoursId) => {
     try {
       // Faites une requête DELETE pour supprimer le Jour_Cours côté serveur
-      const response = await axios.delete(`http://localhost:3001/Jour_Cours/${jourCoursId}`,{
+      const response = await axios.delete(`${config.api.baseUrl}/Jour_Cours/${jourCoursId}`,{
         headers: {
           accessToken: localStorage.getItem("accessToken"),
         },
@@ -198,7 +198,7 @@ const TimetableDropArea = ({ classes, jours, selectedClass, handleClassChange, t
         draggedItem.course.Enseignant.id,
         timetableId,
         draggedItem.course)
-      const response = await axios.post('http://localhost:3001/Jour_Cours/create', {
+      const response = await axios.post(`${config.api.baseUrl}/Jour_Cours/create`, {
         coursId: draggedItem.course.id,
         jourId: jours[colIndex - 1].id,
         heureDebut: timeSlots[rowIndex].heureDebut,
@@ -395,7 +395,7 @@ const TimeTable = () => {
       // Vérifiez si la classe est sélectionnée
       if (selectedClass) {
         // Vérifiez si un emploi du temps existe déjà pour cette classe
-        const existingTimetable = await axios.get(`http://localhost:3001/Emplois_temps/byclasse/${selectedClass.id}`);
+        const existingTimetable = await axios.get(`${config.api.baseUrl}/Emplois_temps/byclasse/${selectedClass.id}`);
 
         let id;
 
@@ -403,7 +403,7 @@ const TimeTable = () => {
         // Si l'emploi du temps n'existe pas, créez-en un
         if (!existingTimetable.data) {
           console.log("ID de l'emploi du temps n'existe pas");
-          const createdTimetable = await axios.post('http://localhost:3001/Emplois_temps', {
+          const createdTimetable = await axios.post(`${config.api.baseUrl}/Emplois_temps`, {
             classe: selectedClass.id,
           });
           id = createdTimetable.data.id;
@@ -430,7 +430,7 @@ const TimeTable = () => {
   useEffect(() => {
     const fetchClasse = async () => {
       try {
-        const response = await axios.get("http://localhost:3001/Classe",
+        const response = await axios.get(`${config.api.baseUrl}/Classe`,
           {
             headers: {
               accessToken: localStorage.getItem("accessToken"),
@@ -451,7 +451,7 @@ const TimeTable = () => {
   useEffect(() => {
     const fetchJours = async () => {
       try {
-        const response = await axios.get("http://localhost:3001/Jour",{
+        const response = await axios.get(`${config.api.baseUrl}/Jour`,{
           headers: {
             accessToken: localStorage.getItem("accessToken"),
           },
@@ -468,7 +468,7 @@ const TimeTable = () => {
   useEffect(() => {
     if (selectedClass) {
       axios
-        .get(`http://localhost:3001/Cours/byclasse/${selectedClass.id}`,
+        .get(`${config.api.baseUrl}/Cours/byclasse/${selectedClass.id}`,
         {
           headers:{
             accessToken: localStorage.getItem("accessToken"),
@@ -485,14 +485,14 @@ const TimeTable = () => {
             response.data.map(async (course) => {
 
               const enseignantDetails = await axios.get(
-                `http://localhost:3001/Enseignants/${course.Enseignant}`,{
+                `${config.api.baseUrl}/Enseignants/${course.Enseignant}`,{
                   headers:{
                     accessToken: localStorage.getItem("accessToken"),
                   },
                 }
               );
               const joursDetails = await axios.get(
-                "http://localhost:3001/Jour/${course.jour}",{
+                `${config.api.baseUrl}/Jour/${course.jour}`,{
                   headers: {
                     accessToken: localStorage.getItem("accessToken"),
                   },

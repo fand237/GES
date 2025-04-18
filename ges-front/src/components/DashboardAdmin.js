@@ -1,160 +1,201 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Outlet, useNavigate } from 'react-router-dom';
+import {
+    FiMenu,
+    FiX,
+    FiChevronRight,
+    FiChevronLeft,
+    FiUsers,
+    FiCalendar,
+    FiUserCheck,
+    FiBook,
+    FiBookOpen,
+    FiLayers,
+    FiGrid,
+    FiClipboard,
+    FiBarChart2,
+    FiEdit3
+} from 'react-icons/fi';
 import config from "../config/config";
 
 const DashboardAdmin = () => {
     const [activeTab, setActiveTab] = useState('');
+    const [isCollapsed, setIsCollapsed] = useState(false);
+    const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
+    const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
     const navigate = useNavigate();
+
+    useEffect(() => {
+        const handleResize = () => {
+            setIsMobile(window.innerWidth < 768);
+            if (window.innerWidth >= 768) {
+                setMobileMenuOpen(false);
+            }
+        };
+
+        window.addEventListener('resize', handleResize);
+        return () => window.removeEventListener('resize', handleResize);
+    }, []);
 
     const handleTabChange = (tab, path) => {
         setActiveTab(tab);
         navigate(path);
+        if (isMobile) setMobileMenuOpen(false);
     };
 
+    const toggleSidebar = () => {
+        if (isMobile) {
+            setMobileMenuOpen(!mobileMenuOpen);
+        } else {
+            setIsCollapsed(!isCollapsed);
+        }
+    };
+
+    // Configuration des éléments du menu avec icônes
+    const menuItems = [
+        {
+            tab: 'FormAll',
+            path: '/DashboardAdmin/FormAll',
+            label: 'Enregistrement utilisateurs',
+            icon: <FiUsers className="flex-shrink-0" />
+        },
+        {
+            tab: 'EmploisTemps',
+            path: '/DashboardAdmin/EmploisTemps',
+            label: 'Emplois de temps',
+            icon: <FiCalendar className="flex-shrink-0" />
+        },
+        {
+            tab: 'UserAll',
+            path: '/DashboardAdmin/UserAll',
+            label: 'Gérer les Utilisateurs',
+            icon: <FiUserCheck className="flex-shrink-0" />
+        },
+        {
+            tab: 'CoursAll',
+            path: '/DashboardAdmin/CoursAll',
+            label: 'Gérer les cours',
+            icon: <FiBook className="flex-shrink-0" />
+        },
+        {
+            tab: 'CoursForm',
+            path: '/DashboardAdmin/CoursForm',
+            label: 'Enregistrement des Cours',
+            icon: <FiBookOpen className="flex-shrink-0" />
+        },
+        {
+            tab: 'CyClass',
+            path: '/DashboardAdmin/CyClass',
+            label: 'Cycles et Classes',
+            icon: <FiLayers className="flex-shrink-0" />
+        },
+        {
+            tab: 'CyClassAll',
+            path: '/DashboardAdmin/CyClassAll',
+            label: 'Gérer Cycles/Classes',
+            icon: <FiGrid className="flex-shrink-0" />
+        },
+        {
+            tab: 'PresenceRapport',
+            path: '/DashboardAdmin/PresenceRapport',
+            label: 'Rapport des présences',
+            icon: <FiClipboard className="flex-shrink-0" />
+        },
+        {
+            tab: 'StatistiquesMoyenne',
+            path: '/DashboardAdmin/StatistiquesMoyenne',
+            label: 'Statistiques',
+            icon: <FiBarChart2 className="flex-shrink-0" />
+        },
+        {
+            tab: 'PlanningExamen',
+            path: '/DashboardAdmin/PlanningExamen',
+            label: 'Plannifier Examens',
+            icon: <FiEdit3 className="flex-shrink-0" />
+        }
+    ];
+
     return (
-        <div className="flex h-screen">
+        <div className="flex h-screen bg-gray-100">
+            {/* Bouton de menu pour mobile */}
+            <button
+                onClick={toggleSidebar}
+                className="md:hidden fixed top-4 left-4 z-50 bg-purple-600 text-white p-2 rounded-lg shadow-lg"
+            >
+                {mobileMenuOpen ? <FiX size={24} /> : <FiMenu size={24} />}
+            </button>
+
             {/* Sidebar */}
-            <nav className="fixed top-16 left-0 h-[calc(100%-4rem)] w-64 bg-gradient-to-b from-purple-500 to-purple-800 text-white shadow-lg">
-                <div className="p-4">
-                    <h1 className="text-xl font-bold mb-6 text-center">
-                        Admin Dashboard
-                    </h1>
-                    <ul className="space-y-4">
-                        <li>
+            <nav className={`
+                fixed md:relative fixed top-16 left-0 h-[calc(100%-4rem)] bg-gradient-to-b from-purple-500 to-purple-800 text-white shadow-lg
+                transition-all duration-300 ease-in-out z-40
+                ${isMobile ?
+                (mobileMenuOpen ? 'w-64 translate-x-0' : '-translate-x-full') :
+                (isCollapsed ? 'w-20' : 'w-64')
+            }
+            `}>
+                <div className="p-4 h-full flex flex-col">
+                    {/* En-tête avec bouton de repli */}
+                    <div className={`flex items-center ${isCollapsed && !isMobile ? 'justify-center' : 'justify-between'} mb-6`}>
+                        {(!isCollapsed || isMobile) && (
+                            <h1 className="text-xl font-bold">
+                                {isMobile ? 'Menu' : 'Admin Dashboard'}
+                            </h1>
+                        )}
+                        {!isMobile && (
                             <button
-                                className={`w-full text-left px-4 py-2 rounded-lg transition ${
-                                    activeTab === 'FormAll'
-                                        ? 'bg-purple-600 font-semibold'
-                                        : 'hover:bg-purple-700'
-                                }`}
-                                onClick={() => handleTabChange('FormAll', '/DashboardAdmin/FormAll')}
+                                onClick={toggleSidebar}
+                                className="text-white hover:bg-purple-700 p-1 rounded-full"
                             >
-                                Enregistrement utilisateurs
+                                {isCollapsed ? <FiChevronRight size={20} /> : <FiChevronLeft size={20} />}
                             </button>
-                        </li>
-                        <li>
-                            <button
-                                className={`w-full text-left px-4 py-2 rounded-lg transition ${
-                                    activeTab === 'EmploisTemps'
-                                        ? 'bg-purple-600 font-semibold'
-                                        : 'hover:bg-purple-700'
-                                }`}
-                                onClick={() => handleTabChange('EmploisTemps', '/DashboardAdmin/EmploisTemps')}
-                            >
-                                Gérer les emplois de temps
-                            </button>
-                        </li>
-                        <li>
-                            <button
-                                className={`w-full text-left px-4 py-2 rounded-lg transition ${
-                                    activeTab === 'UserAll'
-                                        ? 'bg-purple-600 font-semibold'
-                                        : 'hover:bg-purple-700'
-                                }`}
-                                onClick={() => handleTabChange('UserAll', '/DashboardAdmin/UserAll')}
-                            >
-                                Gérer les Utilisateurs
-                            </button>
-                        </li>
-                        <li>
-                            <button
-                                className={`w-full text-left px-4 py-2 rounded-lg transition ${
-                                    activeTab === 'CoursAll'
-                                        ? 'bg-purple-600 font-semibold'
-                                        : 'hover:bg-purple-700'
-                                }`}
-                                onClick={() => handleTabChange('CoursAll', '/DashboardAdmin/CoursAll')}
-                            >
-                                Gérer les cours
-                            </button>
-                        </li>
-                        <li>
-                            <button
-                                className={`w-full text-left px-4 py-2 rounded-lg transition ${
-                                    activeTab === 'CoursForm'
-                                        ? 'bg-purple-600 font-semibold'
-                                        : 'hover:bg-purple-700'
-                                }`}
-                                onClick={() => handleTabChange('CoursForm', '/DashboardAdmin/CoursForm')}
-                            >
-                                Enregistrement des Cours
-                            </button>
-                        </li>
-                        <li>
-                            <button
-                                className={`w-full text-left px-4 py-2 rounded-lg transition ${
-                                    activeTab === 'CyClass'
-                                        ? 'bg-purple-600 font-semibold'
-                                        : 'hover:bg-purple-700'
-                                }`}
-                                onClick={() => handleTabChange('CyClass', '/DashboardAdmin/CyClass')}
-                            >
-                                Enregistrement des Cycles et Classes
-                            </button>
-                        </li>
-                        
-                        <li>
-                            <button
-                                className={`w-full text-left px-4 py-2 rounded-lg transition ${
-                                    activeTab === 'CyClassAll'
-                                        ? 'bg-purple-600 font-semibold'
-                                        : 'hover:bg-purple-700'
-                                }`}
-                                onClick={() => handleTabChange('CyClassAll', '/DashboardAdmin/CyClassAll')}
-                            >
-                                Gérer les Cycles et Classes
-                            </button>
-                        </li>
-                        <li>
-                            <button
-                                className={`w-full text-left px-4 py-2 rounded-lg transition ${
-                                    activeTab === 'PresenceRapport'
-                                        ? 'bg-purple-600 font-semibold'
-                                        : 'hover:bg-purple-700'
-                                }`}
-                                onClick={() => handleTabChange('PresenceRapport', '/DashboardAdmin/PresenceRapport')}
-                            >
-                                Rapport des présences
-                            </button>
-                        </li>
-                        <li>
-                            <button
-                                className={`w-full text-left px-4 py-2 rounded-lg transition ${
-                                    activeTab === 'StatistiquesMoyenne'
-                                        ? 'bg-purple-600 font-semibold'
-                                        : 'hover:bg-purple-700'
-                                }`}
-                                onClick={() => handleTabChange('StatistiquesMoyenne', '/DashboardAdmin/StatistiquesMoyenne')}
-                            >
-                                Rapport des Statistiques
-                            </button>
-                        </li>
+                        )}
+                    </div>
 
-                        <li>
-                            <button
-                                className={`w-full text-left px-4 py-2 rounded-lg transition ${
-                                    activeTab === 'PlanningExamen'
-                                        ? 'bg-purple-600 font-semibold'
-                                        : 'hover:bg-purple-700'
-                                }`}
-                                onClick={() => handleTabChange('PlanningExamen', '/DashboardAdmin/PlanningExamen')}
-                            >
-                                Plannifier les Examens
-                            </button>
-                        </li>
-
+                    {/* Menu items */}
+                    <ul className="flex-1 space-y-2 overflow-y-auto">
+                        {menuItems.map((item) => (
+                            <li key={item.tab}>
+                                <button
+                                    className={`
+                                        w-full flex items-center px-4 py-3 rounded-lg transition
+                                        ${activeTab === item.tab ?
+                                        'bg-purple-600 font-semibold' :
+                                        'hover:bg-purple-700'
+                                    }
+                                    `}
+                                    onClick={() => handleTabChange(item.tab, item.path)}
+                                    title={isCollapsed && !isMobile ? item.label : ''}
+                                >
+                                    <span className="mr-3 flex items-center justify-center" style={{ minWidth: '24px' }}>
+                                        {item.icon}
+                                    </span>
+                                    {(!isCollapsed || isMobile) && (
+                                        <span>{item.label}</span>
+                                    )}
+                                </button>
+                            </li>
+                        ))}
                     </ul>
+
+                    {/* Pied de page */}
+                    {(!isCollapsed || isMobile) && (
+                        <footer className="mt-auto pt-4 text-center text-xs">
+                            <p>
+                                &copy; {new Date().getFullYear()} Tous droits réservés.<br />
+                                Gestionnaire d'établissement scolaire
+                            </p>
+                        </footer>
+                    )}
                 </div>
-                <footer className="absolute bottom-4 w-full text-center text-sm">
-                    <p>
-                        &copy; {new Date().getFullYear()} Tous droits réservés.{' '}
-                        Gestionnaire d'établissement scolaire
-                    </p>
-                </footer>
             </nav>
 
             {/* Main Content */}
-            <div className="ml-64 mt-16 flex-1 bg-gray-100 p-6 overflow-auto">
+            <div className={`
+                flex-1 bg-gray-100 p-6 overflow-auto
+                transition-all duration-300 ease-in-out
+                ${isMobile ? 'ml-0 mt-16' : (isCollapsed ? 'ml-0' : 'ml-0 mt-16')} ml-0 mt-16'}
+            `}>
                 <Outlet />
             </div>
         </div>

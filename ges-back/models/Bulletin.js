@@ -1,9 +1,5 @@
 // models/Bulletin.js
 
-
-
-
-
 module.exports = (sequelize, DataTypes) => {
     const Bulletin = sequelize.define("Bulletin", {
         id: {

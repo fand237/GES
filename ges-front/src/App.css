@@ -83,11 +83,16 @@ th {
 }
 
 .modify-button{
+  @apply px-4 py-2 bg-blue-500 text-white text-sm rounded hover:bg-blue-600 focus:ring focus:ring-blue-300
+}
+
+.valid-button{
   @apply bg-green-500 text-white py-1 px-2 rounded hover:bg-blue-700
 }
 
+
 .delete-button{
-  @apply bg-red-600 text-white py-1 px-2 rounded mr-2 hover:bg-red-700
+  @apply px-4 py-2 bg-red-500 text-white text-sm rounded hover:bg-red-600 focus:ring focus:ring-red-300
 }
 
 .dashboard-button{
@@ -302,4 +307,37 @@ th {
 
 .notification-item:hover {
   background-color: #f0f4ff;
+}
+
+
+/* Dans votre fichier CSS global */
+.transition-all {
+  transition-property: all;
+}
+
+.duration-300 {
+  transition-duration: 300ms;
+}
+
+.ease-in-out {
+  transition-timing-function: ease-in-out;
+}
+
+/* Pour le scroll dans la sidebar */
+.overflow-y-auto {
+  scrollbar-width: thin;
+  scrollbar-color: #7e22ce #4c1d95;
+}
+
+.overflow-y-auto::-webkit-scrollbar {
+  width: 6px;
+}
+
+.overflow-y-auto::-webkit-scrollbar-thumb {
+  background-color: #7e22ce;
+  border-radius: 3px;
+}
+
+.overflow-y-auto::-webkit-scrollbar-track {
+  background-color: #4c1d95;
 }
