@@ -71,7 +71,7 @@ const LeconGen = () => {
 
     // Exemples de prompts prédéfinis
     const presetPrompts = [
-        "Crée une leçon sur les systèmes d'information en Terminale TI",
+        "Crée une leçon sur les systèmes d'information en Terminale Technmologie de l'information",
         "Propose une leçon sur les réseaux informatiques pour lycée",
         "Génère un cours sur les bases de données relationnelles"
     ];
