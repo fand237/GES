@@ -81,7 +81,7 @@ const DashboardEnseignant = () => {
         },
         {
             tab: 'CreerLecons',
-            path: '/DashboardEnseignant/ChatEnseignantAll',
+            path: '/DashboardEnseignant/LeconGen',
             label: 'Créer des leçons',
             icon: <FiBook className="flex-shrink-0" />
         }

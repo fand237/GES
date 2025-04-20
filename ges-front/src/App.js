@@ -19,6 +19,7 @@ import StatistiquesMoyenne from "./components/StatistiquesMoyenne";
 import PlanningExamen from './components/PlanningExamen';
 
 import DashboardEleve from './components/DashboardEleve'
+import LeconGen from './components/LeconGen';
 
 import CyClass from './components/CyClass'
 import CyClassAll from './components/CyClassAll'
@@ -202,6 +203,8 @@ function App() {
               <Route path="NoteUpdate/:idCours/:idClasse/:idSequence/:idType/:date" element={<ProtectedRoute requiredRole="Enseignant"> <NoteUpdate2 /> </ProtectedRoute>} />
               <Route path="NoteDelete/:idNote" element={<ProtectedRoute requiredRole="Enseignant"> <NoteDelete /> </ProtectedRoute>} />
               <Route path="ChatEnseignantAll" element={<ProtectedRoute requiredRole="Enseignant"> <ChatEnseignantAll /> </ProtectedRoute>} />
+              <Route path="LeconGen" element={<ProtectedRoute requiredRole="Enseignant"> <LeconGen /> </ProtectedRoute>} />
+
 
               <Route path="EmploisTempsEnseignant" element={<ProtectedRoute requiredRole="Enseignant"> <TimeTableEnseignant /> </ProtectedRoute>} />
 
