@@ -16,6 +16,8 @@ const NoteEval = () => {
             .then(response => {
                 console.log(response.data);
                 setEvaluations(response.data);
+                console.log("les evaluations sont:",response.data);
+
             })
             .catch(error => {
                 console.error('Erreur lors de la récupération des évaluations :', error);

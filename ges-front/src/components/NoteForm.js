@@ -33,6 +33,8 @@ const NoteForm = () => {
           },
         });
         setSequences(response.data);
+        console.log("les sequences sont:",response.data);
+
       } catch (error) {
         console.error('Erreur lors de la récupération de la liste des séquences :', error);
       }
@@ -49,6 +51,7 @@ const NoteForm = () => {
             accessToken: localStorage.getItem("accessToken"),
           },
         });
+        console.log("les evaluations sont:",response.data);
         setTypeEvaluation(response.data);
       } catch (error) {
         console.error('Erreur lors de la récupération de la liste des types d\'évaluation :', error);
