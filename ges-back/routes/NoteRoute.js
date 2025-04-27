@@ -109,9 +109,9 @@ router.get("/byeval/:idEnseignant", async (req, res) => {
     const distinctElements = await Note.findAll({
       attributes: [[fn('MIN', col('Note.id')), 'id'], 'cours', 'sequence', 'type_Evaluation', 'dateEvaluation','annee'],
       include: [
-        { model: Cours, attributes: ['id', 'matiere', 'Enseignant'], as: 'coursNote', include: [{ model: Classe, as: 'classeCours' }], where: { Enseignant: idEnseignant } }, // Utilisez l'alias 'coursNote' correspondant à votre association
-        { model: Sequence, attributes: ['sequence'], as: 'sequenceNote' }, // Utilisez l'alias 'sequenceNote' correspondant à votre association
-        { model: Type_Evaluation, attributes: ['type'], as: 'TypeNote' }, // Utilisez l'alias 'typeEvaluationNote' correspondant à votre association
+        { model: Cours, attributes: ['id', 'matiere', 'Enseignant'], as: 'coursNote', include: [{ model: Classe, as: 'classeCours' }], where: { Enseignant: idEnseignant } },
+        { model: Sequence, attributes: ['sequence'], as: 'sequenceNote' },
+        { model: Type_Evaluation, attributes: ['type'], as: 'TypeNote' },
       ],
       group: ['cours', 'sequence', 'type_Evaluation', 'dateEvaluation','annee'],
       raw: true,
@@ -145,7 +145,6 @@ router.delete('/:id', validateToken, async (req, res) => {
     res.status(500).json({ error: 'Erreur lors de la suppression de la note' });
   }
 });
-// Autres routes CRUD à ajouter selon les besoins
 
 
 

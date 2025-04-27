@@ -15,3 +15,21 @@ module.exports = function override(config) {
     })
     return config;
 }
+
+module.exports = function override(config, env) {
+    config.module.rules[1].oneOf.forEach((rule) => {
+        if (rule.options && rule.options.presets) {
+            rule.options.plugins = [
+                ...(rule.options.plugins || []),
+                [
+                    'react-i18next',
+                    {
+                        locales: ['fr', 'en'],
+                        keyAsDefaultValue: true,
+                    },
+                ],
+            ];
+        }
+    });
+    return config;
+};

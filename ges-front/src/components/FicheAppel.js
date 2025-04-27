@@ -164,112 +164,123 @@ function FicheAppel() {
   };
 
   return (
-    <div className="ficheAppelPage p-4">
-      <h2 className="text-2xl font-bold mb-4">Fiche d'appel</h2>
-      <label className="block mb-2">Sélectionnez un cours :</label>
-      <select
-        onChange={handleCoursChange}
-        value={selectedCours ? selectedCours.id : ''}
-        className="block w-full p-2 border border-gray-300 rounded mb-4"
-      >
-        <option value="" disabled>Sélectionnez un cours</option>
-        {coursList.map((cours) => (
-          <option key={cours.id} value={cours.id}>
-            {cours.matiere} ({cours.classe.classe})
-          </option>
-        ))}
-      </select>
+      <div className="p-2 md:p-4">
+        <h2 className="text-xl md:text-2xl font-bold mb-4">Fiche d'appel</h2>
 
-      {selectedCours && (
-        <>
-          <label className="block mb-2">Résumé du cours :</label>
-          <textarea
-            value={resumeCours}
-            onChange={(e) => setResumeCours(e.target.value)}
-            className="block w-full p-2 border border-gray-300 rounded mb-4"
-          />
-
-          <table className="min-w-full table-auto">
-            <thead>
-              <tr>
-                <th className="px-4 py-2">Nom</th>
-                <th className="px-4 py-2">Prénom</th>
-                <th className="px-4 py-2">Présence</th>
-                <th className="px-4 py-2">Participation</th>
-                <th className="px-4 py-2">Retard (min)</th>
-              </tr>
-            </thead>
-            <tbody>
-              {elevesList.map((eleve) => (
-                <tr key={eleve.id}>
-                  <td className="border px-4 py-2">{eleve.nom}</td>
-                  <td className="border px-4 py-2">{eleve.prenom}</td>
-                  <td className="border px-4 py-2">
-                  <div className="flex space-x-4">
-  <label className="inline-flex items-center">
-    <input
-      type="radio"
-      name={`presence-${eleve.id}`}
-      value="Présent(e)"
-      checked={presenceStatus[eleve.id] === 'Présent(e)'}
-      onChange={(e) => handlePresenceChange(eleve, e.target.value)}
-      className="form-radio"
-    />
-    <span className="ml-2">Présent(e)</span>
-  </label>
-  
-  <label className="inline-flex items-center">
-    <input
-      type="radio"
-      name={`presence-${eleve.id}`}
-      value="Absent(e)"
-      checked={presenceStatus[eleve.id] === 'Absent(e)'}
-      onChange={(e) => handlePresenceChange(eleve, e.target.value)}
-      className="form-radio"
-    />
-    <span className="ml-2">Absent(e)</span>
-  </label>
-</div>
-
-                  </td>
-                  <td className="border px-4 py-2">
-  <input
-    type="number"
-    min="1"
-    max="5"
-    value={participation[eleve.id] || ''}
-    onChange={(e) => handleParticipationChange(eleve.id, e.target.value)}
-    className="block w-full p-2 border border-gray-300 rounded"
-    disabled={presenceStatus[eleve.id] === 'Absent(e)'}
-  />
-</td>
-
-                  <td className="border px-4 py-2">
-                    {presenceStatus[eleve.id] === 'Présent(e)' && (
-                      <input
-                        type="number"
-                        min="0"
-                        value={retardMinutes[eleve.id] || ''}
-                        onChange={(e) => handleRetardMinutesChange(eleve.id, e.target.value)}
-                        onKeyDown={(e) => handleKeyDown(e, eleve)}
-                        className="form-input w-full"
-                      />
-                    )}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-
-          <button
-            onClick={handleEnregistrer}
-            className="mt-4 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+        {/* Sélection du cours */}
+        <div className="mb-4">
+          <label className="block mb-2 text-sm md:text-base">Sélectionnez un cours :</label>
+          <select
+              onChange={handleCoursChange}
+              value={selectedCours ? selectedCours.id : ''}
+              className="block w-full p-2 text-sm md:text-base border border-gray-300 rounded"
           >
-            Enregistrer
-          </button>
-        </>
-      )}
-    </div>
+            <option value="" disabled>Sélectionnez un cours</option>
+            {coursList.map((cours) => (
+                <option key={cours.id} value={cours.id}>
+                  {cours.matiere} ({cours.classe.classe})
+                </option>
+            ))}
+          </select>
+        </div>
+
+        {selectedCours && (
+            <>
+              {/* Résumé du cours */}
+              <div className="mb-4">
+                <label className="block mb-2 text-sm md:text-base">Résumé du cours :</label>
+                <textarea
+                    value={resumeCours}
+                    onChange={(e) => setResumeCours(e.target.value)}
+                    className="block w-full p-2 text-sm md:text-base border border-gray-300 rounded"
+                    rows="3"
+                />
+              </div>
+
+              {/* Tableau des élèves - version responsive */}
+              <div className="overflow-x-auto">
+                <table className="min-w-full bg-white border border-gray-300">
+                  <thead className="bg-gray-100">
+                  <tr>
+                    <th className="p-2 md:p-3 text-left text-xs md:text-sm font-medium text-gray-700 uppercase tracking-wider">Nom</th>
+                    <th className="p-2 md:p-3 text-left text-xs md:text-sm font-medium text-gray-700 uppercase tracking-wider">Prénom</th>
+                    <th className="p-2 md:p-3 text-left text-xs md:text-sm font-medium text-gray-700 uppercase tracking-wider">Présence</th>
+                    <th className="p-2 md:p-3 text-left text-xs md:text-sm font-medium text-gray-700 uppercase tracking-wider">Participation</th>
+                    <th className="p-2 md:p-3 text-left text-xs md:text-sm font-medium text-gray-700 uppercase tracking-wider">Retard (min)</th>
+                  </tr>
+                  </thead>
+                  <tbody className="divide-y divide-gray-200">
+                  {elevesList.map((eleve) => (
+                      <tr key={eleve.id} className="hover:bg-gray-50">
+                        <td className="p-2 md:p-3 text-sm md:text-base">{eleve.nom}</td>
+                        <td className="p-2 md:p-3 text-sm md:text-base">{eleve.prenom}</td>
+                        <td className="p-2 md:p-3">
+                          <div className="flex flex-col md:flex-row md:space-x-2 space-y-1 md:space-y-0">
+                            <label className="inline-flex items-center">
+                              <input
+                                  type="radio"
+                                  name={`presence-${eleve.id}`}
+                                  value="Présent(e)"
+                                  checked={presenceStatus[eleve.id] === 'Présent(e)'}
+                                  onChange={(e) => handlePresenceChange(eleve, e.target.value)}
+                                  className="form-radio h-4 w-4 text-blue-600"
+                              />
+                              <span className="ml-2 text-xs md:text-sm">Présent(e)</span>
+                            </label>
+                            <label className="inline-flex items-center">
+                              <input
+                                  type="radio"
+                                  name={`presence-${eleve.id}`}
+                                  value="Absent(e)"
+                                  checked={presenceStatus[eleve.id] === 'Absent(e)'}
+                                  onChange={(e) => handlePresenceChange(eleve, e.target.value)}
+                                  className="form-radio h-4 w-4 text-blue-600"
+                              />
+                              <span className="ml-2 text-xs md:text-sm">Absent(e)</span>
+                            </label>
+                          </div>
+                        </td>
+                        <td className="p-2 md:p-3">
+                          <input
+                              type="number"
+                              min="1"
+                              max="5"
+                              value={participation[eleve.id] || ''}
+                              onChange={(e) => handleParticipationChange(eleve.id, e.target.value)}
+                              className="w-full p-1 text-sm md:text-base border border-gray-300 rounded"
+                              disabled={presenceStatus[eleve.id] === 'Absent(e)'}
+                          />
+                        </td>
+                        <td className="p-2 md:p-3">
+                          {presenceStatus[eleve.id] === 'Présent(e)' && (
+                              <input
+                                  type="number"
+                                  min="0"
+                                  value={retardMinutes[eleve.id] || ''}
+                                  onChange={(e) => handleRetardMinutesChange(eleve.id, e.target.value)}
+                                  onKeyDown={(e) => handleKeyDown(e, eleve)}
+                                  className="w-full p-1 text-sm md:text-base border border-gray-300 rounded"
+                              />
+                          )}
+                        </td>
+                      </tr>
+                  ))}
+                  </tbody>
+                </table>
+              </div>
+
+              {/* Bouton Enregistrer */}
+              <div className="mt-4">
+                <button
+                    onClick={handleEnregistrer}
+                    className="w-full md:w-auto px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded text-sm md:text-base"
+                >
+                  Enregistrer
+                </button>
+              </div>
+            </>
+        )}
+      </div>
   );
 }
 

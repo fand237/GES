@@ -205,119 +205,121 @@ const NoteForm = () => {
   };
 
   return (
-    <div className="p-4">
-      <h2 className="text-2xl font-bold mb-4">Enregistrement des Notes</h2>
-      {sequenceError && <p className="text-red-500">Veuillez sélectionner une séquence.</p>}
-      {typeEvaluationError && <p className="text-red-500">Veuillez sélectionner un type d'évaluation.</p>}
-      {dateError && <p className="text-red-500">Veuillez sélectionner une date d'évaluation.</p>}
-      {notesError && <p className="text-red-500">Veuillez saisir des notes valides (entre 0 et 20).</p>}
+      <div className="p-2 md:p-4">
+        <h2 className="text-xl md:text-2xl font-bold mb-4">Enregistrement des Notes</h2>
+        {sequenceError && <p className="text-red-500 text-sm md:text-base">Veuillez sélectionner une séquence.</p>}
+        {typeEvaluationError && <p className="text-red-500 text-sm md:text-base">Veuillez sélectionner un type d'évaluation.</p>}
+        {dateError && <p className="text-red-500 text-sm md:text-base">Veuillez sélectionner une date d'évaluation.</p>}
+        {notesError && <p className="text-red-500 text-sm md:text-base">Veuillez saisir des notes valides (entre 0 et 20).</p>}
 
-      <div className="flex flex-wrap items-center space-x-4 mb-4">
-  {/* Sélectionnez un cours */}
-  <div className="flex-1">
-    <label className="block font-medium mb-2">Sélectionnez un cours :</label>
-    <select
-      onChange={(e) => handleCoursChange(e.target.value)}
-      value={selectedCours ? selectedCours.id : ''}
-      className="block w-full p-2 border border-gray-300 rounded"
-    >
-      <option value="" disabled>Sélectionnez un Cours</option>
-      {coursList.map((cours) => (
-        <option key={cours.id} value={cours.id}>
-          {cours.matiere} {cours.classe.classe}
-        </option>
-      ))}
-    </select>
-  </div>
-
-  {/* Sélectionnez une séquence */}
-  <div className="flex-1">
-    <label className="block font-medium mb-2">Sélectionnez une séquence :</label>
-    <select
-      onChange={(e) => handlesequenceChange(e.target.value)}
-      value={selectedSequence ? selectedSequence.id : ''}
-      className="block w-full p-2 border border-gray-300 rounded"
-    >
-      <option value="" disabled>Sélectionnez une séquence</option>
-      {sequences.map((sequence) => (
-        <option key={sequence.id} value={sequence.id}>
-          {sequence.sequence}
-        </option>
-      ))}
-    </select>
-  </div>
-
-  {/* Date d'évaluation */}
-  <div className="flex-1">
-    <label className="block font-medium mb-2">Date d'évaluation :</label>
-    <input
-      type="date"
-      value={dateEvaluation}
-      onChange={(e) => setDateEvaluation(e.target.value)}
-      className="block w-full p-2 border border-gray-300 rounded"
-    />
-  </div>
-
-  {/* Sélectionnez le type d'évaluation */}
-  <div className="flex-1">
-    <label className="block font-medium mb-2">Sélectionnez le type d'évaluation :</label>
-    <select
-      onChange={(e) => handletypeChange(e.target.value)}
-      value={selectedTypeEvaluation ? selectedTypeEvaluation.id : ''}
-      className="block w-full p-2 border border-gray-300 rounded"
-    >
-      <option value="" disabled>Sélectionnez le type d'évaluation</option>
-      {typesEvaluation.map((type) => (
-        <option key={type.id} value={type.id}>
-          {type.type}
-        </option>
-      ))}
-    </select>
-  </div>
-</div>
-
-
-      <div className="mb-4">
-        <table className="min-w-full bg-white border border-gray-300">
-          <thead>
-            <tr className="bg-gray-200">
-              <th className="p-4 border-b">Nom de l'élève</th>
-              <th className="p-4 border-b">Note</th>
-            </tr>
-          </thead>
-          <tbody>
-            {eleves.map((eleve) => (
-              <tr key={eleve.id} className="border-b">
-                <td className="p-4">{`${eleve.nom} ${eleve.prenom}`}</td>
-                <td className="p-4">
-                  <input
-                    type="number"
-                    min="0"
-                    max="20"
-                    value={notes[eleve.id] || ''}
-                    onChange={(e) => handleNoteChange(eleve.id, e.target.value)}
-                    className="w-full p-1 border border-gray-300 rounded"
-                  />
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-
-      <button
-        onClick={handleSaveNotes}
-        className="save-button"
-      >
-        Enregistrer les Notes
-      </button>
-      {showSuccessMessage && (
-          <div className="success-message">
-            Notes ajoutés avec succès !
+        {/* Conteneur des sélecteurs */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3 mb-4">
+          {/* Sélection du cours */}
+          <div className="mb-2">
+            <label className="block font-medium mb-1 text-sm md:text-base">Cours :</label>
+            <select
+                onChange={(e) => handleCoursChange(e.target.value)}
+                value={selectedCours ? selectedCours.id : ''}
+                className="block w-full p-2 text-sm md:text-base border border-gray-300 rounded"
+            >
+              <option value="" disabled>Sélectionnez un Cours</option>
+              {coursList.map((cours) => (
+                  <option key={cours.id} value={cours.id}>
+                    {cours.matiere} {cours.classe.classe}
+                  </option>
+              ))}
+            </select>
           </div>
-        )}
-    </div>
-    
+
+          {/* Sélection de la séquence */}
+          <div className="mb-2">
+            <label className="block font-medium mb-1 text-sm md:text-base">Séquence :</label>
+            <select
+                onChange={(e) => handlesequenceChange(e.target.value)}
+                value={selectedSequence ? selectedSequence.id : ''}
+                className="block w-full p-2 text-sm md:text-base border border-gray-300 rounded"
+            >
+              <option value="" disabled>Sélectionnez une séquence</option>
+              {sequences.map((sequence) => (
+                  <option key={sequence.id} value={sequence.id}>
+                    {sequence.sequence}
+                  </option>
+              ))}
+            </select>
+          </div>
+
+          {/* Date d'évaluation */}
+          <div className="mb-2">
+            <label className="block font-medium mb-1 text-sm md:text-base">Date :</label>
+            <input
+                type="date"
+                value={dateEvaluation}
+                onChange={(e) => setDateEvaluation(e.target.value)}
+                className="block w-full p-2 text-sm md:text-base border border-gray-300 rounded"
+            />
+          </div>
+
+          {/* Type d'évaluation */}
+          <div className="mb-2">
+            <label className="block font-medium mb-1 text-sm md:text-base">Type :</label>
+            <select
+                onChange={(e) => handletypeChange(e.target.value)}
+                value={selectedTypeEvaluation ? selectedTypeEvaluation.id : ''}
+                className="block w-full p-2 text-sm md:text-base border border-gray-300 rounded"
+            >
+              <option value="" disabled>Sélectionnez le type</option>
+              {typesEvaluation.map((type) => (
+                  <option key={type.id} value={type.id}>
+                    {type.type}
+                  </option>
+              ))}
+            </select>
+          </div>
+        </div>
+
+        {/* Tableau des notes */}
+        <div className="mb-4 overflow-x-auto">
+          <table className="min-w-full bg-white border border-gray-300">
+            <thead>
+            <tr className="bg-gray-200">
+              <th className="p-2 md:p-4 border-b text-sm md:text-base">Nom de l'élève</th>
+              <th className="p-2 md:p-4 border-b text-sm md:text-base">Note</th>
+            </tr>
+            </thead>
+            <tbody>
+            {eleves.map((eleve) => (
+                <tr key={eleve.id} className="border-b">
+                  <td className="p-2 md:p-4 text-sm md:text-base">{`${eleve.nom} ${eleve.prenom}`}</td>
+                  <td className="p-2 md:p-4">
+                    <input
+                        type="number"
+                        min="0"
+                        max="20"
+                        value={notes[eleve.id] || ''}
+                        onChange={(e) => handleNoteChange(eleve.id, e.target.value)}
+                        className="w-full p-1 text-sm md:text-base border border-gray-300 rounded"
+                    />
+                  </td>
+                </tr>
+            ))}
+            </tbody>
+          </table>
+        </div>
+
+        <div className="flex flex-col items-center">
+          <button
+              onClick={handleSaveNotes}
+              className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 text-sm md:text-base"
+          >
+            Enregistrer les Notes
+          </button>
+          {showSuccessMessage && (
+              <div className="mt-2 p-2 bg-green-100 text-green-700 rounded text-sm md:text-base">
+                Notes ajoutées avec succès !
+              </div>
+          )}
+        </div>
+      </div>
   );
 };
 
