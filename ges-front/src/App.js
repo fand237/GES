@@ -3,7 +3,6 @@ import { BrowserRouter as Router, Route, Routes, Link, Navigate, BrowserRouter, 
 /*import 'crypto-browserify';
 import 'stream-browserify';
 import jwt from 'jsonwebtoken';*/
-import './i18n';
 import Home from "./components/Home";
 import Navbar from "./components/Navbar";
 import AdminForm from './components/AdminForm';
