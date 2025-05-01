@@ -2,6 +2,9 @@ const { Sequelize } = require('sequelize');
 const {sendNotification} = require("../middlewares/socketMiddleware");
 const { Conversation, Eleve, Enseignant,Classe,Cours,Message} = require("../models");
 const {validateToken} = require("../middlewares/AuthMiddleware");
+const upload = require("../config/multerConfig");
+const path = require('path');
+const fs = require('fs');
 
 module.exports = (io, sendNotification) => {
     const router = require('express').Router();
@@ -742,12 +745,12 @@ module.exports = (io, sendNotification) => {
         }
     });
 
-    // Envoyer une annonce instantanée
 // Modifiez la route /annonceInst
-    router.post('/annonceInst', validateToken, async (req, res) => {
+    router.post('/annonceInst', validateToken, upload.single('file'), async (req, res) => {
         try {
             const { contenu, classeId } = req.body;
             const enseignantId = req.utilisateur.id;
+            const fichierJoint = req.file ? req.file.filename : null;
 
             // Vérification des permissions
             const classe = await Classe.findOne({
@@ -760,6 +763,10 @@ module.exports = (io, sendNotification) => {
             });
 
             if (!classe) {
+                // Supprimer le fichier uploadé si la permission est refusée
+                if (fichierJoint) {
+                    fs.unlinkSync(path.join(__dirname, '../uploads', fichierJoint));
+                }
                 return res.status(403).json({ error: "Action non autorisée" });
             }
 
@@ -778,7 +785,8 @@ module.exports = (io, sendNotification) => {
                 envoyeurId: enseignantId,
                 conversationId: conversation.id,
                 envoyeurType: 'enseignant',
-                estAnnonce: true
+                estAnnonce: true,
+                fichierJoint
             });
 
             // Récupération complète du message avec les relations
@@ -806,10 +814,13 @@ module.exports = (io, sendNotification) => {
 
         } catch (error) {
             console.error(error);
+            // Supprimer le fichier uploadé en cas d'erreur
+            if (req.file) {
+                fs.unlinkSync(path.join(__dirname, '../uploads', req.file.filename));
+            }
             res.status(500).json({ error: 'Erreur serveur' });
         }
     });
-
     // Récupérer l'historique des annonces par classe
     router.get('/annonceClasse/:classeId', validateToken, async (req, res) => {
         try {
@@ -850,16 +861,65 @@ module.exports = (io, sendNotification) => {
             });
 
             if (!conversation) {
-
                 return res.json([]);
             }
-            res.json(conversation.messages);
+
+            // Ajouter l'URL de téléchargement pour chaque message avec fichier
+            const messagesWithDownload = conversation.messages.map(message => {
+                if (message.fichierJoint) {
+                    return {
+                        ...message.toJSON(),
+                        downloadUrl: `${config.api.baseUrl}/download/${message.fichierJoint}`
+                    };
+                }
+                return message.toJSON();
+            });
+
+            res.json(messagesWithDownload);
         } catch (error) {
             console.error(error);
             res.status(500).json({ error: 'Erreur serveur' });
         }
     });
 
+    router.get('/download/:filename', validateToken, async (req, res) => {
+        try {
+            const { filename } = req.params;
+            const uploadDir = path.join(__dirname, '../uploads');
+            const filePath = path.join(uploadDir, filename);
+
+            console.log(`Tentative de téléchargement: ${filePath}`); // Log de débogage
+
+            // Vérifier que le fichier existe
+            if (!fs.existsSync(filePath)) {
+                console.error(`Fichier non trouvé: ${filePath}`);
+                return res.status(404).json({ error: 'Fichier non trouvé' });
+            }
+
+            // Vérification des permissions
+            const message = await Message.findOne({ where: { fichierJoint: filename } });
+            if (!message) {
+                return res.status(404).json({ error: 'Message non trouvé' });
+            }
+
+            const conversation = await Conversation.findByPk(message.conversationId);
+
+
+            // Envoyer le fichier avec le bon Content-Type
+            res.download(filePath, filename, (err) => {
+                if (err) {
+                    console.error('Erreur lors du téléchargement:', err);
+                    if (!res.headersSent) {
+                        res.status(500).json({ error: 'Erreur de serveur' });
+                    }
+                }
+            });
+
+        } catch (error) {
+            console.error('Erreur:', error);
+            res.status(500).json({ error: 'Erreur serveur' });
+        }
+    });
     // Nouvelle route pour les élèves
     router.get('/annonceClasseEleve/:classeId', validateToken, async (req, res) => {
         try {

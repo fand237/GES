@@ -33,6 +33,10 @@ module.exports = (sequelize, DataTypes) => {
         pinned: {
             type: DataTypes.BOOLEAN,
             defaultValue: false,
+        },
+        fichierJoint: {
+            type: DataTypes.STRING,
+            allowNull: true
         }
     });
 

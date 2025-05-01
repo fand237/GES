@@ -1,22 +1,21 @@
-// components/AnnoncesEnseignant.js
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import UseAuthEnseignant from './UseAuth';
 import { io } from 'socket.io-client';
 import config from "../config/config";
 
-
 const AnnonceEnseignant = () => {
     const { idens } = UseAuthEnseignant();
     const [classes, setClasses] = useState([]);
     const [selectedClasse, setSelectedClasse] = useState('');
     const [annonce, setAnnonce] = useState('');
+    const [file, setFile] = useState(null);
+    const [fileName, setFileName] = useState('');
     const [historique, setHistorique] = useState([]);
     const [loading, setLoading] = useState(false);
     const [socket, setSocket] = useState(null);
 
     useEffect(() => {
-        // Charger les classes dont l'enseignant est responsable
         const fetchClasses = async () => {
             try {
                 const response = await axios.get(
@@ -36,7 +35,6 @@ const AnnonceEnseignant = () => {
 
         fetchClasses();
 
-        // Configurer Socket.IO
         const newSocket = io(`${config.api.baseUrl}`, {
             auth: { token: localStorage.getItem("accessToken") }
         });
@@ -65,20 +63,47 @@ const AnnonceEnseignant = () => {
         }
     };
 
+    const handleFileChange = (e) => {
+        const selectedFile = e.target.files[0];
+        if (selectedFile) {
+            setFile(selectedFile);
+            setFileName(selectedFile.name);
+        }
+    };
+
+    const removeFile = () => {
+        setFile(null);
+        setFileName('');
+    };
+
     const handleSubmit = async (e) => {
         e.preventDefault();
-        if (!selectedClasse || !annonce.trim()) return;
+        if (!selectedClasse || (!annonce.trim() && !file)) return;
 
         setLoading(true);
         try {
+            const formData = new FormData();
+            formData.append('contenu', annonce);
+            formData.append('classeId', selectedClasse);
+            if (file) {
+                formData.append('file', file);
+            }
+
             const response = await axios.post(
                 `${config.api.baseUrl}/Conversation/annonceInst`,
-                { contenu: annonce, classeId: selectedClasse },
-                { headers: { accessToken: localStorage.getItem("accessToken") } }
+                formData,
+                {
+                    headers: {
+                        'Content-Type': 'multipart/form-data',
+                        accessToken: localStorage.getItem("accessToken")
+                    }
+                }
             );
 
             setAnnonce('');
-            // Pas besoin de recharger l'historique, le socket s'en charge
+            setFile(null);
+            setFileName('');
+            loadHistorique(selectedClasse); // Recharger l'historique
         } catch (error) {
             console.error("Erreur d'envoi d'annonce:", error);
         } finally {
@@ -116,8 +141,34 @@ const AnnonceEnseignant = () => {
                             className="w-full p-2 border rounded"
                             rows="3"
                             placeholder="Écrivez votre annonce ici..."
-                            required
                         />
+                    </div>
+
+                    <div>
+                        <label className="block text-gray-700 mb-2">Fichier joint</label>
+                        {!file ? (
+                            <div className="flex items-center">
+                                <label className="cursor-pointer bg-gray-100 hover:bg-gray-200 px-4 py-2 rounded border border-gray-300">
+                                    <span>Sélectionner un fichier</span>
+                                    <input
+                                        type="file"
+                                        onChange={handleFileChange}
+                                        className="hidden"
+                                    />
+                                </label>
+                            </div>
+                        ) : (
+                            <div className="flex items-center justify-between p-2 bg-gray-100 rounded">
+                                <span className="truncate">{fileName}</span>
+                                <button
+                                    type="button"
+                                    onClick={removeFile}
+                                    className="text-red-500 hover:text-red-700 ml-2"
+                                >
+                                    ×
+                                </button>
+                            </div>
+                        )}
                     </div>
 
                     <button
@@ -145,7 +196,22 @@ const AnnonceEnseignant = () => {
                                         {new Date(msg.createdAt).toLocaleString()}
                                     </span>
                                 </div>
-                                <p className="text-sm text-gray-600">
+                                {msg.fichierJoint && (
+                                    <div className="mt-2">
+                                        <a
+                                            href={`${config.api.baseUrl}/uploads/${msg.fichierJoint}`}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            className="text-blue-500 hover:underline flex items-center"
+                                        >
+                                            <svg className="w-5 h-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3V10" />
+                                            </svg>
+                                            {msg.fichierJoint.split('_').pop()}
+                                        </a>
+                                    </div>
+                                )}
+                                <p className="text-sm text-gray-600 mt-2">
                                     Envoyé par: {msg.envoyeurEnseignant?.prenom} {msg.envoyeurEnseignant?.nom}
                                 </p>
                             </div>
@@ -156,6 +222,5 @@ const AnnonceEnseignant = () => {
         </div>
     );
 };
-
 
 export default AnnonceEnseignant;

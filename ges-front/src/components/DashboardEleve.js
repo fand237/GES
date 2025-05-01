@@ -54,6 +54,12 @@ const DashboardEleve = () => {
             path: '/DashboardEleve/ChatInterfaceAll',
             label: 'Chat',
             icon: <FiMessageSquare className="flex-shrink-0" />
+        },
+        {
+            tab: 'TimeTableClasse',
+            path: '/DashboardEleve/TimeTableClasse',
+            label: 'Emplois de temps',
+            icon: <FiMessageSquare className="flex-shrink-0" />
         }
     ];
 

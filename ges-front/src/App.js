@@ -30,6 +30,7 @@ import EleveAll from './components/EleveAll'
 import EleveUpdate from './components/EleveUpdate'
 import EleveDelete from './components/EleveDelete'
 import AnnonceEleve from "./components/AnnonceEleve";
+import TimeTableClasse from "./components/TimeTableClasse";
 
 import EnseignantUpdate from './components/EnseignantUpdate';
 import EnseignantDelete from './components/EnseignantDelete';
@@ -258,6 +259,8 @@ function App() {
             <Route path="/DashboardEleve" element={<ProtectedRoute requiredRole="Eleve"> <DashboardEleve /></ProtectedRoute>}>
               <Route path="BulletinSequence" element={<ProtectedRoute requiredRole="Eleve"> <BulletinSequence /> </ProtectedRoute>} />
               <Route path="ChatInterfaceAll" element={<ProtectedRoute requiredRole="Eleve"> <ChatInterfaceAll /> </ProtectedRoute>} />
+              <Route path="TimeTableClasse" element={<ProtectedRoute requiredRole="Eleve"> <TimeTableClasse /> </ProtectedRoute>} />
+
 
             </Route>
 

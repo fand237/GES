@@ -5,19 +5,20 @@ import UseAuthEnseignant from './UseAuth';
 import config from "../config/config";
 
 const ChatInterfaceDesEnseignant = ({ classeId }) => {
-    const {  idens } = UseAuthEnseignant();
+    const { idens } = UseAuthEnseignant();
     const [conversations, setConversations] = useState([]);
     const [selectedConversation, setSelectedConversation] = useState(null);
     const [messages, setMessages] = useState([]);
     const [newMessage, setNewMessage] = useState('');
     const [eleves, setEleves] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [menuOpen, setMenuOpen] = useState(false);
     const socketRef = useRef();
+    const messagesEndRef = useRef();
 
     useEffect(() => {
         const fetchData = async () => {
             try {
-                // Charger les conversations et les élèves de la classe
                 const [conversationsRes, elevesRes] = await Promise.all([
                     axios.get(`${config.api.baseUrl}/Conversation/Enseignant/${idens}`, {
                         headers: { accessToken: localStorage.getItem("accessToken") }
@@ -28,21 +29,12 @@ const ChatInterfaceDesEnseignant = ({ classeId }) => {
                 ]);
 
                 setConversations(conversationsRes.data);
-                console.log("les conversations des enseignants sont:", conversationsRes.data);
-
-                // Filtrer les élèves avec qui l'enseignant a déjà une conversation
                 const existingParticipants = new Set(
                     conversationsRes.data.flatMap(conv =>
                         conv.participants.map(p => p.id)
                     )
                 );
-console.log("les elevs sont ",elevesRes.data)
-                setEleves(
-                    elevesRes.data.filter(e =>
-                        !existingParticipants.has(e.id)
-                    )
-                );
-
+                setEleves(elevesRes.data.filter(e => !existingParticipants.has(e.id)));
                 setLoading(false);
             } catch (error) {
                 console.error("Erreur de chargement:", error);
@@ -52,25 +44,16 @@ console.log("les elevs sont ",elevesRes.data)
 
         fetchData();
 
-        // Configuration Socket.io
         const socket = io(`${config.api.baseUrl}`, {
             transports: ['websocket'],
-            auth: {
-                token: localStorage.getItem("accessToken")
-            },
+            auth: { token: localStorage.getItem("accessToken") },
             withCredentials: true,
-            extraHeaders: {
-                "Access-Control-Allow-Origin": "http://localhost:3000"
-            }
+            extraHeaders: { "Access-Control-Allow-Origin": "http://localhost:3000" }
         });
 
         socket.on('connect', () => {
             const token = localStorage.getItem("accessToken");
-            if (token) {
-                socket.emit('authenticate', token);
-            } else {
-                console.error('Aucun token trouvé dans le localStorage');
-            }
+            if (token) socket.emit('authenticate', token);
         });
 
         socketRef.current = socket;
@@ -81,38 +64,22 @@ console.log("les elevs sont ",elevesRes.data)
             }
         });
 
-        socket.on('connect_error', (err) => {
-            console.error('Connection error:', err);
-        });
-
-        socket.on('disconnect', (reason) => {
-            console.log('Disconnected:', reason);
-        });
-
-        if (selectedConversation) {
-            socket.emit('joinConversation', selectedConversation.id);
-        }
-
-        return () => {
-            socket.disconnect();
-        };
-
+        return () => socket.disconnect();
     }, [idens, classeId, selectedConversation]);
+
+    useEffect(() => {
+        messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    }, [messages]);
 
     const loadMessages = async (conversation) => {
         try {
             setSelectedConversation(conversation);
-
             const response = await axios.get(
                 `${config.api.baseUrl}/Conversation/Enseignant/${conversation.id}/messages`,
                 { headers: { accessToken: localStorage.getItem("accessToken") } }
             );
             setMessages(response.data);
-
-            if (socketRef.current) {
-                socketRef.current.emit('joinConversation', conversation.id);
-            }
-
+            if (socketRef.current) socketRef.current.emit('joinConversation', conversation.id);
         } catch (error) {
             console.error("Erreur de chargement des messages:", error);
         }
@@ -122,17 +89,9 @@ console.log("les elevs sont ",elevesRes.data)
         try {
             const response = await axios.post(
                 `${config.api.baseUrl}/Conversation/Enseignant`,
-                {
-                    enseignantId: idens,
-                    eleveId
-                },
-                {
-                    headers: {
-                        accessToken: localStorage.getItem("accessToken"),
-                    },
-                }
+                { enseignantId: idens, eleveId },
+                { headers: { accessToken: localStorage.getItem("accessToken") } }
             );
-
             setConversations(prev => [...prev, response.data]);
             setEleves(prev => prev.filter(e => e.id !== eleveId));
             loadMessages(response.data);
@@ -143,14 +102,12 @@ console.log("les elevs sont ",elevesRes.data)
 
     const sendMessage = async () => {
         if (!newMessage.trim() || !selectedConversation) return;
-
         try {
             await axios.post(
                 `${config.api.baseUrl}/Conversation/Enseignant/${selectedConversation.id}/messages`,
                 { contenu: newMessage, envoyeurId: idens },
                 { headers: { accessToken: localStorage.getItem("accessToken") } }
             );
-
             setNewMessage('');
         } catch (error) {
             console.error("Erreur d'envoi de message:", error);
@@ -164,112 +121,141 @@ console.log("les elevs sont ",elevesRes.data)
     if (loading) return <div className="flex justify-center p-8">Chargement...</div>;
 
     return (
-        <div className="flex h-screen bg-gray-100">
+        <div className="flex h-screen overflow-hidden">
             {/* Sidebar */}
-            <div className="w-1/3 bg-white border-r">
-                <div className="p-4 border-b">
-                    <h2 className="text-xl font-bold">Messagerie Élèves</h2>
-                    <button
-                        onClick={() => document.getElementById('new-chat-modal').showModal()}
-                        className="mt-2 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
-                    >
-                        Nouvelle conversation
-                    </button>
-                </div>
+            <div className="w-1/4 bg-white border-r border-gray-300">
+                <header className="p-4 border-b border-gray-300 flex justify-between items-center bg-indigo-600 text-white">
+                    <h1 className="text-xl font-semibold">Messagerie</h1>
+                    <div className="relative">
+                        <button
+                            onClick={() => setMenuOpen(!menuOpen)}
+                            className="focus:outline-none"
+                        >
+                            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-gray-100" viewBox="0 0 20 20" fill="currentColor">
+                                <path d="M10 12a2 2 0 100-4 2 2 0 000 4z" />
+                                <path d="M2 10a2 2 0 012-2h12a2 2 0 012 2 2 2 0 01-2 2H4a2 2 0 01-2-2z" />
+                            </svg>
+                        </button>
+                        {menuOpen && (
+                            <div className="absolute right-0 mt-2 w-48 bg-white border border-gray-300 rounded-md shadow-lg">
+                                <ul className="py-2 px-3">
+                                    <li>
+                                        <button
+                                            onClick={() => {
+                                                document.getElementById('new-chat-modal').showModal();
+                                                setMenuOpen(false);
+                                            }}
+                                            className="block px-4 py-2 text-gray-800 hover:text-gray-400 w-full text-left"
+                                        >
+                                            Nouvelle conversation
+                                        </button>
+                                    </li>
+                                </ul>
+                            </div>
+                        )}
+                    </div>
+                </header>
 
-                {/* Liste des conversations existantes */}
-                <div className="overflow-y-auto h-[calc(100%-60px)]">
+                <div className="overflow-y-auto h-screen p-3 mb-9 pb-20">
                     {conversations.map(conv => (
                         <div
                             key={conv.id}
-                            className={`p-4 border-b cursor-pointer hover:bg-gray-50 ${
-                                selectedConversation?.id === conv.id ? 'bg-blue-50' : ''
+                            className={`flex items-center mb-4 cursor-pointer hover:bg-gray-100 p-2 rounded-md ${
+                                selectedConversation?.id === conv.id ? 'bg-gray-200' : ''
                             }`}
                             onClick={() => loadMessages(conv)}
                         >
-                            <div className="flex items-center">
-                                <div className="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center mr-3">
-                                    <span className="text-green-600 font-medium">
+                            <div className="w-12 h-12 bg-gray-300 rounded-full mr-3">
+                                <div className="w-12 h-12 rounded-full bg-indigo-100 flex items-center justify-center">
+                                    <span className="text-indigo-600 font-medium">
                                         {getInterlocutor(conv)?.prenom.charAt(0)}
                                         {getInterlocutor(conv)?.nom.charAt(0)}
                                     </span>
                                 </div>
-                                <div>
-                                    <p className="font-medium">
-                                        {getInterlocutor(conv)?.prenom} {getInterlocutor(conv)?.nom} {getInterlocutor(conv)?.classeEleve.classe}
-                                    </p>
-                                    {conv.messages[0] && (
-                                        <p className="text-sm text-gray-500 truncate">
-                                            {conv.messages[0].contenu}
-                                        </p>
-                                    )}
-                                </div>
+                            </div>
+                            <div className="flex-1">
+                                <h2 className="text-lg font-semibold">
+                                    {getInterlocutor(conv)?.prenom} {getInterlocutor(conv)?.nom}
+                                </h2>
+                                <p className="text-gray-600 truncate">
+                                    {conv.messages[0]?.contenu || 'Aucun message'}
+                                </p>
                             </div>
                         </div>
                     ))}
                 </div>
             </div>
 
-            {/* Zone de conversation principale */}
+            {/* Main Chat Area */}
             <div className="flex-1 flex flex-col">
                 {selectedConversation ? (
                     <>
-                        <div className="p-4 border-b bg-white flex items-center">
-                            <div className="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center mr-3">
-                                <span className="text-green-600 font-medium">
-                                    {getInterlocutor(selectedConversation)?.prenom.charAt(0)}
-                                    {getInterlocutor(selectedConversation)?.nom.charAt(0)}
+                        <header className="bg-white p-4 text-gray-700 border-b border-gray-300">
+                            <h1 className="text-xl font-semibold">
+                                {getInterlocutor(selectedConversation)?.prenom} {getInterlocutor(selectedConversation)?.nom}
+                                <span className="text-sm text-gray-500 ml-2">
+                                    {getInterlocutor(selectedConversation)?.classeEleve?.classe}
                                 </span>
-                            </div>
-                            <h3 className="text-lg font-semibold">
-                                {getInterlocutor(selectedConversation)?.prenom} {getInterlocutor(selectedConversation)?.nom} {getInterlocutor(selectedConversation)?.classeEleve.classe}
-                            </h3>
-                        </div>
+                            </h1>
+                        </header>
 
-                        <div className="flex-1 overflow-y-auto p-4 bg-gray-50">
+                        <div className="flex-1 overflow-y-auto p-4">
                             {messages.map(msg => (
                                 <div
                                     key={msg.id}
-                                    className={`mb-4 flex ${
-                                        msg.envoyeurType === 'enseignant' ? 'justify-end' : 'justify-start'
-                                    }`}
+                                    className={`flex mb-4 ${msg.envoyeurType === 'enseignant' ? 'justify-end' : ''}`}
                                 >
-                                    <div className={`max-w-xs px-4 py-2 rounded-lg ${
+                                    {msg.envoyeurType !== 'enseignant' && (
+                                        <div className="w-9 h-9 rounded-full flex items-center justify-center mr-2">
+                                            <div className="w-9 h-9 rounded-full bg-indigo-100 flex items-center justify-center">
+                                                <span className="text-indigo-600 text-sm font-medium">
+                                                    {getInterlocutor(selectedConversation)?.prenom.charAt(0)}
+                                                    {getInterlocutor(selectedConversation)?.nom.charAt(0)}
+                                                </span>
+                                            </div>
+                                        </div>
+                                    )}
+                                    <div className={`flex max-w-96 rounded-lg p-3 gap-3 ${
                                         msg.envoyeurType === 'enseignant'
-                                            ? 'bg-green-500 text-white'
-                                            : 'bg-white border border-gray-200'
+                                            ? 'bg-indigo-500 text-white rounded-br-none'
+                                            : 'bg-white border border-gray-200 rounded-bl-none'
                                     }`}>
                                         <p>{msg.contenu}</p>
-                                        <p className="text-xs opacity-70 mt-1">
-                                            {new Date(msg.createdAt).toLocaleTimeString()}
-                                        </p>
                                     </div>
+                                    {msg.envoyeurType === 'enseignant' && (
+                                        <div className="w-9 h-9 rounded-full flex items-center justify-center ml-2">
+                                            <div className="w-9 h-9 rounded-full bg-indigo-100 flex items-center justify-center">
+                                                <span className="text-indigo-600 text-sm font-medium">ME</span>
+                                            </div>
+                                        </div>
+                                    )}
                                 </div>
                             ))}
+                            <div ref={messagesEndRef} />
                         </div>
 
-                        <div className="p-4 border-t bg-white">
-                            <div className="flex">
+                        <footer className="bg-white border-t border-gray-300 p-4">
+                            <div className="flex items-center">
                                 <input
                                     type="text"
                                     value={newMessage}
                                     onChange={(e) => setNewMessage(e.target.value)}
                                     onKeyPress={(e) => e.key === 'Enter' && sendMessage()}
-                                    className="flex-1 border p-2 rounded-l focus:outline-none focus:ring-2 focus:ring-green-500"
-                                    placeholder="Écrivez un message..."
+                                    placeholder="Type a message..."
+                                    className="w-full p-2 rounded-md border border-gray-400 focus:outline-none focus:border-blue-500"
                                 />
                                 <button
                                     onClick={sendMessage}
-                                    className="bg-green-500 text-white px-4 py-2 rounded-r hover:bg-green-600"
+                                    className="bg-indigo-500 text-white px-4 py-2 rounded-md ml-2 hover:bg-indigo-600"
                                 >
                                     Envoyer
                                 </button>
                             </div>
-                        </div>
+                        </footer>
                     </>
                 ) : (
-                    <div className="flex-1 flex items-center justify-center">
-                        <div className="text-center p-6 max-w-md">
+                    <div className="flex-1 flex items-center justify-center bg-gray-50">
+                        <div className="text-center p-6">
                             <div className="mx-auto w-16 h-16 bg-gray-200 rounded-full flex items-center justify-center mb-4">
                                 <svg className="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
@@ -286,7 +272,7 @@ console.log("les elevs sont ",elevesRes.data)
             <dialog id="new-chat-modal" className="modal">
                 <div className="modal-box max-w-md">
                     <div className="flex justify-between items-center mb-4">
-                        <h3 className="text-lg font-bold">Nouvelle conversation avec un élève</h3>
+                        <h3 className="text-lg font-bold">Nouvelle conversation</h3>
                         <button
                             onClick={() => document.getElementById('new-chat-modal').close()}
                             className="text-gray-500 hover:text-gray-700"
@@ -306,14 +292,16 @@ console.log("les elevs sont ",elevesRes.data)
                                         document.getElementById('new-chat-modal').close();
                                     }}
                                 >
-                                    <div className="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center mr-3">
-                                        <span className="text-green-600 font-medium">
-                                            {eleve.prenom.charAt(0)}{eleve.nom.charAt(0)}
-                                        </span>
+                                    <div className="w-12 h-12 bg-gray-300 rounded-full mr-3">
+                                        <div className="w-12 h-12 rounded-full bg-indigo-100 flex items-center justify-center">
+                                            <span className="text-indigo-600 font-medium">
+                                                {eleve.prenom.charAt(0)}{eleve.nom.charAt(0)}
+                                            </span>
+                                        </div>
                                     </div>
                                     <div>
-                                        <p className="font-medium">{eleve.prenom} {eleve.nom} {eleve.classeNom}</p>
-                                        <p className="text-sm text-gray-500">Élève</p>
+                                        <p className="font-medium">{eleve.prenom} {eleve.nom}</p>
+                                        <p className="text-sm text-gray-500">{eleve.classeNom}</p>
                                     </div>
                                 </div>
                             ))
