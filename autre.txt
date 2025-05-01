@@ -1,3 +1,10 @@
 creer un planning qui prendra en compte les dates et le jour de la semaine correspondant en l;en tete des lignes , de tel sorte que les tranches horaires , les duree et les matieres soit range par date
 au tout debut on devra choisir une heure de debit par exemple 7h30 et si on ajouter une tranche horaires on aura le choix entre 30 min, 45 min,1heures, 2 heures jusqu a 4 heures
 et enfonction de la durre la tranche horaire va se calculer automatiquement en fonction de la date de debut si on veyt insierer la premiere tranche horaire sinon on va utiliser l'heure de fin de la derniere tranche horaire
+
+      "scripts": {
+        "extract-i18n": "i18next 'src/**/*.{js,jsx}'"
+    "start": "react-app-rewired start",
+        "build": "react-app-rewired build",
+        "test": "react-app-rewired test"
+      },
