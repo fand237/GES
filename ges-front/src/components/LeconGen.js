@@ -2,8 +2,12 @@ import React, { useState, useRef, useEffect } from 'react';
 import axios from 'axios';
 
 const LeconGen = () => {
+    // Charger les messages depuis le localStorage au démarrage
     const [input, setInput] = useState('');
-    const [messages, setMessages] = useState([]);
+    const [messages, setMessages] = useState(() => {
+        const savedMessages = localStorage.getItem('leconGenHistory');
+        return savedMessages ? JSON.parse(savedMessages) : [];
+    });
     const [isTyping, setIsTyping] = useState(false);
     const messagesEndRef = useRef(null);
     const inputRef = useRef(null);
@@ -12,28 +16,28 @@ const LeconGen = () => {
     const API_KEY = process.env.REACT_APP_OPENAI_API_KEY;
     const MODEL_NAME = "ft:gpt-4o-mini-2024-07-18:personal:lecon-gen-20250416:BMwC7jaZ";
 
+    // Sauvegarder les messages dans le localStorage à chaque changement
+    useEffect(() => {
+        localStorage.setItem('leconGenHistory', JSON.stringify(messages));
+    }, [messages]);
+
     // Exemples de prompts prédéfinis
     const presetPrompts = [
-        "Crée une leçon sur les systèmes d'information en Terminale Technologie de l'information",
-        "Propose une leçon sur les réseaux informatiques pour lycée",
+        "cree une lecon sur l'introduction aux base de donnee en classe de Tle A",
+        "cree une lecon sur la gestion des compte utilisateurs en classe de 5eme",
         "Génère un cours sur les bases de données relationnelles"
     ];
 
-    // Nouvelle fonction de formatage améliorée
+    // Fonction de formatage inchangée
     const formatResponse = (text) => {
         let formattedText = text
             .replace(/(\n|^)([IVX]+\.\s+[A-ZÀ-Ý][^\n]*)/g, '$1$2\n\n')
-            // 2. Séparation après les sous-titres (2.1., 3.2., etc.)
             .replace(/(?:^|\n)(\d+\.\d+\.\s.+?)(?=\s*[A-Z0-9])/g, "\n\n$1")
             .replace(/(?:^|\n)(\d+\.\d+\s.+?)(?=\s*[A-Z0-9])/g, "\n\n$1")
-            // 3. Espacement après les sections spéciales
             .replace(/(🎯 .+?:)/g, "\n$1\n")
-            // 4. Séparation des listes numérotées
             .replace(/\s*(\d+\.)/g, "\n$1")
-            // 5. Nettoyage des sauts de ligne multiples
             .replace(/\n{3,}/g, '\n\n');
 
-        // Vérification finale des sauts de ligne
         return formattedText
             .split('\n')
             .map(line => line.trim() === '' ? line : line)
@@ -41,27 +45,20 @@ const LeconGen = () => {
             .trim();
     };
 
-    // Envoyer un message avec template structuré
+    // Envoyer un message (ajout de timestamp)
     const sendMessage = async () => {
         if (!input.trim()) return;
 
-        const structuredPrompt = `Crée une leçon bien structurée avec :
-- Titres clairs (niveau 1 à 3)
-- Sauts de ligne après chaque titre
-- Listes bien formatées
-- Sections distinctes
-- Contenu pédagogique
-
-Sujet : ${input}`;
-
-        const userMessage = { text: input, from: 'user' };
+        const userMessage = {
+            text: input,
+            from: 'user',
+            timestamp: new Date().toISOString()
+        };
         setMessages(prev => [...prev, userMessage]);
         setInput('');
         setIsTyping(true);
 
         try {
-
-            // Vérification que la clé API est bien chargée
             if (!API_KEY) {
                 throw new Error("Clé API non configurée");
             }
@@ -70,7 +67,7 @@ Sujet : ${input}`;
                 {
                     model: MODEL_NAME,
                     messages: [{ role: "user", content: input }],
-                    temperature: 0.4,  // Plus précis
+                    temperature: 0.4,
                     max_tokens: 4000
                 },
                 {
@@ -85,6 +82,7 @@ Sujet : ${input}`;
             const botMessage = {
                 text: generatedText,
                 from: 'bot',
+                timestamp: new Date().toISOString(),
                 actions: [
                     { label: 'Copier', action: () => navigator.clipboard.writeText(generatedText) },
                     { label: 'Télécharger', action: () => downloadText(generatedText) }
@@ -96,14 +94,15 @@ Sujet : ${input}`;
             console.error('Erreur:', error);
             setMessages(prev => [...prev, {
                 text: 'Erreur lors de la génération. Veuillez réessayer.',
-                from: 'bot'
+                from: 'bot',
+                timestamp: new Date().toISOString()
             }]);
         } finally {
             setIsTyping(false);
         }
     };
 
-    // Télécharger le texte
+    // Télécharger le texte (inchangé)
     const downloadText = (text) => {
         const blob = new Blob([text], { type: 'text/plain' });
         const url = URL.createObjectURL(blob);
@@ -113,7 +112,7 @@ Sujet : ${input}`;
         a.click();
     };
 
-    // Gestion des touches
+    // Gestion des touches (inchangé)
     const handleKeyDown = (e) => {
         if (e.key === 'Enter' && !e.shiftKey) {
             e.preventDefault();
@@ -121,24 +120,41 @@ Sujet : ${input}`;
         }
     };
 
-    // Auto-scroll vers le bas
+    // Auto-scroll vers le bas (inchangé)
     useEffect(() => {
         messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
     }, [messages]);
 
-    // Focus sur l'input au chargement
+    // Focus sur l'input au chargement (inchangé)
     useEffect(() => {
         inputRef.current?.focus();
     }, []);
 
+    // Fonction pour effacer l'historique
+    const clearHistory = () => {
+        if (window.confirm("Voulez-vous vraiment effacer tout l'historique ?")) {
+            localStorage.removeItem('leconGenHistory');
+            setMessages([]);
+        }
+    };
+
+    // JSX inchangé sauf l'ajout du bouton d'effacement dans l'en-tête
     return (
         <div className="flex flex-col h-screen bg-white">
-            {/* Header */}
-            <div className="bg-blue-500 text-white p-4">
+            {/* Header avec bouton de suppression */}
+            <div className="bg-blue-500 text-white p-4 flex justify-between items-center">
                 <h1 className="text-xl font-bold">Générateur de Leçons Pédagogiques</h1>
+                {messages.length > 0 && (
+                    <button
+                        onClick={clearHistory}
+                        className="text-sm bg-white text-blue-500 hover:bg-gray-200 px-2 py-1 rounded"
+                    >
+                        Effacer l'historique
+                    </button>
+                )}
             </div>
 
-            {/* Messages */}
+            {/* Le reste du JSX reste strictement identique */}
             <div className="flex-1 p-4 overflow-y-auto">
                 {/* Message de bienvenue */}
                 <div className="flex items-end mb-4">
@@ -183,7 +199,7 @@ Sujet : ${input}`;
                         </div>
                         {message.from === 'user' && (
                             <img
-                                src="https://i.pravatar.cc/100?img=7"
+                                src="https://i.pravatar.cc/100?img=64"
                                 alt="User"
                                 className="w-8 h-8 rounded-full ml-2"
                             />
