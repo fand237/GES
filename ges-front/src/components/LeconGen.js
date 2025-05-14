@@ -60,6 +60,11 @@ Sujet : ${input}`;
         setIsTyping(true);
 
         try {
+
+            // Vérification que la clé API est bien chargée
+            if (!API_KEY) {
+                throw new Error("Clé API non configurée");
+            }
             const response = await axios.post(
                 'https://api.openai.com/v1/chat/completions',
                 {
