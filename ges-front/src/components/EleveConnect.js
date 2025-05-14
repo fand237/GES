@@ -112,7 +112,7 @@ const Elevelogin = () => {
                     href="#"
                     className="text-sm text-purple-600 hover:underline"
                   >
-                    Mot de passe oublié ?
+                    Mot de passe- oublié ?
                   </a>
                 </div>
 
