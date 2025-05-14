@@ -35,7 +35,7 @@ const EnseignantConnect = () => {
                             typeUtilisateur: response.data.typeUtilisateur,
                             status: true,
                         });
-                        navigate("/DashboardEnseignant");
+                        navigate("/DashboardEnseignant/LeconGen");
                     }
                 });
         } catch (error) {

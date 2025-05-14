@@ -35,7 +35,7 @@ const Elevelogin = () => {
               typeUtilisateur: response.data.typeUtilisateur,
               status: true,
             });
-            navigate("/DashboardEleve");
+            navigate("/DashboardEleve/BulletinSequence");
           }
         });
     } catch (error) {

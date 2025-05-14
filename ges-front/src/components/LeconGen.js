@@ -19,20 +19,40 @@ const LeconGen = () => {
         "Génère un cours sur les bases de données relationnelles"
     ];
 
-    // Formatage de la réponse
+    // Nouvelle fonction de formatage améliorée
     const formatResponse = (text) => {
-        return text
-            .replace(/(?:^|\n)([IVX]+\. .+?)(?=\s*[A-Z0-9])/g, '\n\n$1')
-            .replace(/(?:^|\n)(\d+\.\d+\.\s.+?)(?=\s*[A-Z0-9])/g, '\n\n$1')
-            .replace(/(?:^|\n)(\d+\.\d+\s.+?)(?=\s*[A-Z0-9])/g, '\n\n$1')
-            .replace(/(🎯 .+?:)/g, '\n$1\n')
-            .replace(/\s*(\d+\.)/g, '\n$1')
+        let formattedText = text
+            .replace(/(\n|^)([IVX]+\.\s+[A-ZÀ-Ý][^\n]*)/g, '$1$2\n\n')
+            // 2. Séparation après les sous-titres (2.1., 3.2., etc.)
+            .replace(/(?:^|\n)(\d+\.\d+\.\s.+?)(?=\s*[A-Z0-9])/g, "\n\n$1")
+            .replace(/(?:^|\n)(\d+\.\d+\s.+?)(?=\s*[A-Z0-9])/g, "\n\n$1")
+            // 3. Espacement après les sections spéciales
+            .replace(/(🎯 .+?:)/g, "\n$1\n")
+            // 4. Séparation des listes numérotées
+            .replace(/\s*(\d+\.)/g, "\n$1")
+            // 5. Nettoyage des sauts de ligne multiples
+            .replace(/\n{3,}/g, '\n\n');
+
+        // Vérification finale des sauts de ligne
+        return formattedText
+            .split('\n')
+            .map(line => line.trim() === '' ? line : line)
+            .join('\n')
             .trim();
     };
 
-    // Envoyer un message
+    // Envoyer un message avec template structuré
     const sendMessage = async () => {
         if (!input.trim()) return;
+
+        const structuredPrompt = `Crée une leçon bien structurée avec :
+- Titres clairs (niveau 1 à 3)
+- Sauts de ligne après chaque titre
+- Listes bien formatées
+- Sections distinctes
+- Contenu pédagogique
+
+Sujet : ${input}`;
 
         const userMessage = { text: input, from: 'user' };
         setMessages(prev => [...prev, userMessage]);
@@ -45,8 +65,8 @@ const LeconGen = () => {
                 {
                     model: MODEL_NAME,
                     messages: [{ role: "user", content: input }],
-                    temperature: 0.5,
-                    max_tokens: 2000
+                    temperature: 0.4,  // Plus précis
+                    max_tokens: 4000
                 },
                 {
                     headers: {
@@ -141,7 +161,7 @@ const LeconGen = () => {
                             ? 'bg-gray-100 text-gray-800 rounded-bl-none'
                             : 'bg-blue-500 text-white rounded-br-none'}`}
                         >
-                            <div className="whitespace-pre-line">{message.text}</div>
+                            <pre className="whitespace-pre-wrap font-sans">{message.text}</pre>
                             {message.from === 'bot' && message.actions && (
                                 <div className="flex mt-2 space-x-2">
                                     {message.actions.map((action, i) => (
@@ -175,11 +195,11 @@ const LeconGen = () => {
                             className="w-8 h-8 rounded-full mr-2"
                         />
                         <div className="bg-gray-100 px-4 py-2 rounded-xl rounded-bl-none">
-                            <img
-                                src="https://support.signal.org/hc/article_attachments/360016877511/typing-animation-3x.gif"
-                                alt="Typing..."
-                                className="w-16"
-                            />
+                            <div className="flex space-x-1">
+                                <div className="w-2 h-2 rounded-full bg-gray-400 animate-bounce"></div>
+                                <div className="w-2 h-2 rounded-full bg-gray-400 animate-bounce delay-100"></div>
+                                <div className="w-2 h-2 rounded-full bg-gray-400 animate-bounce delay-200"></div>
+                            </div>
                         </div>
                     </div>
                 )}
