@@ -24,11 +24,11 @@ const Navbar = ({ authState, logout }) => {
   const handleHomeClick = () => {
     if (token && userRole) {
       if (userRole === 'Administrateur') {
-        navigate('/DashboardAdmin');
+        navigate('/DashboardAdmin/EmploisTemps');
       } else if (userRole === 'Enseignant') {
-        navigate('/DashboardEnseignant');
+        navigate('/DashboardEnseignant/LeconGen');
       } else if (userRole === 'Eleve') {
-        navigate('/DashboardEleve');
+        navigate('/DashboardEleve/BulletinSequence');
       }
     } else {
       navigate('/Home');
@@ -78,11 +78,11 @@ const Navbar = ({ authState, logout }) => {
       <h1
         onClick={() => {
           if (userRole === 'Administrateur') {
-            navigate('/DashboardAdmin');
+            navigate('/DashboardAdmin/EmploisTemps');
           } else if (userRole === 'Enseignant') {
-            navigate('/DashboardEnseignant');
+            navigate('/DashboardEnseignant/LeconGen');
           } else if (userRole === 'Eleve') {
-            navigate('/DashboardEleve');
+            navigate('/DashboardEleve/BulletinSequence');
           }
         }}
         className="text-lg font-semibold cursor-pointer hover:text-gray-300"
